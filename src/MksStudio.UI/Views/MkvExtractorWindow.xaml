@@ -1,0 +1,152 @@
+<Window x:Class="MksStudio.UI.Views.MkvExtractorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:MksStudio.UI.ViewModels"
+        mc:Ignorable="d"
+        Title="MKV Subtitle Extractor Studio" Height="700" Width="920"
+        WindowStartupLocation="CenterOwner" AllowDrop="True" Drop="OnWindowDrop"
+        Background="{StaticResource BgDark}" Foreground="{StaticResource TextPrimary}" FontFamily="Segoe UI">
+    <Window.DataContext>
+        <vm:MkvExtractorViewModel/>
+    </Window.DataContext>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- Title -->
+            <RowDefinition Height="Auto"/> <!-- Input Selection -->
+            <RowDefinition Height="*"/>    <!-- Track List -->
+            <RowDefinition Height="Auto"/> <!-- Output Options -->
+            <RowDefinition Height="Auto"/> <!-- Progress & Logs -->
+            <RowDefinition Height="Auto"/> <!-- Action Buttons -->
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Margin="0,0,0,14">
+            <StackPanel Orientation="Vertical">
+                <TextBlock Text="🎬 MKV Subtitle Extractor &amp; Demuxer" FontSize="20" FontWeight="Bold" Foreground="{StaticResource AccentPurple}"/>
+                <TextBlock Text="Ekstraksi subtitle berkecepatan tinggi (SRT, ASS, VTT, PGS) dan font langsung dari file MKV tanpa re-encoding." FontSize="12" Foreground="{StaticResource TextSecondary}" Margin="0,3,0,0"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Input File / Folder Selection Dropzone -->
+        <Border Grid.Row="1" Background="{StaticResource BgCard}" CornerRadius="8" Padding="15,12" Margin="0,0,0,14" BorderBrush="{StaticResource BorderDark}" BorderThickness="1">
+            <StackPanel>
+                <Grid Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Source MKV:" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,12,0"/>
+                    <TextBox Grid.Column="1" Text="{Binding InputPath, UpdateSourceTrigger=PropertyChanged}" Background="{StaticResource BgInput}" Foreground="#FFFFFF" BorderBrush="{StaticResource BorderDark}" Padding="8,5"/>
+                    <Button Grid.Column="2" Content="📁 Browse..." Command="{Binding BrowseInputCommand}" Background="{StaticResource AccentPrimary}" Foreground="#FFFFFF" Margin="8,0,0,0" Padding="14,5"/>
+                </Grid>
+
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox Content="Batch Folder Mode (Proses semua MKV dalam folder sekaligus)" IsChecked="{Binding IsBatchMode}" Foreground="{StaticResource TextPrimary}" Margin="0,0,20,0"/>
+                    <TextBlock Text="💡 Tip: Anda dapat Drag &amp; Drop file .mkv atau folder langsung ke jendela ini." Foreground="{StaticResource TextMuted}" FontStyle="Italic"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Subtitle Tracks & Attachments DataGrid -->
+        <Grid Grid.Row="2" Margin="0,0,0,14">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Table Header Toolbar -->
+            <Grid Grid.Row="0" Margin="0,0,0,6">
+                <TextBlock Text="DETECTED SUBTITLE TRACKS &amp; FONTS:" FontWeight="Bold" FontSize="11" Foreground="{StaticResource AccentPrimary}" VerticalAlignment="Center"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="✓ Select All" Command="{Binding SelectAllTracksCommand}" Padding="8,3" Margin="0,0,6,0" FontSize="11"/>
+                    <Button Content="✗ Deselect All" Command="{Binding DeselectAllTracksCommand}" Padding="8,3" FontSize="11"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- DataGrid -->
+            <DataGrid Grid.Row="1" ItemsSource="{Binding ScannedTracks}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
+                      Background="{StaticResource BgPanel}" Foreground="{StaticResource TextPrimary}" RowBackground="{StaticResource BgDark}" AlternatingRowBackground="{StaticResource BgPanel}"
+                      GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{StaticResource BorderDark}" BorderBrush="{StaticResource BorderDark}" HeadersVisibility="Column">
+                <DataGrid.Resources>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="Background" Value="{StaticResource BgCardElevated}"/>
+                        <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+                        <Setter Property="Padding" Value="10,7"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                        <Setter Property="BorderBrush" Value="{StaticResource BorderDark}"/>
+                        <Setter Property="BorderThickness" Value="0,0,1,1"/>
+                    </Style>
+                </DataGrid.Resources>
+                <DataGrid.Columns>
+                    <DataGridCheckBoxColumn Header="Extract" Binding="{Binding IsSelected}" Width="65"/>
+                    <DataGridTextColumn Header="Track ID" Binding="{Binding Id}" Width="75" IsReadOnly="True" FontFamily="Consolas"/>
+                    <DataGridTextColumn Header="Codec Format" Binding="{Binding Codec}" Width="160" IsReadOnly="True" FontWeight="SemiBold"/>
+                    <DataGridTextColumn Header="Language" Binding="{Binding Language}" Width="85" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Default" Binding="{Binding IsDefault}" Width="70" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Forced" Binding="{Binding IsForced}" Width="70" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Track Name" Binding="{Binding TrackName}" Width="*" IsReadOnly="True"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+
+        <!-- Output Options Card -->
+        <Border Grid.Row="3" Background="{StaticResource BgCard}" CornerRadius="8" Padding="15,12" Margin="0,0,0,14" BorderBrush="{StaticResource BorderDark}" BorderThickness="1">
+            <StackPanel>
+                <TextBlock Text="EXTRACTION TARGET &amp; FORMAT:" FontWeight="Bold" FontSize="11" Foreground="{StaticResource AccentPrimary}" Margin="0,0,0,8"/>
+
+                <!-- Output Format Radios -->
+                <Grid Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <RadioButton Grid.Column="0" Content="Standalone Subtitle (.srt / .ass / .sup)" IsChecked="{Binding OutputMode, Converter={StaticResource TimeSpanToStringConverter}, FallbackValue=True}" GroupName="OutputMode" Foreground="{StaticResource TextPrimary}" FontWeight="SemiBold" Margin="0,0,24,0" Checked="OnModeStandaloneChecked"/>
+                    <RadioButton Grid.Column="1" Content="Pure .mks Subtitle Container" GroupName="OutputMode" Foreground="{StaticResource TextPrimary}" FontWeight="SemiBold" Margin="0,0,24,0" Checked="OnModeMksChecked"/>
+                    <RadioButton Grid.Column="2" Content="Embedded Fonts Only" GroupName="OutputMode" Foreground="{StaticResource TextPrimary}" FontWeight="SemiBold" Checked="OnModeFontsChecked"/>
+                </Grid>
+
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                    <CheckBox Content="Ekstrak file font embedded (TTF/OTF) ke folder ./fonts/" IsChecked="{Binding ExtractFonts}" Foreground="{StaticResource TextSecondary}"/>
+                </StackPanel>
+
+                <!-- Output Folder -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Output Folder:" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,12,0"/>
+                    <TextBox Grid.Column="1" Text="{Binding OutputFolder, UpdateSourceTrigger=PropertyChanged}" Background="{StaticResource BgInput}" Foreground="#FFFFFF" BorderBrush="{StaticResource BorderDark}" Padding="8,5"/>
+                    <Button Grid.Column="2" Content="📁 Select Folder..." Command="{Binding BrowseOutputFolderCommand}" Margin="8,0,0,0" Padding="12,5"/>
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <!-- Progress & Status -->
+        <StackPanel Grid.Row="4" Margin="0,0,0,14">
+            <Grid Margin="0,0,0,4">
+                <TextBlock Text="{Binding StatusText}" Foreground="{StaticResource AccentPrimary}" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding ProgressValue, StringFormat='{}{0}%'}" HorizontalAlignment="Right" Foreground="{StaticResource TextSecondary}" FontWeight="Bold"/>
+            </Grid>
+            <ProgressBar Value="{Binding ProgressValue}" Maximum="100" Height="8" Background="{StaticResource BgPanel}" Foreground="{StaticResource AccentPrimary}" BorderThickness="0"/>
+        </StackPanel>
+
+        <!-- Bottom Action Buttons -->
+        <Grid Grid.Row="5">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                <Button Content="✏️ Open in MKS Editor" Command="{Binding OpenLastInEditorCommand}" Background="{StaticResource AccentGreen}" Foreground="#FFFFFF" FontWeight="Bold" Padding="14,8" BorderThickness="0" Margin="0,0,8,0"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="⚡ Start Extraction" Command="{Binding ExtractCommand}" Background="{StaticResource AccentPurple}" Foreground="#FFFFFF" FontWeight="Bold" Padding="20,8" BorderThickness="0" Margin="0,0,8,0" IsDefault="True"/>
+                <Button Content="Close" Padding="14,8" Background="{StaticResource BgCardElevated}" Foreground="#FFFFFF" BorderThickness="0" Click="OnCloseClicked"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

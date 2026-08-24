@@ -1,0 +1,58 @@
+<Window x:Class="MksStudio.UI.Views.AttachmentWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Embedded Attachments (Fonts &amp; Assets)" Height="480" Width="700"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource BgDark}" Foreground="{StaticResource TextPrimary}" FontFamily="Segoe UI">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header & Action Buttons -->
+        <Grid Margin="0,0,0,16">
+            <StackPanel Orientation="Vertical">
+                <TextBlock Text="🔤 Embedded Font &amp; Asset Attachments" FontSize="18" FontWeight="Bold" Foreground="{StaticResource AccentPrimary}"/>
+                <TextBlock Text="Fonts (TTF/OTF) embedded in .mks are automatically loaded by subtitle renderers for styled typography." FontSize="12" Foreground="{StaticResource TextSecondary}" Margin="0,4,0,0"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <Button Content="➕ Add Font..." Padding="12,6" Background="{StaticResource AccentPrimary}" Foreground="#FFFFFF" BorderThickness="0" Margin="0,0,8,0" Cursor="Hand" Click="OnAddAttachmentClicked"/>
+                <Button Content="💾 Export Font..." Padding="12,6" Background="{StaticResource AccentGreen}" Foreground="#FFFFFF" BorderThickness="0" Margin="0,0,8,0" Cursor="Hand" Click="OnExportAttachmentClicked"/>
+                <Button Content="🗑️ Remove" Padding="12,6" Background="{StaticResource AccentRed}" Foreground="#FFFFFF" BorderThickness="0" Cursor="Hand" Click="OnRemoveAttachmentClicked"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- DataGrid of Attachments -->
+        <DataGrid Grid.Row="1" x:Name="AttachmentsGrid" ItemsSource="{Binding Attachments}" AutoGenerateColumns="False" CanUserAddRows="False"
+                  Background="{StaticResource BgPanel}" Foreground="{StaticResource TextPrimary}" RowBackground="{StaticResource BgDark}" AlternatingRowBackground="{StaticResource BgPanel}"
+                  GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{StaticResource BorderDark}" BorderBrush="{StaticResource BorderDark}" HeadersVisibility="Column" SelectionMode="Single">
+            <DataGrid.Resources>
+                <Style TargetType="DataGridColumnHeader">
+                    <Setter Property="Background" Value="{StaticResource BgCardElevated}"/>
+                    <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+                    <Setter Property="Padding" Value="10,7"/>
+                    <Setter Property="FontWeight" Value="SemiBold"/>
+                    <Setter Property="BorderBrush" Value="{StaticResource BorderDark}"/>
+                    <Setter Property="BorderThickness" Value="0,0,1,1"/>
+                </Style>
+            </DataGrid.Resources>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="File Name" Binding="{Binding FileName}" Width="220" IsReadOnly="False" FontWeight="SemiBold"/>
+                <DataGridTextColumn Header="MIME Type" Binding="{Binding FileMimeType}" Width="180" IsReadOnly="False"/>
+                <DataGridTextColumn Header="Size" Binding="{Binding FileSizeFormatted}" Width="90" IsReadOnly="True" FontFamily="Consolas"/>
+                <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*" IsReadOnly="False"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Bottom Close Button -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <Button Content="Done" Width="100" Padding="10,6" Background="{StaticResource BgCardElevated}" Foreground="#FFFFFF" BorderThickness="0" Cursor="Hand" Click="OnCloseClicked"/>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -1,0 +1,65 @@
+<Window x:Class="MksStudio.UI.Views.TimeShiftWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Time Shift &amp; FPS Converter" Height="390" Width="460"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
+        Background="{StaticResource BgDark}" Foreground="{StaticResource TextPrimary}" FontFamily="Segoe UI">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="⏱️ Time Shift &amp; FPS Converter" FontSize="18" FontWeight="Bold" Foreground="{StaticResource AccentPrimary}" Margin="0,0,0,15"/>
+
+        <!-- Millisecond Shift Card -->
+        <Border Grid.Row="1" Background="{StaticResource BgCard}" CornerRadius="8" Padding="15" Margin="0,0,0,12" BorderBrush="{StaticResource BorderDark}" BorderThickness="1">
+            <StackPanel>
+                <TextBlock Text="Timestamp Shift (Offset in Milliseconds):" Margin="0,0,0,8" Foreground="{StaticResource TextSecondary}" FontWeight="SemiBold"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox x:Name="OffsetBox" Text="{Binding OffsetMilliseconds, UpdateSourceTrigger=PropertyChanged}" Background="{StaticResource BgInput}" Foreground="#FFFFFF" BorderBrush="{StaticResource BorderDark}" Padding="8,6" FontSize="14" FontFamily="Consolas, Segoe UI"/>
+                    <TextBlock Grid.Column="1" Text="ms (+/-)" VerticalAlignment="Center" Margin="10,0,0,0" Foreground="{StaticResource TextMuted}" FontWeight="SemiBold"/>
+                </Grid>
+                <Button Content="⚡ Apply Time Shift" Margin="0,10,0,0" Background="{StaticResource AccentPrimary}" Foreground="#FFFFFF" FontWeight="Bold" Padding="10,6" BorderThickness="0" Cursor="Hand" Click="OnApplyShiftClicked"/>
+            </StackPanel>
+        </Border>
+
+        <!-- FPS Scaling Card -->
+        <Border Grid.Row="2" Background="{StaticResource BgCard}" CornerRadius="8" Padding="15" Margin="0,0,0,12" BorderBrush="{StaticResource BorderDark}" BorderThickness="1">
+            <StackPanel>
+                <TextBlock Text="Frame Rate Scaling (FPS Conversion):" Margin="0,0,0,8" Foreground="{StaticResource TextSecondary}" FontWeight="SemiBold"/>
+                <Grid Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Source FPS:" FontSize="11" Foreground="{StaticResource TextMuted}"/>
+                        <TextBox Text="{Binding SourceFps, UpdateSourceTrigger=PropertyChanged}" Background="{StaticResource BgInput}" Foreground="#FFFFFF" BorderBrush="{StaticResource BorderDark}" Padding="6,4" FontFamily="Consolas"/>
+                    </StackPanel>
+                    <TextBlock Grid.Column="1" Text="➔" VerticalAlignment="Center" Margin="12,12,12,0" Foreground="{StaticResource AccentPrimary}" FontSize="18" FontWeight="Bold"/>
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="Target FPS:" FontSize="11" Foreground="{StaticResource TextMuted}"/>
+                        <TextBox Text="{Binding TargetFps, UpdateSourceTrigger=PropertyChanged}" Background="{StaticResource BgInput}" Foreground="#FFFFFF" BorderBrush="{StaticResource BorderDark}" Padding="6,4" FontFamily="Consolas"/>
+                    </StackPanel>
+                </Grid>
+                <Button Content="🔄 Convert Frame Rate" Background="{StaticResource AccentGreen}" Foreground="#FFFFFF" FontWeight="Bold" Padding="10,6" BorderThickness="0" Cursor="Hand" Click="OnApplyFpsClicked"/>
+            </StackPanel>
+        </Border>
+
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Done" Width="90" Padding="10,6" Background="{StaticResource BgCardElevated}" Foreground="#FFFFFF" BorderThickness="0" Cursor="Hand" Click="OnCloseClicked"/>
+        </StackPanel>
+    </Grid>
+</Window>

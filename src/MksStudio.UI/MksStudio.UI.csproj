@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\MksStudio.Core\MksStudio.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+  </ItemGroup>
+
+  <!-- Bundle MKVToolNix Binaries & App Icon -->
+  <ItemGroup>
+    <None Update="tools\mkvtoolnix\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
+    <Resource Include="app.ico" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+    
+    <!-- Assembly Metadata -->
+    <AssemblyTitle>MKS Subtitle Studio</AssemblyTitle>
+    <Product>MKS Subtitle Studio</Product>
+    <Company>MKS Studio</Company>
+    <Description>Matroska Subtitle (.mks) Editor, Viewer &amp; MKV Subtitle Extractor</Description>
+    <Copyright>Copyright © 2026</Copyright>
+    <Version>1.0.0</Version>
+    <FileVersion>1.0.0.0</FileVersion>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    
+    <!-- High DPI Support -->
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+  </PropertyGroup>
+
+</Project>
