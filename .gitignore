@@ -69,3 +69,4 @@ Setup.exe
 src/MksStudio.UI/tools/mkvtoolnix/*.exe
 
 tests/*
+sample/*
