@@ -53,6 +53,7 @@ public partial class MkvExtractorViewModel : ObservableObject
     public ObservableCollection<string> BatchFiles { get; } = [];
 
     public Action<string>? RequestOpenInEditor { get; set; }
+    public Action? RequestNavigateToExtractor { get; set; }
 
     public MkvExtractorViewModel()
     {
@@ -78,6 +79,7 @@ public partial class MkvExtractorViewModel : ObservableObject
                 InputPath = folderDialog.FolderName;
                 if (string.IsNullOrEmpty(OutputFolder))
                     OutputFolder = folderDialog.FolderName;
+                RequestNavigateToExtractor?.Invoke();
                 await ScanInput();
             }
         }
@@ -86,6 +88,8 @@ public partial class MkvExtractorViewModel : ObservableObject
             var fileDialog = new OpenFileDialog
             {
                 Filter = "Matroska Video (*.mkv)|*.mkv|All Files (*.*)|*.*",
+                DefaultExt = ".mkv",
+                FilterIndex = 1,
                 Title = "Select MKV Video File"
             };
 
@@ -94,6 +98,7 @@ public partial class MkvExtractorViewModel : ObservableObject
                 InputPath = fileDialog.FileName;
                 if (string.IsNullOrEmpty(OutputFolder))
                     OutputFolder = Path.GetDirectoryName(fileDialog.FileName) ?? string.Empty;
+                RequestNavigateToExtractor?.Invoke();
                 await ScanInput();
             }
         }

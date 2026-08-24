@@ -68,6 +68,7 @@ public partial class MainViewModel : ObservableObject
     {
         _extractorVm = new MkvExtractorViewModel
         {
+            RequestNavigateToExtractor = () => CurrentViewIndex = 2,
             RequestOpenInEditor = path =>
             {
                 if (File.Exists(path))
@@ -238,16 +239,55 @@ public partial class MainViewModel : ObservableObject
     {
         var dialog = new OpenFileDialog
         {
-            Filter = "Matroska Subtitle Files (*.mks;*.mkv)|*.mks;*.mkv|All Files (*.*)|*.*",
-            Title = "Open MKS / MKV File"
+            Filter = "Matroska Subtitles (*.mks)|*.mks|SubRip Subtitles (*.srt)|*.srt|Advanced SubStation (*.ass;*.ssa)|*.ass;*.ssa|WebVTT Subtitles (*.vtt)|*.vtt|Matroska Video (*.mkv)|*.mkv|All Files (*.*)|*.*",
+            DefaultExt = ".mks",
+            FilterIndex = 1,
+            Title = "Open Subtitle File"
         };
 
         if (dialog.ShowDialog() == true)
         {
             try
             {
-                var mks = _demuxer.Demux(dialog.FileName);
-                LoadMksModel(mks, dialog.FileName);
+                string ext = Path.GetExtension(dialog.FileName).ToLowerInvariant();
+                if (ext is ".mks" or ".mkv")
+                {
+                    var mks = _demuxer.Demux(dialog.FileName);
+                    LoadMksModel(mks, dialog.FileName);
+                }
+                else
+                {
+                    // Single subtitle file (.srt, .ass, .ssa, .vtt)
+                    string text = File.ReadAllText(dialog.FileName);
+                    var track = new MksTrack
+                    {
+                        TrackNumber = 1,
+                        Name = Path.GetFileNameWithoutExtension(dialog.FileName),
+                        Language = "und",
+                        IsDefault = true
+                    };
+                    if (ext is ".ass" or ".ssa")
+                    {
+                        track.CodecId = EbmlConstants.CodecAss;
+                        track.CodecName = "Advanced SubStation Alpha";
+                        track.Subtitles = AssCodec.Parse(text);
+                    }
+                    else if (ext is ".vtt")
+                    {
+                        track.CodecId = EbmlConstants.CodecVtt;
+                        track.CodecName = "WebVTT";
+                        track.Subtitles = VttCodec.Parse(text);
+                    }
+                    else
+                    {
+                        track.CodecId = EbmlConstants.CodecSrt;
+                        track.CodecName = "SubRip";
+                        track.Subtitles = SrtCodec.Parse(text);
+                    }
+                    _currentMks = new MksFile { Title = Path.GetFileNameWithoutExtension(dialog.FileName) };
+                    _currentMks.Tracks.Add(track);
+                    LoadMksModel(_currentMks, dialog.FileName);
+                }
                 CurrentViewIndex = 1; // Switch to editor
                 StatusMessage = $"Opened '{Path.GetFileName(dialog.FileName)}' ({Tracks.Count} tracks, {Attachments.Count} attachments).";
             }
@@ -365,7 +405,9 @@ public partial class MainViewModel : ObservableObject
     {
         var dialog = new OpenFileDialog
         {
-            Filter = "Supported Subtitles (*.srt;*.ass;*.ssa;*.vtt)|*.srt;*.ass;*.ssa;*.vtt|SubRip (*.srt)|*.srt|Advanced SubStation (*.ass;*.ssa)|*.ass;*.ssa|WebVTT (*.vtt)|*.vtt|All Files (*.*)|*.*",
+            Filter = "SubRip Subtitles (*.srt)|*.srt|Advanced SubStation (*.ass)|*.ass|SubStation Alpha (*.ssa)|*.ssa|WebVTT Subtitles (*.vtt)|*.vtt|All Files (*.*)|*.*",
+            DefaultExt = ".srt",
+            FilterIndex = 1,
             Title = "Import Subtitle Track"
         };
 
@@ -483,8 +525,12 @@ public partial class MainViewModel : ObservableObject
         var dialog = new SaveFileDialog
         {
             Filter = SelectedTrack.IsAss
-                ? "Advanced SubStation Alpha (*.ass)|*.ass|SubRip (*.srt)|*.srt|Matroska Subtitles (*.mks)|*.mks|WebVTT (*.vtt)|*.vtt"
-                : "SubRip (*.srt)|*.srt|Advanced SubStation Alpha (*.ass)|*.ass|WebVTT (*.vtt)|*.vtt|Matroska Subtitles (*.mks)|*.mks",
+                ? "Advanced SubStation Alpha (*.ass)|*.ass|SubRip (*.srt)|*.srt|WebVTT (*.vtt)|*.vtt|Matroska Subtitles (*.mks)|*.mks|All Files (*.*)|*.*"
+                : (SelectedTrack.IsVtt
+                    ? "WebVTT (*.vtt)|*.vtt|SubRip (*.srt)|*.srt|Advanced SubStation Alpha (*.ass)|*.ass|Matroska Subtitles (*.mks)|*.mks|All Files (*.*)|*.*"
+                    : "SubRip (*.srt)|*.srt|Advanced SubStation Alpha (*.ass)|*.ass|WebVTT (*.vtt)|*.vtt|Matroska Subtitles (*.mks)|*.mks|All Files (*.*)|*.*"),
+            DefaultExt = ext,
+            FilterIndex = 1,
             FileName = $"{baseName}{ext}",
             Title = "Export Subtitle Track"
         };
@@ -688,7 +734,9 @@ public partial class MainViewModel : ObservableObject
     {
         var dialog = new OpenFileDialog
         {
-            Filter = "Font & Asset Files (*.ttf;*.otf;*.woff;*.png;*.jpg)|*.ttf;*.otf;*.woff;*.png;*.jpg|All Files (*.*)|*.*",
+            Filter = "TrueType Font (*.ttf)|*.ttf|OpenType Font (*.otf)|*.otf|Web Font (*.woff;*.woff2)|*.woff;*.woff2|PNG Image (*.png)|*.png|JPEG Image (*.jpg;*.jpeg)|*.jpg;*.jpeg|All Files (*.*)|*.*",
+            DefaultExt = ".ttf",
+            FilterIndex = 1,
             Multiselect = true,
             Title = "Add Font Attachment"
         };
