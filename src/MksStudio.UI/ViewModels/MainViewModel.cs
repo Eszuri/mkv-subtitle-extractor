@@ -116,12 +116,6 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private string _filterQuery = string.Empty;
 
-    public string SearchFilter
-    {
-        get => FilterQuery;
-        set => FilterQuery = value;
-    }
-
     public ObservableCollection<CueItemViewModel> VisibleCues
     {
         get
@@ -138,13 +132,9 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    public ObservableCollection<CueItemViewModel> FilteredCues => VisibleCues;
-
     partial void OnFilterQueryChanged(string value)
     {
         OnPropertyChanged(nameof(VisibleCues));
-        OnPropertyChanged(nameof(FilteredCues));
-        OnPropertyChanged(nameof(SearchFilter));
     }
 
     partial void OnSelectedTrackChanged(TrackItemViewModel? value)
@@ -152,7 +142,6 @@ public partial class MainViewModel : ObservableObject
         SelectedCue = value?.Cues.FirstOrDefault();
         OnPropertyChanged(nameof(TotalDurationText));
         OnPropertyChanged(nameof(VisibleCues));
-        OnPropertyChanged(nameof(FilteredCues));
         UpdatePreviewProperties();
     }
 
@@ -162,7 +151,6 @@ public partial class MainViewModel : ObservableObject
         OnPropertyChanged(nameof(TotalTracksCount));
         OnPropertyChanged(nameof(TotalDurationText));
         OnPropertyChanged(nameof(VisibleCues));
-        OnPropertyChanged(nameof(FilteredCues));
         UpdatePreviewProperties();
     }
 
@@ -197,13 +185,11 @@ public partial class MainViewModel : ObservableObject
     {
         OnPropertyChanged(nameof(HasSelectedCue));
         OnPropertyChanged(nameof(PreviewText));
-        OnPropertyChanged(nameof(PreviewRawText));
         OnPropertyChanged(nameof(PreviewTimecodeText));
         OnPropertyChanged(nameof(CurrentAssStyle));
         OnPropertyChanged(nameof(ActiveStyleDisplayName));
         OnPropertyChanged(nameof(ActiveStyleDetails));
         OnPropertyChanged(nameof(PreviewPrimaryBrush));
-        OnPropertyChanged(nameof(PreviewPrimaryColor));
         OnPropertyChanged(nameof(PreviewOutlineBrush));
         OnPropertyChanged(nameof(PreviewOutlineThickness));
         OnPropertyChanged(nameof(PreviewShadowColor));
@@ -213,9 +199,6 @@ public partial class MainViewModel : ObservableObject
         OnPropertyChanged(nameof(PreviewFontWeight));
         OnPropertyChanged(nameof(PreviewFontStyle));
         OnPropertyChanged(nameof(PreviewTextAlignment));
-        OnPropertyChanged(nameof(PreviewVerticalAlignment));
-        OnPropertyChanged(nameof(PreviewHorizontalAlignment));
-        OnPropertyChanged(nameof(PreviewMargin));
         OnPropertyChanged(nameof(HasSelectedCueActor));
         OnPropertyChanged(nameof(SelectedCueActorText));
         OnPropertyChanged(nameof(SelectedCueCharCount));
@@ -227,7 +210,6 @@ public partial class MainViewModel : ObservableObject
     public bool HasSelectedCueActor => !string.IsNullOrWhiteSpace(SelectedCue?.Actor);
     public string SelectedCueActorText => HasSelectedCueActor ? $"Actor: {SelectedCue!.Actor}" : string.Empty;
     public string PreviewText => SelectedCue?.PlainText ?? string.Empty;
-    public string PreviewRawText => SelectedCue?.RawText ?? string.Empty;
     public string PreviewTimecodeText => SelectedCue != null
         ? $"▶ {SelectedCue.StartTimeText} → {SelectedCue.EndTimeText} ({SelectedCue.Duration.TotalSeconds:F1}s)"
         : "--:--:--.---";
@@ -311,13 +293,12 @@ public partial class MainViewModel : ObservableObject
         return fallback;
     }
 
-    public Color PreviewPrimaryColor => ParseAssColor(CurrentAssStyle?.PrimaryColour, Colors.White);
-
     public Brush PreviewPrimaryBrush
     {
         get
         {
-            var brush = new SolidColorBrush(PreviewPrimaryColor);
+            var color = ParseAssColor(CurrentAssStyle?.PrimaryColour, Colors.White);
+            var brush = new SolidColorBrush(color);
             brush.Freeze();
             return brush;
         }
@@ -371,34 +352,6 @@ public partial class MainViewModel : ObservableObject
     public FontWeight PreviewFontWeight => FontWeights.Normal;
     public FontStyle PreviewFontStyle => (CurrentAssStyle?.Italic != 0) ? FontStyles.Italic : FontStyles.Normal;
 
-    public VerticalAlignment PreviewVerticalAlignment
-    {
-        get
-        {
-            int align = CurrentAssStyle?.Alignment ?? 2;
-            return align switch
-            {
-                7 or 8 or 9 => VerticalAlignment.Top,
-                4 or 5 or 6 => VerticalAlignment.Center,
-                _ => VerticalAlignment.Bottom
-            };
-        }
-    }
-
-    public HorizontalAlignment PreviewHorizontalAlignment
-    {
-        get
-        {
-            int align = CurrentAssStyle?.Alignment ?? 2;
-            return align switch
-            {
-                1 or 4 or 7 => HorizontalAlignment.Left,
-                3 or 6 or 9 => HorizontalAlignment.Right,
-                _ => HorizontalAlignment.Center
-            };
-        }
-    }
-
     public TextAlignment PreviewTextAlignment
     {
         get
@@ -411,63 +364,6 @@ public partial class MainViewModel : ObservableObject
                 _ => TextAlignment.Center
             };
         }
-    }
-
-    public Thickness PreviewMargin
-    {
-        get
-        {
-            int align = CurrentAssStyle?.Alignment ?? 2;
-            double hMargin = Math.Clamp((CurrentAssStyle?.MarginL ?? 10) * 0.6, 24, 60);
-            double vMargin = Math.Clamp((CurrentAssStyle?.MarginV ?? 10) * 0.5, 16, 40);
-
-            return align switch
-            {
-                7 or 8 or 9 => new Thickness(hMargin, vMargin, hMargin, 0),
-                4 or 5 or 6 => new Thickness(hMargin, 0, hMargin, 0),
-                _ => new Thickness(hMargin, 0, hMargin, vMargin)
-            };
-        }
-    }
-
-    [RelayCommand]
-    public void InsertFormatting(string tag)
-    {
-        if (SelectedCue == null) return;
-        bool isAss = SelectedTrack?.IsAss != false;
-
-        string newText = SelectedCue.RawText;
-        switch (tag)
-        {
-            case "b":
-            case "i":
-            case "u":
-            case "s":
-            case "n":
-            case "h":
-                var tagRes = SubtitleFormatter.ApplyTag(SelectedCue.RawText, 0, 0, tag, isAss);
-                newText = tagRes.newText;
-                break;
-            case "color_yellow":
-                var cy = SubtitleFormatter.ApplyColor(SelectedCue.RawText, 0, 0, "FFFF00", isAss);
-                newText = cy.newText;
-                break;
-            case "color_cyan":
-                var cc = SubtitleFormatter.ApplyColor(SelectedCue.RawText, 0, 0, "00FFFF", isAss);
-                newText = cc.newText;
-                break;
-            case "color_white":
-                var cw = SubtitleFormatter.ApplyColor(SelectedCue.RawText, 0, 0, "FFFFFF", isAss);
-                newText = cw.newText;
-                break;
-            case "strip":
-                var st = SubtitleFormatter.StripFormatting(SelectedCue.RawText, 0, 0);
-                newText = st.newText;
-                break;
-        }
-
-        SelectedCue.RawText = newText;
-        IsModified = true;
     }
 
     [RelayCommand]
@@ -483,7 +379,6 @@ public partial class MainViewModel : ObservableObject
             SelectedCue = cue;
             IsModified = true;
             OnPropertyChanged(nameof(VisibleCues));
-            OnPropertyChanged(nameof(FilteredCues));
         }
     }
 
@@ -500,7 +395,6 @@ public partial class MainViewModel : ObservableObject
             SelectedCue = cue;
             IsModified = true;
             OnPropertyChanged(nameof(VisibleCues));
-            OnPropertyChanged(nameof(FilteredCues));
         }
     }
 
@@ -957,7 +851,6 @@ public partial class MainViewModel : ObservableObject
         SelectedCue = newCue;
         IsModified = true;
         OnPropertyChanged(nameof(VisibleCues));
-        OnPropertyChanged(nameof(FilteredCues));
         StatusMessage = $"Added cue #{newCue.Index}.";
     }
 
@@ -971,7 +864,6 @@ public partial class MainViewModel : ObservableObject
         SelectedCue = SelectedTrack.Cues.ElementAtOrDefault(idx) ?? SelectedTrack.Cues.LastOrDefault();
         IsModified = true;
         OnPropertyChanged(nameof(VisibleCues));
-        OnPropertyChanged(nameof(FilteredCues));
         StatusMessage = "Cue deleted.";
     }
 
@@ -1004,7 +896,6 @@ public partial class MainViewModel : ObservableObject
         SelectedCue = newCue;
         IsModified = true;
         OnPropertyChanged(nameof(VisibleCues));
-        OnPropertyChanged(nameof(FilteredCues));
         StatusMessage = "Cue split into two segments.";
     }
 

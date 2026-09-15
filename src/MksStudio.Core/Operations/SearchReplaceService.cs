@@ -91,9 +91,9 @@ public static class SearchReplaceService
                     while ((index = cue.RawText.IndexOf(search, index, comparison)) >= 0)
                     {
                         count++;
-                        cue.RawText = cue.RawText.Remove(index, search.Length).Insert(index, replacement);
-                        index += replacement.Length;
+                        index += search.Length;
                     }
+                    cue.RawText = cue.RawText.Replace(search, replacement, comparison);
                 }
             }
         }

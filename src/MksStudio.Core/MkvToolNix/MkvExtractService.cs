@@ -13,82 +13,44 @@ public class MkvExtractService
 {
     private static readonly Regex ProgressRegex = new(@"Progress:\s*(\d+)%", RegexOptions.Compiled);
 
-    public async Task<bool> ExtractTracksAsync(
+    public Task<bool> ExtractTracksAsync(
         string mkvPath,
         IDictionary<int, string> trackOutputs,
         IProgress<int>? progress = null,
         IProgress<string>? log = null,
         CancellationToken ct = default)
     {
-        if (trackOutputs.Count == 0) return true;
-
-        string? exe = MkvToolNixLocator.GetMkvExtractPath();
-        if (exe == null)
-            throw new FileNotFoundException("mkvextract.exe was not found. Please ensure MKVToolNix is installed.");
-
-        var argsBuilder = new StringBuilder();
-        argsBuilder.Append($"tracks \"{mkvPath}\"");
-
-        foreach (var kvp in trackOutputs)
-        {
-            // Ensure parent directory exists
-            string? dir = Path.GetDirectoryName(kvp.Value);
-            if (!string.IsNullOrEmpty(dir))
-                Directory.CreateDirectory(dir);
-
-            argsBuilder.Append($" {kvp.Key}:\"{kvp.Value}\"");
-        }
-
-        var psi = new ProcessStartInfo
-        {
-            FileName = exe,
-            Arguments = argsBuilder.ToString(),
-            UseShellExecute = false,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            CreateNoWindow = true,
-            StandardOutputEncoding = Encoding.UTF8
-        };
-
-        using var process = new Process { StartInfo = psi };
-        process.OutputDataReceived += (_, e) =>
-        {
-            if (string.IsNullOrWhiteSpace(e.Data)) return;
-
-            log?.Report(e.Data);
-            var m = ProgressRegex.Match(e.Data);
-            if (m.Success && int.TryParse(m.Groups[1].Value, out int percent))
-            {
-                progress?.Report(percent);
-            }
-        };
-
-        process.Start();
-        process.BeginOutputReadLine();
-
-        await process.WaitForExitAsync(ct);
-        progress?.Report(100);
-
-        return process.ExitCode is 0 or 1;
+        return RunExtractProcessAsync("tracks", mkvPath, trackOutputs, progress, log, ct);
     }
 
-    public async Task<bool> ExtractAttachmentsAsync(
+    public Task<bool> ExtractAttachmentsAsync(
         string mkvPath,
         IDictionary<int, string> attachmentOutputs,
         IProgress<int>? progress = null,
         IProgress<string>? log = null,
         CancellationToken ct = default)
     {
-        if (attachmentOutputs.Count == 0) return true;
+        return RunExtractProcessAsync("attachments", mkvPath, attachmentOutputs, progress, log, ct);
+    }
+
+    private static async Task<bool> RunExtractProcessAsync(
+        string mode,
+        string mkvPath,
+        IDictionary<int, string> idToOutputMap,
+        IProgress<int>? progress,
+        IProgress<string>? log,
+        CancellationToken ct)
+    {
+        if (idToOutputMap.Count == 0) return true;
 
         string? exe = MkvToolNixLocator.GetMkvExtractPath();
         if (exe == null)
             throw new FileNotFoundException("mkvextract.exe was not found. Please ensure MKVToolNix is installed.");
 
         var argsBuilder = new StringBuilder();
-        argsBuilder.Append($"attachments \"{mkvPath}\"");
+        argsBuilder.Append($"{mode} \"{mkvPath}\"");
 
-        foreach (var kvp in attachmentOutputs)
+        foreach (var kvp in idToOutputMap)
         {
             string? dir = Path.GetDirectoryName(kvp.Value);
             if (!string.IsNullOrEmpty(dir))

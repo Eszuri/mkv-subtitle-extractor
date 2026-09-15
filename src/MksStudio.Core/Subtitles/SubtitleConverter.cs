@@ -1,4 +1,3 @@
-using MksStudio.Core.Ebml;
 using MksStudio.Core.Subtitles.Models;
 
 namespace MksStudio.Core.Subtitles;
@@ -11,18 +10,7 @@ public static class SubtitleConverter
     /// <summary>
     /// Converts any subtitle document to pure SRT.
     /// </summary>
-    public static SubtitleDocument ConvertToSrt(SubtitleDocument source)
-    {
-        var doc = new SubtitleDocument();
-        foreach (var cue in source.Cues)
-        {
-            var newCue = cue.Clone();
-            newCue.RawText = cue.PlainText;
-            doc.Cues.Add(newCue);
-        }
-        doc.Reindex();
-        return doc;
-    }
+    public static SubtitleDocument ConvertToSrt(SubtitleDocument source) => ConvertToPlainTextFormat(source);
 
     /// <summary>
     /// Converts any subtitle document to ASS format with standard styles.
@@ -84,18 +72,7 @@ public static class SubtitleConverter
     /// <summary>
     /// Converts any subtitle document to WebVTT.
     /// </summary>
-    public static SubtitleDocument ConvertToVtt(SubtitleDocument source)
-    {
-        var doc = new SubtitleDocument();
-        foreach (var cue in source.Cues)
-        {
-            var newCue = cue.Clone();
-            newCue.RawText = cue.PlainText;
-            doc.Cues.Add(newCue);
-        }
-        doc.Reindex();
-        return doc;
-    }
+    public static SubtitleDocument ConvertToVtt(SubtitleDocument source) => ConvertToPlainTextFormat(source);
 
     /// <summary>
     /// Converts any subtitle document to plain text cues suitable for TTML, SAMI, SBV, MicroDVD, or LRC.

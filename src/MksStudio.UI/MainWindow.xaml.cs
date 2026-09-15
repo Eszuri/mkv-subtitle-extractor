@@ -161,11 +161,6 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         }
     }
 
-    private void OnExitClicked(object sender, RoutedEventArgs e)
-    {
-        Application.Current.Shutdown();
-    }
-
     private void OnWindowDrop(object sender, DragEventArgs e)
     {
         if (e.Data.GetDataPresent(DataFormats.FileDrop))
@@ -229,11 +224,6 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
     private void OnModeFontsChecked(object sender, RoutedEventArgs e)
     {
         if (Vm?.ExtractorVm != null) Vm.ExtractorVm.OutputMode = 2;
-    }
-
-    private void OnOpenMkvExtractorClicked(object sender, RoutedEventArgs e)
-    {
-        Vm.CurrentViewIndex = 2;
     }
 
     private void OnTrackRowMouseLeftButtonUp(object sender, MouseButtonEventArgs e)

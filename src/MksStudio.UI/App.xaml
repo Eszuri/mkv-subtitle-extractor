@@ -12,7 +12,6 @@
             </ResourceDictionary.MergedDictionaries>
 
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-            <converters:TimeSpanToStringConverter x:Key="TimeSpanToStringConverter"/>
             <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
             <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
             <converters:EnumToBooleanConverter x:Key="EnumToBooleanConverter"/>
