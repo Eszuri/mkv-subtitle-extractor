@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         xmlns:vm="clr-namespace:MksStudio.UI.ViewModels"
+        xmlns:controls="clr-namespace:MksStudio.UI.Controls"
         mc:Ignorable="d"
         Title="{Binding WindowTitle}" Height="920" Width="1540" MinHeight="780" MinWidth="1280"
         WindowStartupLocation="CenterScreen" AllowDrop="True" Drop="OnWindowDrop"
@@ -412,8 +413,6 @@
 
                             <!-- Toolbar Action Buttons -->
                             <StackPanel Grid.Column="0" Orientation="Horizontal">
-                                <ui:Button Content="Buka" Command="{Binding OpenFileCommand}" Icon="{ui:SymbolIcon Symbol=FolderOpen24}" Margin="0,0,5,0" ToolTip="Buka file subtitle atau container .mks"/>
-                                <ui:Button Content="Simpan .mks" Command="{Binding SaveFileCommand}" Appearance="Primary" Icon="{ui:SymbolIcon Symbol=Save24}" Margin="0,0,5,0" ToolTip="Simpan langsung ke container .mks (Ctrl+S)"/>
                                 <ui:Button Content="Tambah Track" Command="{Binding AddTrackFromFileCommand}" Icon="{ui:SymbolIcon Symbol=Add24}" Margin="0,0,10,0" ToolTip="Impor file subtitle sebagai track baru"/>
 
                                 <Border Width="1" Background="{StaticResource BorderDark}" Margin="4,4,10,4"/>
@@ -424,6 +423,7 @@
 
                                 <Border Width="1" Background="{StaticResource BorderDark}" Margin="4,4,10,4"/>
 
+                                <ui:Button Content="Simpan .mks" Command="{Binding SaveFileCommand}" Icon="{ui:SymbolIcon Symbol=Save24}" Margin="0,0,5,0" ToolTip="Simpan langsung ke container .mks (Ctrl+S)"/>
                                 <ui:Button Content="Ekspor" Command="{Binding ExportTrackCommand}" Icon="{ui:SymbolIcon Symbol=Share24}" Margin="0,0,5,0" ToolTip="Ekspor track aktif ke format .srt/.ass"/>
                                 <ui:Button Content="Ekspor Semua" Command="{Binding ExportAllTracksCommand}" Icon="{ui:SymbolIcon Symbol=FolderZip24}" Margin="0,0,5,0" ToolTip="Ekspor semua track ke folder"/>
                             </StackPanel>
@@ -448,9 +448,9 @@
                         <Grid Grid.Column="0" Background="{StaticResource BgPanel}">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="180" MinHeight="110"/>
-                                <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
 
                             <!-- Track List Header -->
@@ -512,7 +512,7 @@
                                     <TextBlock Text="Nama Track:" FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,4"/>
                                     <ui:TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Height="32" Margin="0,0,0,10" FontSize="11" Padding="8,4"/>
 
-                                    <Grid Margin="0,0,0,10">
+                                    <Grid Margin="0">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="*"/>
@@ -625,12 +625,12 @@
                                     </Style>
                                 </DataGrid.Resources>
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="#" Binding="{Binding Index}" Width="55" IsReadOnly="True"/>
-                                    <DataGridTextColumn Header="Mulai" Binding="{Binding StartTimeText}" Width="105" FontFamily="Consolas"/>
-                                    <DataGridTextColumn Header="Selesai" Binding="{Binding EndTimeText}" Width="105" FontFamily="Consolas"/>
-                                    <DataGridTextColumn Header="Durasi" Binding="{Binding DurationText}" Width="85" IsReadOnly="True" FontFamily="Consolas"/>
-                                    <DataGridTextColumn Header="Style" Binding="{Binding Style}" Width="100"/>
-                                    <DataGridTextColumn Header="Karakter" Binding="{Binding Actor}" Width="100"/>
+                                    <DataGridTextColumn Header="#" Binding="{Binding Index}" Width="50" IsReadOnly="True"/>
+                                    <DataGridTextColumn Header="Mulai" Binding="{Binding StartTimeText}" Width="115" FontFamily="Consolas"/>
+                                    <DataGridTextColumn Header="Selesai" Binding="{Binding EndTimeText}" Width="115" FontFamily="Consolas"/>
+                                    <DataGridTextColumn Header="Durasi" Binding="{Binding DurationText}" Width="115" IsReadOnly="True" FontFamily="Consolas"/>
+                                    <DataGridTextColumn Header="Style" Binding="{Binding Style}" Width="110"/>
+                                    <DataGridTextColumn Header="Karakter" Binding="{Binding Actor}" Width="110"/>
                                     <DataGridTextColumn Header="Teks Subtitle" Binding="{Binding RawText}" Width="*"/>
                                 </DataGrid.Columns>
                             </DataGrid>
@@ -654,22 +654,85 @@
                                             <RowDefinition Height="Auto"/>
                                         </Grid.RowDefinitions>
 
-                                        <!-- Quick Format Bar -->
-                                        <Grid Grid.Row="0" Margin="0,0,0,10">
-                                            <StackPanel Orientation="Horizontal">
-                                                <TextBlock Text="FORMAT TEKS:" FontWeight="Bold" FontSize="11" Foreground="{StaticResource AccentPrimary}" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                                                <Button Content="𝗕 Bold" Command="{Binding InsertFormattingCommand}" CommandParameter="b" Padding="7,3" Margin="0,0,4,0" FontSize="11"/>
-                                                <Button Content="𝘐 Italic" Command="{Binding InsertFormattingCommand}" CommandParameter="i" Padding="7,3" Margin="0,0,4,0" FontSize="11"/>
-                                                <Button Content="U Underline" Command="{Binding InsertFormattingCommand}" CommandParameter="u" Padding="7,3" Margin="0,0,4,0" FontSize="11"/>
-                                                <Button Content="↵ \N Newline" Command="{Binding InsertFormattingCommand}" CommandParameter="n" Padding="7,3" Margin="0,0,4,0" FontSize="11"/>
-                                                <Button Content="🎨 Yellow" Command="{Binding InsertFormattingCommand}" CommandParameter="color_yellow" Padding="7,3" Margin="0,0,4,0" FontSize="11"/>
-                                                <Button Content="🎨 Cyan" Command="{Binding InsertFormattingCommand}" CommandParameter="color_cyan" Padding="7,3" FontSize="11"/>
-                                            </StackPanel>
-                                        </Grid>
+                                        <!-- Comprehensive Subtitle Formatting Preset Toolbar -->
+                                        <Border Grid.Row="0" Margin="0,0,0,10" Background="#161922" BorderBrush="{StaticResource BorderDark}" BorderThickness="1" CornerRadius="6" Padding="6,4">
+                                            <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <TextBlock Text="PRESET FORMAT:" FontWeight="Bold" FontSize="10" Foreground="{StaticResource AccentPrimary}" VerticalAlignment="Center" Margin="2,0,8,0"/>
+
+                                                <!-- Style Group (Bold, Italic, Underline, Strikeout) -->
+                                                <Border Background="#0F131B" CornerRadius="4" Padding="2" Margin="0,0,6,0" BorderBrush="#252C3A" BorderThickness="1">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Button Content="𝗕" Width="26" Height="24" Padding="0" Focusable="False" Tag="b" Click="OnFormatActionClicked"
+                                                                ToolTip="Bold / Tebal (Ctrl+B) - {\b1}..{\b0}" Background="Transparent" BorderThickness="0" Foreground="#F1F5F9" FontWeight="Bold" FontSize="12"/>
+                                                        <Button Content="𝘐" Width="26" Height="24" Padding="0" Focusable="False" Tag="i" Click="OnFormatActionClicked"
+                                                                ToolTip="Italic / Miring (Ctrl+I) - {\i1}..{\i0}" Background="Transparent" BorderThickness="0" Foreground="#F1F5F9" FontStyle="Italic" FontSize="12"/>
+                                                        <Button Content="U̲" Width="26" Height="24" Padding="0" Focusable="False" Tag="u" Click="OnFormatActionClicked"
+                                                                ToolTip="Underline / Garis Bawah (Ctrl+U) - {\u1}..{\u0}" Background="Transparent" BorderThickness="0" Foreground="#F1F5F9" FontSize="12"/>
+                                                        <Button Content="S̶" Width="26" Height="24" Padding="0" Focusable="False" Tag="s" Click="OnFormatActionClicked"
+                                                                ToolTip="Strikeout / Coret Teks - {\s1}..{\s0}" Background="Transparent" BorderThickness="0" Foreground="#F1F5F9" FontSize="12"/>
+                                                    </StackPanel>
+                                                </Border>
+
+                                                <!-- Linebreak & Spacing Group -->
+                                                <Border Background="#0F131B" CornerRadius="4" Padding="2" Margin="0,0,6,0" BorderBrush="#252C3A" BorderThickness="1">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Button Content="↵ \N" Height="24" Padding="6,0" Focusable="False" Tag="n" Click="OnFormatActionClicked"
+                                                                ToolTip="Ganti Baris Subtitle ASS (Shift+Enter) - \N" Background="Transparent" BorderThickness="0" Foreground="#38BDF8" FontWeight="SemiBold" FontSize="11"/>
+                                                        <Button Content="⎵ \h" Height="24" Padding="6,0" Focusable="False" Tag="h" Click="OnFormatActionClicked"
+                                                                ToolTip="Spasi Keras Subtitle ASS (Hard Space) - \h" Background="Transparent" BorderThickness="0" Foreground="#94A3B8" FontSize="11"/>
+                                                    </StackPanel>
+                                                </Border>
+
+                                                <!-- Color Custom Button (Single Unified Picker) -->
+                                                <Button Content="🎨 Kustom" Height="24" Padding="8,0" Margin="0,0,6,0" Focusable="False" Click="OnOpenCustomColorPickerClicked"
+                                                        ToolTip="Pilih Warna Subtitle Kustom (Palet 32 Warna, RGB Slider, &amp; Hex Code)"
+                                                        Background="#0F131B" BorderBrush="#252C3A" BorderThickness="1" Foreground="#38BDF8" FontSize="11" FontWeight="SemiBold"/>
+
+                                                <!-- Screen Alignment Group -->
+                                                <Button Content="⤧ Posisi ▼" Height="24" Padding="6,0" Margin="0,0,6,0" Focusable="False" Click="OnOpenAlignMenuClicked"
+                                                        ToolTip="Atur Posisi Subtitle di Layar ({\an1} - {\an9})" Background="#0F131B" BorderBrush="#252C3A" BorderThickness="1" Foreground="#CBD5E1" FontSize="11">
+                                                    <Button.ContextMenu>
+                                                        <ContextMenu Background="#1A1F2C" Foreground="#E2E8F0" BorderBrush="#2A3241">
+                                                            <MenuItem Header="Top-Center (Tengah Atas) - \an8" Click="OnAlignMenuItemClicked" Tag="8"/>
+                                                            <MenuItem Header="Top-Left (Kiri Atas) - \an7" Click="OnAlignMenuItemClicked" Tag="7"/>
+                                                            <MenuItem Header="Top-Right (Kanan Atas) - \an9" Click="OnAlignMenuItemClicked" Tag="9"/>
+                                                            <Separator Background="#2A3241"/>
+                                                            <MenuItem Header="Mid-Center (Tengah Layar) - \an5" Click="OnAlignMenuItemClicked" Tag="5"/>
+                                                            <MenuItem Header="Mid-Left (Tengah Kiri) - \an4" Click="OnAlignMenuItemClicked" Tag="4"/>
+                                                            <MenuItem Header="Mid-Right (Tengah Kanan) - \an6" Click="OnAlignMenuItemClicked" Tag="6"/>
+                                                            <Separator Background="#2A3241"/>
+                                                            <MenuItem Header="Bottom-Center (Default Bawah) - \an2" Click="OnAlignMenuItemClicked" Tag="2"/>
+                                                            <MenuItem Header="Bottom-Left (Kiri Bawah) - \an1" Click="OnAlignMenuItemClicked" Tag="1"/>
+                                                            <MenuItem Header="Bottom-Right (Kanan Bawah) - \an3" Click="OnAlignMenuItemClicked" Tag="3"/>
+                                                        </ContextMenu>
+                                                    </Button.ContextMenu>
+                                                </Button>
+
+                                                <!-- Case Transformation Group -->
+                                                <Button Content="Aa Huruf ▼" Height="24" Padding="6,0" Margin="0,0,6,0" Focusable="False" Click="OnOpenCaseMenuClicked"
+                                                        ToolTip="Ubah Kapitalisasi Huruf" Background="#0F131B" BorderBrush="#252C3A" BorderThickness="1" Foreground="#CBD5E1" FontSize="11">
+                                                    <Button.ContextMenu>
+                                                        <ContextMenu Background="#1A1F2C" Foreground="#E2E8F0" BorderBrush="#2A3241">
+                                                            <MenuItem Header="HURUF BESAR (UPPERCASE)" Click="OnCaseMenuItemClicked" Tag="upper"/>
+                                                            <MenuItem Header="huruf kecil (lowercase)" Click="OnCaseMenuItemClicked" Tag="lower"/>
+                                                            <MenuItem Header="Huruf Besar Tiap Kata (Title Case)" Click="OnCaseMenuItemClicked" Tag="title"/>
+                                                            <MenuItem Header="Huruf besar awal kalimat (Sentence case)" Click="OnCaseMenuItemClicked" Tag="sentence"/>
+                                                        </ContextMenu>
+                                                    </Button.ContextMenu>
+                                                </Button>
+
+                                                <!-- Clean Strip Group -->
+                                                <Button Content="🧹 Bersihkan" Height="24" Padding="6,0" Focusable="False" Tag="strip" Click="OnFormatActionClicked"
+                                                        ToolTip="Hapus semua tag format ASS {\...} atau HTML dari teks terpilih / baris ini"
+                                                        Background="#1A1418" BorderBrush="#4B2328" BorderThickness="1" Foreground="#F87171" FontSize="11"/>
+                                            </WrapPanel>
+                                        </Border>
 
                                         <!-- Text Box -->
                                         <TextBox x:Name="CueRawTextBox" Grid.Row="1" Text="{Binding SelectedCue.RawText, UpdateSourceTrigger=PropertyChanged}"
                                                  IsInactiveSelectionHighlightEnabled="True"
+                                                 PreviewKeyDown="OnCueRawTextBoxPreviewKeyDown"
+                                                 TextChanged="OnCueRawTextBoxTextChanged"
                                                  AcceptsReturn="True" AcceptsTab="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
                                                  Background="{StaticResource BgDark}" Foreground="#FFFFFF" FontSize="15" Padding="12,10" BorderBrush="{StaticResource BorderDark}"/>
 
@@ -690,33 +753,94 @@
                                             <RowDefinition Height="*"/>
                                         </Grid.RowDefinitions>
 
+                                        <!-- Header Bar -->
                                         <Grid Grid.Row="0" Margin="0,0,0,8">
-                                            <TextBlock Text="LIVE CINEMA PREVIEW" FontWeight="Bold" FontSize="11" Foreground="{StaticResource AccentPrimary}"/>
-                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                                <TextBlock Text="{Binding SelectedCue.Style, StringFormat='{}Style: {0}'}" FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,0,10,0"/>
-                                                <TextBlock Text="{Binding SelectedCue.Actor, StringFormat='{}Actor: {0}'}" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <TextBlock Text="LIVE CINEMA PREVIEW" FontWeight="Bold" FontSize="11" Foreground="{StaticResource AccentPrimary}"/>
+                                                <Border Margin="8,0,0,0" Background="#1800E5FF" CornerRadius="3" Padding="5,1">
+                                                    <TextBlock Text="16:9 VIEWPORT" FontSize="9" FontWeight="SemiBold" Foreground="{StaticResource AccentPrimary}"/>
+                                                </Border>
+                                            </StackPanel>
+
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                                <!-- Style Pill with Live Color Chip -->
+                                                <Border Background="{StaticResource BgCard}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0"
+                                                        Visibility="{Binding HasSelectedCue, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <Ellipse Width="8" Height="8" Margin="0,0,6,0" Fill="{Binding PreviewPrimaryBrush}" Stroke="#40FFFFFF" StrokeThickness="1" VerticalAlignment="Center"/>
+                                                        <TextBlock Text="{Binding ActiveStyleDisplayName, StringFormat='{}Style: {0}'}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
+                                                    </StackPanel>
+                                                </Border>
+                                                <TextBlock Text="{Binding SelectedCueActorText}" FontSize="11" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"
+                                                           Visibility="{Binding HasSelectedCueActor, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                                             </StackPanel>
                                         </Grid>
 
                                         <!-- Simulated Cinema Canvas Viewport -->
-                                        <Border Grid.Row="1" Background="#000000" CornerRadius="8" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
+                                        <Border Grid.Row="1" CornerRadius="8" BorderBrush="{StaticResource BorderLight}" BorderThickness="1" ClipToBounds="True">
+                                            <!-- Realistic dark cinema screen backdrop with subtle vignette -->
+                                            <Border.Background>
+                                                <RadialGradientBrush Center="0.5,0.45" GradientOrigin="0.5,0.45" RadiusX="0.85" RadiusY="0.85">
+                                                    <GradientStop Color="#0E141D" Offset="0.0"/>
+                                                    <GradientStop Color="#080B10" Offset="0.65"/>
+                                                    <GradientStop Color="#020305" Offset="1.0"/>
+                                                </RadialGradientBrush>
+                                            </Border.Background>
+
                                             <Grid>
+                                                <!-- Subtle 16:9 Safe Title / Safe Action Guide Lines -->
+                                                <Border Margin="18,14" BorderBrush="#0DFFFFFF" BorderThickness="1" SnapsToDevicePixels="True" IsHitTestVisible="False">
+                                                    <Grid>
+                                                        <!-- Corner framing ticks -->
+                                                        <Path Data="M 0,8 L 0,0 L 8,0" Stroke="#25FFFFFF" StrokeThickness="1" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                                        <Path Data="M 0,0 L 8,0 L 8,8" Stroke="#25FFFFFF" StrokeThickness="1" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+                                                        <Path Data="M 0,0 L 0,8 L 8,8" Stroke="#25FFFFFF" StrokeThickness="1" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+                                                        <Path Data="M 0,8 L 8,8 L 8,0" Stroke="#25FFFFFF" StrokeThickness="1" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+                                                        <!-- Faint center crosshair -->
+                                                        <Path Data="M -6,0 L 6,0 M 0,-6 L 0,6" Stroke="#15FFFFFF" StrokeThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Grid>
+                                                </Border>
+
                                                 <!-- Timecode HUD overlay on top-left -->
-                                                <Border VerticalAlignment="Top" HorizontalAlignment="Left" Margin="12" Background="#33000000" CornerRadius="4" Padding="7,3">
-                                                    <TextBlock Text="{Binding SelectedCue.StartTimeText, StringFormat='{}▶ {0}'}" Foreground="#00E5FF" FontSize="10" FontFamily="Consolas, Segoe UI"/>
+                                                <Border VerticalAlignment="Top" HorizontalAlignment="Left" Margin="12,10" Background="#99000000" CornerRadius="4" Padding="8,3" BorderBrush="#3000E5FF" BorderThickness="1"
+                                                        Visibility="{Binding HasSelectedCue, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                    <TextBlock Text="{Binding PreviewTimecodeText}" Foreground="#00E5FF" FontSize="10" FontWeight="SemiBold" FontFamily="Consolas, Segoe UI"/>
                                                 </Border>
 
-                                                <!-- Watermark in center -->
-                                                <TextBlock Text="16:9 PREVIEW VIEWPORT" Foreground="#1E1E1E" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" FontWeight="Bold"/>
-
-                                                <!-- Rendered Subtitle Text -->
-                                                <Border VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="24,0,24,22" Padding="14,8">
-                                                    <TextBlock Text="{Binding PreviewText}" Foreground="#FFFFFF" FontSize="20" FontWeight="SemiBold" TextWrapping="Wrap" TextAlignment="Center" FontFamily="Arial, Segoe UI">
-                                                        <TextBlock.Effect>
-                                                             <DropShadowEffect Color="Black" BlurRadius="8" ShadowDepth="2" Opacity="0.95"/>
-                                                        </TextBlock.Effect>
-                                                    </TextBlock>
+                                                <!-- Style Details HUD overlay on top-right -->
+                                                <Border VerticalAlignment="Top" HorizontalAlignment="Right" Margin="12,10" Background="#99000000" CornerRadius="4" Padding="8,3" BorderBrush="#20FFFFFF" BorderThickness="1"
+                                                        Visibility="{Binding HasSelectedCue, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                    <TextBlock Text="{Binding ActiveStyleDetails}" Foreground="{StaticResource TextMuted}" FontSize="10" FontFamily="Segoe UI Variable, Segoe UI"/>
                                                 </Border>
+
+                                                <!-- Empty State when no cue is selected -->
+                                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                            Visibility="{Binding HasSelectedCue, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
+                                                    <ui:SymbolIcon Symbol="MoviesAndTv24" FontSize="34" Foreground="#2A3545" HorizontalAlignment="Center" Margin="0,0,0,6"/>
+                                                    <TextBlock Text="LIVE CINEMA VIEWPORT" Foreground="#3A4659" HorizontalAlignment="Center" FontSize="12" FontWeight="Bold"/>
+                                                    <TextBlock Text="Pilih baris subtitle untuk melihat preview styling secara real-time" Foreground="#3A4659" HorizontalAlignment="Center" FontSize="11" Margin="0,4,0,0"/>
+                                                </StackPanel>
+
+                                                <!-- Authentic Cinema Outlined Subtitle Element -->
+                                                <controls:OutlinedTextBlock
+                                                    Visibility="{Binding HasSelectedCue, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                    Text="{Binding ElementName=CueRawTextBox, Path=Text}"
+                                                    Fill="{Binding PreviewPrimaryBrush}"
+                                                    Stroke="{Binding PreviewOutlineBrush}"
+                                                    StrokeThickness="{Binding PreviewOutlineThickness}"
+                                                    ShadowColor="{Binding PreviewShadowColor}"
+                                                    ShadowDepth="{Binding PreviewShadowDepth}"
+                                                    FontFamily="{Binding PreviewFontFamily}"
+                                                    FontSize="{Binding PreviewFontSize}"
+                                                    FontWeight="{Binding PreviewFontWeight}"
+                                                    FontStyle="{Binding PreviewFontStyle}"
+                                                    TextAlignment="{Binding PreviewTextAlignment}"
+                                                    VerticalAlignment="Stretch"
+                                                    HorizontalAlignment="Stretch"
+                                                    Margin="16,10"/>
+
+                                                <!-- Subtle Cinema Viewport Bottom Letterbox Bar -->
+                                                <Border VerticalAlignment="Bottom" Height="2" Background="#18FFFFFF" HorizontalAlignment="Stretch"/>
                                             </Grid>
                                         </Border>
                                     </Grid>

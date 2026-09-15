@@ -1,7 +1,10 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Windows;
+using System.Windows.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
@@ -150,6 +153,7 @@ public partial class MainViewModel : ObservableObject
         OnPropertyChanged(nameof(TotalDurationText));
         OnPropertyChanged(nameof(VisibleCues));
         OnPropertyChanged(nameof(FilteredCues));
+        UpdatePreviewProperties();
     }
 
     public void RefreshAllViews()
@@ -159,43 +163,310 @@ public partial class MainViewModel : ObservableObject
         OnPropertyChanged(nameof(TotalDurationText));
         OnPropertyChanged(nameof(VisibleCues));
         OnPropertyChanged(nameof(FilteredCues));
-        OnPropertyChanged(nameof(PreviewText));
-        OnPropertyChanged(nameof(SelectedCueCharCount));
-        OnPropertyChanged(nameof(SelectedCueWordCount));
-        OnPropertyChanged(nameof(SelectedCueLineCount));
+        UpdatePreviewProperties();
     }
 
-    partial void OnSelectedCueChanged(CueItemViewModel? value)
+    partial void OnSelectedCueChanged(CueItemViewModel? oldValue, CueItemViewModel? newValue)
     {
+        if (oldValue != null)
+        {
+            oldValue.PropertyChanged -= OnSelectedCuePropertyChanged;
+        }
+        if (newValue != null)
+        {
+            newValue.PropertyChanged += OnSelectedCuePropertyChanged;
+        }
+
+        UpdatePreviewProperties();
+    }
+
+    private void OnSelectedCuePropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(CueItemViewModel.RawText)
+            or nameof(CueItemViewModel.PlainText)
+            or nameof(CueItemViewModel.Style)
+            or nameof(CueItemViewModel.StartTimeText)
+            or nameof(CueItemViewModel.EndTimeText)
+            or nameof(CueItemViewModel.Actor))
+        {
+            UpdatePreviewProperties();
+        }
+    }
+
+    private void UpdatePreviewProperties()
+    {
+        OnPropertyChanged(nameof(HasSelectedCue));
         OnPropertyChanged(nameof(PreviewText));
+        OnPropertyChanged(nameof(PreviewRawText));
+        OnPropertyChanged(nameof(PreviewTimecodeText));
+        OnPropertyChanged(nameof(CurrentAssStyle));
+        OnPropertyChanged(nameof(ActiveStyleDisplayName));
+        OnPropertyChanged(nameof(ActiveStyleDetails));
+        OnPropertyChanged(nameof(PreviewPrimaryBrush));
+        OnPropertyChanged(nameof(PreviewPrimaryColor));
+        OnPropertyChanged(nameof(PreviewOutlineBrush));
+        OnPropertyChanged(nameof(PreviewOutlineThickness));
+        OnPropertyChanged(nameof(PreviewShadowColor));
+        OnPropertyChanged(nameof(PreviewShadowDepth));
+        OnPropertyChanged(nameof(PreviewFontFamily));
+        OnPropertyChanged(nameof(PreviewFontSize));
+        OnPropertyChanged(nameof(PreviewFontWeight));
+        OnPropertyChanged(nameof(PreviewFontStyle));
+        OnPropertyChanged(nameof(PreviewTextAlignment));
+        OnPropertyChanged(nameof(PreviewVerticalAlignment));
+        OnPropertyChanged(nameof(PreviewHorizontalAlignment));
+        OnPropertyChanged(nameof(PreviewMargin));
+        OnPropertyChanged(nameof(HasSelectedCueActor));
+        OnPropertyChanged(nameof(SelectedCueActorText));
         OnPropertyChanged(nameof(SelectedCueCharCount));
         OnPropertyChanged(nameof(SelectedCueWordCount));
         OnPropertyChanged(nameof(SelectedCueLineCount));
     }
 
-    public string PreviewText => SelectedCue?.PlainText ?? "No subtitle selected";
+    public bool HasSelectedCue => SelectedCue != null;
+    public bool HasSelectedCueActor => !string.IsNullOrWhiteSpace(SelectedCue?.Actor);
+    public string SelectedCueActorText => HasSelectedCueActor ? $"Actor: {SelectedCue!.Actor}" : string.Empty;
+    public string PreviewText => SelectedCue?.PlainText ?? string.Empty;
+    public string PreviewRawText => SelectedCue?.RawText ?? string.Empty;
+    public string PreviewTimecodeText => SelectedCue != null
+        ? $"▶ {SelectedCue.StartTimeText} → {SelectedCue.EndTimeText} ({SelectedCue.Duration.TotalSeconds:F1}s)"
+        : "--:--:--.---";
+
     public int SelectedCueCharCount => SelectedCue?.RawText.Length ?? 0;
     public int SelectedCueWordCount => string.IsNullOrWhiteSpace(SelectedCue?.PlainText)
         ? 0
         : SelectedCue.PlainText.Split([' ', '\r', '\n', '\t'], StringSplitOptions.RemoveEmptyEntries).Length;
     public int SelectedCueLineCount => string.IsNullOrWhiteSpace(SelectedCue?.RawText)
         ? 0
-        : SelectedCue.RawText.Split(['\n', '\\'], StringSplitOptions.RemoveEmptyEntries).Length;
+        : SelectedCue.RawText.Replace("\r\n", "\n").Replace("\\N", "\n").Replace("\\n", "\n").Split('\n', StringSplitOptions.RemoveEmptyEntries).Length;
+
+    public AssStyle? CurrentAssStyle
+    {
+        get
+        {
+            if (SelectedTrack?.Model?.Subtitles?.Styles == null) return null;
+            var styles = SelectedTrack.Model.Subtitles.Styles;
+            if (styles.Count == 0) return null;
+
+            if (SelectedCue != null && !string.IsNullOrWhiteSpace(SelectedCue.Style))
+            {
+                var match = styles.FirstOrDefault(s => string.Equals(s.Name, SelectedCue.Style, StringComparison.OrdinalIgnoreCase));
+                if (match != null) return match;
+            }
+
+            var def = styles.FirstOrDefault(s => string.Equals(s.Name, "Default", StringComparison.OrdinalIgnoreCase));
+            return def ?? styles.FirstOrDefault();
+        }
+    }
+
+    public string ActiveStyleDisplayName => !string.IsNullOrWhiteSpace(SelectedCue?.Style)
+        ? SelectedCue.Style
+        : (CurrentAssStyle?.Name ?? "Default");
+
+    public string ActiveStyleDetails
+    {
+        get
+        {
+            if (CurrentAssStyle == null) return "Standard Style";
+            return $"{CurrentAssStyle.Fontname} • {CurrentAssStyle.Fontsize:0}pt • Outl {CurrentAssStyle.Outline:0.#} • Shad {CurrentAssStyle.Shadow:0.#}";
+        }
+    }
+
+    public static Color ParseAssColor(string? colorStr, Color fallback)
+    {
+        if (string.IsNullOrWhiteSpace(colorStr)) return fallback;
+        string s = colorStr.Trim();
+
+        if (s.StartsWith("&H", StringComparison.OrdinalIgnoreCase) || s.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
+        {
+            string hex = s.Substring(2).TrimEnd('&').Trim();
+            if (uint.TryParse(hex, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out uint val))
+            {
+                if (hex.Length <= 6)
+                {
+                    byte b = (byte)((val >> 16) & 0xFF);
+                    byte g = (byte)((val >> 8) & 0xFF);
+                    byte r = (byte)(val & 0xFF);
+                    return Color.FromArgb(255, r, g, b);
+                }
+                else
+                {
+                    byte assA = (byte)((val >> 24) & 0xFF);
+                    byte b = (byte)((val >> 16) & 0xFF);
+                    byte g = (byte)((val >> 8) & 0xFF);
+                    byte r = (byte)(val & 0xFF);
+                    return Color.FromArgb((byte)(255 - assA), r, g, b);
+                }
+            }
+        }
+        else if (long.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out long num))
+        {
+            uint val = (uint)num;
+            byte assA = (byte)((val >> 24) & 0xFF);
+            byte b = (byte)((val >> 16) & 0xFF);
+            byte g = (byte)((val >> 8) & 0xFF);
+            byte r = (byte)(val & 0xFF);
+            return Color.FromArgb((byte)(255 - assA), r, g, b);
+        }
+        return fallback;
+    }
+
+    public Color PreviewPrimaryColor => ParseAssColor(CurrentAssStyle?.PrimaryColour, Colors.White);
+
+    public Brush PreviewPrimaryBrush
+    {
+        get
+        {
+            var brush = new SolidColorBrush(PreviewPrimaryColor);
+            brush.Freeze();
+            return brush;
+        }
+    }
+
+    public Brush PreviewOutlineBrush
+    {
+        get
+        {
+            var color = ParseAssColor(CurrentAssStyle?.OutlineColour, Colors.Black);
+            var brush = new SolidColorBrush(color);
+            brush.Freeze();
+            return brush;
+        }
+    }
+
+    public Color PreviewShadowColor => ParseAssColor(CurrentAssStyle?.BackColour, Color.FromArgb(190, 0, 0, 0));
+
+    public double PreviewOutlineThickness => CurrentAssStyle != null && CurrentAssStyle.Outline > 0
+        ? Math.Clamp(CurrentAssStyle.Outline * 0.9, 1.2, 4.5)
+        : 2.5;
+
+    public double PreviewShadowDepth => CurrentAssStyle != null && CurrentAssStyle.Shadow > 0
+        ? Math.Clamp(CurrentAssStyle.Shadow * 0.8, 1.0, 3.5)
+        : 1.5;
+
+    public FontFamily PreviewFontFamily
+    {
+        get
+        {
+            string fontName = CurrentAssStyle?.Fontname?.Trim() ?? string.Empty;
+            return !string.IsNullOrEmpty(fontName)
+                ? new FontFamily($"{fontName}, Trebuchet MS, Arial, Segoe UI")
+                : new FontFamily("Trebuchet MS, Arial, Segoe UI");
+        }
+    }
+
+    public double PreviewFontSize
+    {
+        get
+        {
+            double fs = CurrentAssStyle?.Fontsize ?? 22.0;
+            if (fs <= 0) fs = 22.0;
+            if (fs >= 65) return Math.Clamp(fs * 0.42, 16, 32);
+            if (fs >= 40) return Math.Clamp(fs * 0.52, 16, 28);
+            if (fs >= 26) return Math.Clamp(fs * 0.72, 16, 26);
+            return Math.Clamp(fs, 14, 24);
+        }
+    }
+
+    public FontWeight PreviewFontWeight => FontWeights.Normal;
+    public FontStyle PreviewFontStyle => (CurrentAssStyle?.Italic != 0) ? FontStyles.Italic : FontStyles.Normal;
+
+    public VerticalAlignment PreviewVerticalAlignment
+    {
+        get
+        {
+            int align = CurrentAssStyle?.Alignment ?? 2;
+            return align switch
+            {
+                7 or 8 or 9 => VerticalAlignment.Top,
+                4 or 5 or 6 => VerticalAlignment.Center,
+                _ => VerticalAlignment.Bottom
+            };
+        }
+    }
+
+    public HorizontalAlignment PreviewHorizontalAlignment
+    {
+        get
+        {
+            int align = CurrentAssStyle?.Alignment ?? 2;
+            return align switch
+            {
+                1 or 4 or 7 => HorizontalAlignment.Left,
+                3 or 6 or 9 => HorizontalAlignment.Right,
+                _ => HorizontalAlignment.Center
+            };
+        }
+    }
+
+    public TextAlignment PreviewTextAlignment
+    {
+        get
+        {
+            int align = CurrentAssStyle?.Alignment ?? 2;
+            return align switch
+            {
+                1 or 4 or 7 => TextAlignment.Left,
+                3 or 6 or 9 => TextAlignment.Right,
+                _ => TextAlignment.Center
+            };
+        }
+    }
+
+    public Thickness PreviewMargin
+    {
+        get
+        {
+            int align = CurrentAssStyle?.Alignment ?? 2;
+            double hMargin = Math.Clamp((CurrentAssStyle?.MarginL ?? 10) * 0.6, 24, 60);
+            double vMargin = Math.Clamp((CurrentAssStyle?.MarginV ?? 10) * 0.5, 16, 40);
+
+            return align switch
+            {
+                7 or 8 or 9 => new Thickness(hMargin, vMargin, hMargin, 0),
+                4 or 5 or 6 => new Thickness(hMargin, 0, hMargin, 0),
+                _ => new Thickness(hMargin, 0, hMargin, vMargin)
+            };
+        }
+    }
 
     [RelayCommand]
     public void InsertFormatting(string tag)
     {
         if (SelectedCue == null) return;
-        SelectedCue.RawText = tag switch
+        bool isAss = SelectedTrack?.IsAss != false;
+
+        string newText = SelectedCue.RawText;
+        switch (tag)
         {
-            "b" => SelectedTrack?.IsAss == true ? $"{{{SelectedCue.RawText}}}{{\\b1}}" : $"<b>{SelectedCue.RawText}</b>",
-            "i" => SelectedTrack?.IsAss == true ? $"{{{SelectedCue.RawText}}}{{\\i1}}" : $"<i>{SelectedCue.RawText}</i>",
-            "u" => SelectedTrack?.IsAss == true ? $"{{{SelectedCue.RawText}}}{{\\u1}}" : $"<u>{SelectedCue.RawText}</u>",
-            "n" => $"{SelectedCue.RawText}\\N",
-            "color_yellow" => SelectedTrack?.IsAss == true ? $"{{\\c&H00FFFF&}}{SelectedCue.RawText}" : $"<font color=\"yellow\">{SelectedCue.RawText}</font>",
-            "color_cyan" => SelectedTrack?.IsAss == true ? $"{{\\c&HFFFF00&}}{SelectedCue.RawText}" : $"<font color=\"cyan\">{SelectedCue.RawText}</font>",
-            _ => SelectedCue.RawText
-        };
+            case "b":
+            case "i":
+            case "u":
+            case "s":
+            case "n":
+            case "h":
+                var tagRes = SubtitleFormatter.ApplyTag(SelectedCue.RawText, 0, 0, tag, isAss);
+                newText = tagRes.newText;
+                break;
+            case "color_yellow":
+                var cy = SubtitleFormatter.ApplyColor(SelectedCue.RawText, 0, 0, "FFFF00", isAss);
+                newText = cy.newText;
+                break;
+            case "color_cyan":
+                var cc = SubtitleFormatter.ApplyColor(SelectedCue.RawText, 0, 0, "00FFFF", isAss);
+                newText = cc.newText;
+                break;
+            case "color_white":
+                var cw = SubtitleFormatter.ApplyColor(SelectedCue.RawText, 0, 0, "FFFFFF", isAss);
+                newText = cw.newText;
+                break;
+            case "strip":
+                var st = SubtitleFormatter.StripFormatting(SelectedCue.RawText, 0, 0);
+                newText = st.newText;
+                break;
+        }
+
+        SelectedCue.RawText = newText;
         IsModified = true;
     }
 

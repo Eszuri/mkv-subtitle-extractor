@@ -5,6 +5,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shell;
 using MksStudio.Core.Subtitles;
+using MksStudio.Core.Subtitles.Models;
 using MksStudio.UI.ViewModels;
 using MksStudio.UI.Views;
 
@@ -16,6 +17,8 @@ namespace MksStudio.UI;
 public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
 {
     private MainViewModel Vm => (MainViewModel)DataContext;
+    private readonly SubtitleTextUndoManager _undoManager = new();
+    private bool _isApplyingUndoRedo;
 
     public MainWindow()
     {
@@ -26,6 +29,8 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
 
     private void OnWindowLoaded(object sender, RoutedEventArgs e)
     {
+        Vm.PropertyChanged += OnViewModelPropertyChanged;
+
         var args = Environment.GetCommandLineArgs();
         if (args.Length > 1)
         {
@@ -34,6 +39,14 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
             {
                 OpenFileOrFolder(path);
             }
+        }
+    }
+
+    private void OnViewModelPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(Vm.SelectedCue))
+        {
+            _undoManager.Reset(CueRawTextBox.Text, CueRawTextBox.SelectionStart);
         }
     }
 
@@ -454,5 +467,244 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
             "About MKS Subtitle Studio",
             MessageBoxButton.OK,
             MessageBoxImage.Information);
+    }
+
+    private void OnFormatActionClicked(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is string action)
+        {
+            ExecuteFormatAction(action);
+        }
+    }
+
+    private void OnOpenCustomColorPickerClicked(object sender, RoutedEventArgs e)
+    {
+        string? currentHex = null;
+        string? subtitleText = null;
+
+        if (CueRawTextBox != null && !string.IsNullOrEmpty(CueRawTextBox.Text))
+        {
+            string targetText = CueRawTextBox.SelectionLength > 0 ? CueRawTextBox.SelectedText : CueRawTextBox.Text;
+            var match = System.Text.RegularExpressions.Regex.Match(targetText, @"\{\\(?:c|1c)&H([0-9A-Fa-f]{6})&\}");
+            if (match.Success)
+            {
+                // ASS is BGR, convert to RGB for dialog
+                string bgr = match.Groups[1].Value;
+                string b = bgr.Substring(0, 2);
+                string g = bgr.Substring(2, 2);
+                string r = bgr.Substring(4, 2);
+                currentHex = $"{r}{g}{b}";
+            }
+
+            string cleaned = SubtitleCue.CleanTags(targetText);
+            cleaned = System.Text.RegularExpressions.Regex.Replace(cleaned, @"\\[hH]", " ");
+            cleaned = System.Text.RegularExpressions.Regex.Replace(cleaned, @"\\[nN]", "\n").Trim();
+            if (!string.IsNullOrWhiteSpace(cleaned))
+            {
+                subtitleText = cleaned;
+            }
+        }
+
+        var dialog = new CustomColorDialog(currentHex, subtitleText) { Owner = this };
+        if (dialog.ShowDialog() == true)
+        {
+            ExecuteFormatAction("color", dialog.SelectedHex);
+        }
+    }
+
+    private void OnOpenAlignMenuClicked(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.ContextMenu != null)
+        {
+            btn.ContextMenu.PlacementTarget = btn;
+            btn.ContextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
+            btn.ContextMenu.IsOpen = true;
+        }
+    }
+
+    private void OnAlignMenuItemClicked(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem item && item.Tag is string align)
+        {
+            ExecuteFormatAction("align", align);
+        }
+    }
+
+    private void OnOpenCaseMenuClicked(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.ContextMenu != null)
+        {
+            btn.ContextMenu.PlacementTarget = btn;
+            btn.ContextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
+            btn.ContextMenu.IsOpen = true;
+        }
+    }
+
+    private void OnCaseMenuItemClicked(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem item && item.Tag is string mode)
+        {
+            ExecuteFormatAction("case", mode);
+        }
+    }
+
+    private void OnCueRawTextBoxTextChanged(object sender, TextChangedEventArgs e)
+    {
+        if (_isApplyingUndoRedo) return;
+        _undoManager.RecordChange(CueRawTextBox.Text, CueRawTextBox.SelectionStart, CueRawTextBox.SelectionLength, forceNewStep: false);
+    }
+
+    private void OnCueRawTextBoxPreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        bool ctrl = (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control;
+        bool shift = (Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift;
+
+        // Undo: Ctrl+Z (without shift)
+        if (ctrl && !shift && e.Key == Key.Z)
+        {
+            var prev = _undoManager.Undo(CueRawTextBox.Text, CueRawTextBox.SelectionStart, CueRawTextBox.SelectionLength);
+            if (prev.HasValue)
+            {
+                _isApplyingUndoRedo = true;
+                try
+                {
+                    CueRawTextBox.Text = prev.Value.Text;
+                    if (Vm.SelectedCue != null) Vm.SelectedCue.RawText = prev.Value.Text;
+                    Vm.IsModified = true;
+                    int start = Math.Min(prev.Value.SelectionStart, CueRawTextBox.Text.Length);
+                    int len = Math.Min(prev.Value.SelectionLength, CueRawTextBox.Text.Length - start);
+                    CueRawTextBox.Select(start, len);
+                }
+                finally
+                {
+                    _isApplyingUndoRedo = false;
+                }
+            }
+            e.Handled = true;
+            return;
+        }
+
+        // Redo: Ctrl+Y OR Ctrl+Shift+Z
+        if ((ctrl && e.Key == Key.Y) || (ctrl && shift && e.Key == Key.Z))
+        {
+            var next = _undoManager.Redo(CueRawTextBox.Text, CueRawTextBox.SelectionStart, CueRawTextBox.SelectionLength);
+            if (next.HasValue)
+            {
+                _isApplyingUndoRedo = true;
+                try
+                {
+                    CueRawTextBox.Text = next.Value.Text;
+                    if (Vm.SelectedCue != null) Vm.SelectedCue.RawText = next.Value.Text;
+                    Vm.IsModified = true;
+                    int start = Math.Min(next.Value.SelectionStart, CueRawTextBox.Text.Length);
+                    int len = Math.Min(next.Value.SelectionLength, CueRawTextBox.Text.Length - start);
+                    CueRawTextBox.Select(start, len);
+                }
+                finally
+                {
+                    _isApplyingUndoRedo = false;
+                }
+            }
+            e.Handled = true;
+            return;
+        }
+
+        // Formatting Shortcuts
+        if (ctrl && !shift)
+        {
+            if (e.Key == Key.B)
+            {
+                ExecuteFormatAction("b");
+                e.Handled = true;
+            }
+            else if (e.Key == Key.I)
+            {
+                ExecuteFormatAction("i");
+                e.Handled = true;
+            }
+            else if (e.Key == Key.U)
+            {
+                ExecuteFormatAction("u");
+                e.Handled = true;
+            }
+        }
+        else if (shift && e.Key == Key.Enter)
+        {
+            ExecuteFormatAction("n");
+            e.Handled = true;
+        }
+    }
+
+    public void ExecuteFormatAction(string action, string? extraParam = null)
+    {
+        if (Vm.SelectedCue == null) return;
+
+        int selStart = CueRawTextBox.SelectionStart;
+        int selLen = CueRawTextBox.SelectionLength;
+        string fullText = CueRawTextBox.Text ?? string.Empty;
+        bool isAss = Vm.SelectedTrack?.IsAss != false;
+
+        // Record undo checkpoint before format action is applied
+        _undoManager.RecordChange(fullText, selStart, selLen, forceNewStep: true);
+
+        string newText = fullText;
+        int newStart = selStart;
+        int newLen = selLen;
+
+        switch (action)
+        {
+            case "b":
+            case "i":
+            case "u":
+            case "s":
+            case "n":
+            case "h":
+                (newText, newStart, newLen) = SubtitleFormatter.ApplyTag(fullText, selStart, selLen, action, isAss);
+                break;
+
+            case "color":
+                string hex = extraParam ?? "FFFF00";
+                (newText, newStart, newLen) = SubtitleFormatter.ApplyColor(fullText, selStart, selLen, hex, isAss);
+                break;
+
+            case "align":
+                if (int.TryParse(extraParam, out int alignNum))
+                {
+                    newText = SubtitleFormatter.ApplyAlignment(fullText, alignNum, isAss);
+                    newStart = Math.Min(selStart, newText.Length);
+                    newLen = 0;
+                }
+                break;
+
+            case "case":
+                string mode = extraParam ?? "upper";
+                (newText, newStart, newLen) = SubtitleFormatter.ChangeCase(fullText, selStart, selLen, mode);
+                break;
+
+            case "strip":
+                (newText, newStart, newLen) = SubtitleFormatter.StripFormatting(fullText, selStart, selLen);
+                break;
+        }
+
+        _isApplyingUndoRedo = true;
+        try
+        {
+            CueRawTextBox.Text = newText;
+            Vm.SelectedCue.RawText = newText;
+            Vm.IsModified = true;
+        }
+        finally
+        {
+            _isApplyingUndoRedo = false;
+        }
+
+        // Record undo checkpoint for the newly applied text
+        _undoManager.RecordChange(newText, newStart, newLen, forceNewStep: true);
+
+        CueRawTextBox.Focus();
+        if (newStart >= 0 && newStart <= CueRawTextBox.Text.Length)
+        {
+            CueRawTextBox.Select(newStart, Math.Min(newLen, CueRawTextBox.Text.Length - newStart));
+        }
     }
 }
