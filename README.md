@@ -31,6 +31,7 @@ Aplikasi desktop modern berkinerja tinggi untuk mengekstrak (*extractor*), melih
    - **FPS Converter**: Konversi sinkronisasi frame rate video (misal 23.976 fps ↔ 25.000 fps).
    - **Find & Replace**: Cari dan ganti teks (mendukung *Match Case* & *Regular Expression*).
    - **Embedded Font Manager**: Lihat, sematkan (*embed*) font TTF/OTF, atau ekstrak font dari container `.mks`.
+   - **🌐 Google Translate Online**: Terjemahkan track subtitle instan antar berbagai bahasa dengan proteksi tag/formatting ASS (`{\pos(...)}`, `\N`), SRT, dan HTML utuh 100%.
 7. **Visual Cinema Subtitle Preview**:
    - Layar preview 16:9 bersimulasi sinema dengan teks berbayang (*drop shadow*) dan HUD Timecode live.
 8. **Portable & Self-Contained Binary**:
@@ -56,14 +57,14 @@ d:\Codingan\C#\mks-subtitle-studio\
 │   │   ├── Subtitles\                  # SrtCodec, AssCodec, VttCodec, SubtitleConverter
 │   │   └── Operations\                 # TimeShiftService, SearchReplaceService
 │   │
-│   └── MksStudio.UI\                   # Aplikasi Desktop WPF (.NET 10 / MVVM)
-│       ├── ViewModels\                 # MainViewModel, MkvExtractorViewModel, TrackItemViewModel, dll.
-│       ├── Views\                      # MainWindow, MkvExtractorWindow, TimeShiftWindow, SearchReplaceWindow
+│   └── MksStudio.UI\                   # Modern Windows 11 Fluent UI (WPF-UI / MVVM)
+│       ├── ViewModels\                 # MainViewModel, MkvExtractorViewModel, TranslationViewModel, dll.
+│       ├── Views\                      # MainWindow, TranslationWindow, TimeShiftWindow, SearchReplaceWindow, AttachmentWindow
 │       ├── tools\mkvtoolnix\           # Binari bundel mkvmerge.exe & mkvextract.exe
-│       └── App.xaml                    # Tema Modern Dark Glass UI
+│       └── App.xaml                    # Tema Modern Fluent Dark & Mica Backdrop
 │
 ├── tests\
-│   └── MksStudio.Tests\                # 17 Unit Tests xUnit (EBML, Codecs, Roundtrip, MKVToolNix)
+│   └── MksStudio.Tests\                # 23 Unit Tests xUnit (EBML, Codecs, Translation, Tag Protection, MKVToolNix)
 │
 └── sample\                             # File Contoh untuk Demo & Pengujian
     ├── demo_multitrack.mks             # File .mks multi-track lengkap dengan embedded font
@@ -80,7 +81,7 @@ d:\Codingan\C#\mks-subtitle-studio\
 dotnet run --project src/MksStudio.UI
 ```
 
-### 2. Menjalankan Seluruh Unit Test (17/17 Tests)
+### 2. Menjalankan Seluruh Unit Test (23/23 Tests)
 ```powershell
 dotnet test
 ```

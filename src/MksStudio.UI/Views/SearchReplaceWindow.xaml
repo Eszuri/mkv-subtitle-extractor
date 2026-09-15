@@ -1,58 +1,82 @@
-<Window x:Class="MksStudio.UI.Views.SearchReplaceWindow"
+<ui:FluentWindow x:Class="MksStudio.UI.Views.SearchReplaceWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         mc:Ignorable="d"
-        Title="Find &amp; Replace Subtitles" Height="320" Width="460"
+        Title="Cari &amp; Ganti Teks Subtitle" Height="385" Width="580"
         WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
-        Background="{StaticResource BgDark}" Foreground="{StaticResource TextPrimary}" FontFamily="Segoe UI">
-    <Grid Margin="20">
+        Icon="../app.ico"
+        WindowBackdropType="Mica"
+        ExtendsContentIntoTitleBar="True"
+        Foreground="{StaticResource TextPrimary}" FontFamily="Segoe UI Variable, Segoe UI">
+
+    <Grid Background="{StaticResource BgDark}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Text="🔍 Find &amp; Replace" FontSize="18" FontWeight="Bold" Foreground="{StaticResource AccentPrimary}" Margin="0,0,0,16"/>
+        <ui:TitleBar Grid.Row="0" Title="Cari &amp; Ganti Subtitle" Icon="../app.ico" Height="44" Padding="12,0,8,0"/>
 
-        <!-- Find Box -->
-        <Grid Grid.Row="1" Margin="0,0,0,10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="80"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Text="Find:" VerticalAlignment="Center" Foreground="{StaticResource TextSecondary}" FontWeight="SemiBold"/>
-            <TextBox Grid.Column="1" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Background="{StaticResource BgInput}" Foreground="#FFFFFF" BorderBrush="{StaticResource BorderDark}" Padding="8,5"/>
+        <Grid Grid.Row="1" Margin="26,14,26,22">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,16" VerticalAlignment="Center">
+                <Border Width="38" Height="38" Background="#1E1B4B" CornerRadius="10" Margin="0,0,12,0">
+                    <ui:SymbolIcon Symbol="Search24" FontSize="20" Foreground="{StaticResource AccentPrimary}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="Cari &amp; Ganti Teks Subtitle" FontSize="15" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+                    <TextBlock Text="Mendukung pencarian case-sensitive dan Regular Expression (Regex)." FontSize="11" Foreground="{StaticResource TextMuted}" Margin="0,2,0,0"/>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Find Box -->
+            <Grid Grid.Row="1" Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="95"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Cari:" VerticalAlignment="Center" Foreground="{StaticResource TextSecondary}" FontWeight="SemiBold" FontSize="12"/>
+                <ui:TextBox Grid.Column="1" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Height="36" PlaceholderText="Masukkan teks pencarian..." Padding="10,4"/>
+            </Grid>
+
+            <!-- Replace Box -->
+            <Grid Grid.Row="2" Margin="0,0,0,14">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="95"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Ganti dengan:" VerticalAlignment="Center" Foreground="{StaticResource TextSecondary}" FontWeight="SemiBold" FontSize="12"/>
+                <ui:TextBox Grid.Column="1" Text="{Binding ReplaceText, UpdateSourceTrigger=PropertyChanged}" Height="36" PlaceholderText="Masukkan teks pengganti..." Padding="10,4"/>
+            </Grid>
+
+            <!-- Options -->
+            <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="95,0,0,12">
+                <CheckBox Content="Cocokkan Huruf Besar/Kecil (Match Case)" IsChecked="{Binding MatchCase}" Foreground="{StaticResource TextPrimary}" Margin="0,0,16,0" FontSize="11"/>
+                <CheckBox Content="Gunakan Regex" IsChecked="{Binding UseRegex}" Foreground="{StaticResource TextPrimary}" FontSize="11"/>
+            </StackPanel>
+
+            <!-- Status -->
+            <TextBlock Grid.Row="4" Text="{Binding StatusText}" Foreground="{StaticResource AccentPrimary}" FontStyle="Italic" VerticalAlignment="Center" Margin="95,0,0,8" FontSize="11"/>
+
+            <!-- Buttons -->
+            <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right">
+                <ui:Button Content="Cari Selanjutnya" Padding="14,8" Appearance="Primary" Margin="0,0,6,0" Icon="{ui:SymbolIcon Symbol=Search24}" Click="OnFindNextClicked" IsDefault="True"/>
+                <ui:Button Content="Ganti" Padding="14,8" Margin="0,0,6,0" Icon="{ui:SymbolIcon Symbol=ArrowRepeatAll24}" Click="OnReplaceNextClicked"/>
+                <ui:Button Content="Ganti Semua" Padding="14,8" Appearance="Secondary" Margin="0,0,6,0" Icon="{ui:SymbolIcon Symbol=Edit24}" Click="OnReplaceAllClicked"/>
+                <ui:Button Content="Tutup" Padding="14,8" Click="OnCloseClicked" IsCancel="True"/>
+            </StackPanel>
         </Grid>
-
-        <!-- Replace Box -->
-        <Grid Grid.Row="2" Margin="0,0,0,12">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="80"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Text="Replace:" VerticalAlignment="Center" Foreground="{StaticResource TextSecondary}" FontWeight="SemiBold"/>
-            <TextBox Grid.Column="1" Text="{Binding ReplaceText, UpdateSourceTrigger=PropertyChanged}" Background="{StaticResource BgInput}" Foreground="#FFFFFF" BorderBrush="{StaticResource BorderDark}" Padding="8,5"/>
-        </Grid>
-
-        <!-- Options -->
-        <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="80,0,0,12">
-            <CheckBox Content="Match Case" IsChecked="{Binding MatchCase}" Foreground="{StaticResource TextPrimary}" Margin="0,0,20,0"/>
-            <CheckBox Content="Use Regular Expression" IsChecked="{Binding UseRegex}" Foreground="{StaticResource TextPrimary}"/>
-        </StackPanel>
-
-        <!-- Status -->
-        <TextBlock Grid.Row="4" Text="{Binding StatusText}" Foreground="{StaticResource AccentPrimary}" FontStyle="Italic" VerticalAlignment="Center" Margin="80,0,0,0"/>
-
-        <!-- Buttons -->
-        <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="🔍 Find Next" Padding="14,6" Background="{StaticResource AccentPrimary}" Foreground="#FFFFFF" BorderThickness="0" Margin="0,0,8,0" Cursor="Hand" Click="OnFindNextClicked"/>
-            <Button Content="✏️ Replace All" Padding="14,6" Background="{StaticResource AccentGreen}" Foreground="#FFFFFF" BorderThickness="0" Margin="0,0,8,0" Cursor="Hand" Click="OnReplaceAllClicked"/>
-            <Button Content="Close" Padding="12,6" Background="{StaticResource BgCardElevated}" Foreground="#FFFFFF" BorderThickness="0" Cursor="Hand" Click="OnCloseClicked"/>
-        </StackPanel>
     </Grid>
-</Window>
+</ui:FluentWindow>

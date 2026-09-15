@@ -5,7 +5,7 @@ using MksStudio.UI.ViewModels;
 
 namespace MksStudio.UI.Views;
 
-public partial class AttachmentWindow : Window
+public partial class AttachmentWindow : Wpf.Ui.Controls.FluentWindow
 {
     private readonly MainViewModel _mainVm;
 

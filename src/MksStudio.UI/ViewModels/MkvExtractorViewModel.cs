@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Windows;
@@ -25,7 +26,7 @@ public partial class MkvExtractorViewModel : ObservableObject
     private string _outputFolder = string.Empty;
 
     [ObservableProperty]
-    private int _outputMode = 0; // 0 = Standalone (.srt/.ass), 1 = MKS Container (.mks), 2 = Fonts Only
+    private int _outputMode = 0; // 0 = Standalone Subtitles, 1 = MKS Container, 2 = Fonts Only
 
     [ObservableProperty]
     private bool _extractFonts = true;
@@ -34,7 +35,7 @@ public partial class MkvExtractorViewModel : ObservableObject
     private int _progressValue = 0;
 
     [ObservableProperty]
-    private string _statusText = "Ready. Select an MKV file or folder.";
+    private string _statusText = "Siap. Silakan pilih file video MKV atau folder batch.";
 
     [ObservableProperty]
     private string _logOutput = string.Empty;
@@ -48,19 +49,26 @@ public partial class MkvExtractorViewModel : ObservableObject
     [ObservableProperty]
     private bool _isMkvToolNixAvailable = true;
 
+    [ObservableProperty]
+    private int _selectedContentTab = 0; // 0 = Subtitle Tracks, 1 = Embedded Fonts
+
     public ObservableCollection<MkvTrackItemViewModel> ScannedTracks { get; } = [];
+    public ObservableCollection<MkvAttachmentItemViewModel> ScannedFontItems { get; } = [];
     public ObservableCollection<MkvAttachment> ScannedAttachments { get; } = [];
     public ObservableCollection<string> BatchFiles { get; } = [];
 
     public Action<string>? RequestOpenInEditor { get; set; }
     public Action? RequestNavigateToExtractor { get; set; }
 
+    public int SubtitleTracksCount => ScannedTracks.Count;
+    public int FontsCount => ScannedFontItems.Count;
+
     public MkvExtractorViewModel()
     {
         IsMkvToolNixAvailable = MkvToolNixLocator.IsAvailable();
         if (!IsMkvToolNixAvailable)
         {
-            StatusText = "MKVToolNix not detected! Please ensure it is installed in 'C:\\Program Files\\MKVToolNix'.";
+            StatusText = "MKVToolNix tidak terdeteksi! Pastikan terpasang di 'C:\\Program Files\\MKVToolNix'.";
         }
     }
 
@@ -71,7 +79,7 @@ public partial class MkvExtractorViewModel : ObservableObject
         {
             var folderDialog = new OpenFolderDialog
             {
-                Title = "Select Folder Containing MKV Files"
+                Title = "Pilih Folder Berisi File MKV"
             };
 
             if (folderDialog.ShowDialog() == true)
@@ -87,10 +95,10 @@ public partial class MkvExtractorViewModel : ObservableObject
         {
             var fileDialog = new OpenFileDialog
             {
-                Filter = "Matroska Video (*.mkv)|*.mkv|All Files (*.*)|*.*",
+                Filter = "Matroska Video (*.mkv)|*.mkv|Semua File (*.*)|*.*",
                 DefaultExt = ".mkv",
                 FilterIndex = 1,
-                Title = "Select MKV Video File"
+                Title = "Pilih File Video MKV"
             };
 
             if (fileDialog.ShowDialog() == true)
@@ -109,7 +117,7 @@ public partial class MkvExtractorViewModel : ObservableObject
     {
         var dialog = new OpenFolderDialog
         {
-            Title = "Select Output Folder for Extracted Subtitles"
+            Title = "Pilih Folder Output Hasil Ekstraksi"
         };
 
         if (dialog.ShowDialog() == true)
@@ -119,15 +127,43 @@ public partial class MkvExtractorViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void OpenOutputFolder()
+    {
+        if (!string.IsNullOrWhiteSpace(OutputFolder) && Directory.Exists(OutputFolder))
+        {
+            try
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = OutputFolder,
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Tidak dapat membuka folder:\n{ex.Message}", "Info", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+        else
+        {
+            MessageBox.Show("Folder output belum ditentukan atau belum dibuat.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+    }
+
+    [RelayCommand]
     public async Task ScanInput()
     {
         if (string.IsNullOrWhiteSpace(InputPath)) return;
 
         ScannedTracks.Clear();
+        ScannedFontItems.Clear();
         ScannedAttachments.Clear();
         BatchFiles.Clear();
         LogOutput = string.Empty;
         ProgressValue = 0;
+
+        OnPropertyChanged(nameof(SubtitleTracksCount));
+        OnPropertyChanged(nameof(FontsCount));
 
         if (IsBatchMode)
         {
@@ -137,10 +173,9 @@ public partial class MkvExtractorViewModel : ObservableObject
             foreach (var f in files)
                 BatchFiles.Add(f);
 
-            StatusText = $"Found {BatchFiles.Count} MKV file(s) in folder.";
+            StatusText = $"Ditemukan {BatchFiles.Count} file MKV dalam folder.";
             if (BatchFiles.Count > 0)
             {
-                // Scan the first file as a preview
                 await ScanSingleFileAsync(BatchFiles[0]);
             }
         }
@@ -156,7 +191,7 @@ public partial class MkvExtractorViewModel : ObservableObject
         try
         {
             IsBusy = true;
-            StatusText = $"Inspecting '{Path.GetFileName(mkvPath)}' with MKVToolNix...";
+            StatusText = $"Memeriksa '{Path.GetFileName(mkvPath)}' dengan MKVToolNix...";
 
             var info = await _mergeService.IdentifyAsync(mkvPath);
 
@@ -167,17 +202,22 @@ public partial class MkvExtractorViewModel : ObservableObject
             }
 
             ScannedAttachments.Clear();
+            ScannedFontItems.Clear();
             foreach (var att in info.Attachments)
             {
                 ScannedAttachments.Add(att);
+                ScannedFontItems.Add(new MkvAttachmentItemViewModel(att));
             }
 
-            StatusText = $"Detected {ScannedTracks.Count} subtitle track(s) and {ScannedAttachments.Count} font(s).";
-            AppendLog($"Scanned '{Path.GetFileName(mkvPath)}': {ScannedTracks.Count} subtitles, {ScannedAttachments.Count} attachments.");
+            OnPropertyChanged(nameof(SubtitleTracksCount));
+            OnPropertyChanged(nameof(FontsCount));
+
+            StatusText = $"Terdeteksi {ScannedTracks.Count} track subtitle dan {ScannedFontItems.Count} font lampiran.";
+            AppendLog($"Scan '{Path.GetFileName(mkvPath)}': {ScannedTracks.Count} subtitle, {ScannedFontItems.Count} font.");
         }
         catch (Exception ex)
         {
-            StatusText = $"Failed to scan: {ex.Message}";
+            StatusText = $"Gagal memindai: {ex.Message}";
             AppendLog($"Scan Error: {ex.Message}");
         }
         finally
@@ -201,11 +241,25 @@ public partial class MkvExtractorViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void SelectAllFonts()
+    {
+        foreach (var f in ScannedFontItems)
+            f.IsSelected = true;
+    }
+
+    [RelayCommand]
+    private void DeselectAllFonts()
+    {
+        foreach (var f in ScannedFontItems)
+            f.IsSelected = false;
+    }
+
+    [RelayCommand]
     public async Task ExtractAsync()
     {
         if (string.IsNullOrWhiteSpace(OutputFolder))
         {
-            MessageBox.Show("Please select an output folder.", "Output Folder Required", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show("Silakan tentukan folder output terlebih dahulu.", "Folder Output Dibutuhkan", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
@@ -227,28 +281,28 @@ public partial class MkvExtractorViewModel : ObservableObject
                 foreach (var file in BatchFiles)
                 {
                     current++;
-                    StatusText = $"Extracting file {current} of {total}: '{Path.GetFileName(file)}'...";
+                    StatusText = $"Mengekstrak file {current} dari {total}: '{Path.GetFileName(file)}'...";
                     await ProcessSingleFileExtractionAsync(file, progressReporter, logReporter);
                 }
 
-                StatusText = $"Batch extraction completed ({total} files processed).";
-                MessageBox.Show($"Successfully processed {total} file(s) into folder:\n{OutputFolder}", "Batch Complete", MessageBoxButton.OK, MessageBoxImage.Information);
+                StatusText = $"Ekstraksi batch selesai ({total} file diproses).";
+                MessageBox.Show($"Berhasil memproses {total} file ke dalam folder:\n{OutputFolder}", "Ekstraksi Selesai", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             else
             {
-                StatusText = $"Extracting from '{Path.GetFileName(InputPath)}'...";
+                StatusText = $"Mengekstrak dari '{Path.GetFileName(InputPath)}'...";
                 string? firstOut = await ProcessSingleFileExtractionAsync(InputPath, progressReporter, logReporter);
                 LastExtractedFile = firstOut;
 
-                StatusText = "Extraction completed successfully!";
-                MessageBox.Show($"Extraction completed!\nSaved to: {OutputFolder}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                StatusText = "Ekstraksi berhasil selesai!";
+                MessageBox.Show($"Ekstraksi berhasil diselesaikan!\nDisimpan ke: {OutputFolder}", "Sukses", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
         catch (Exception ex)
         {
-            StatusText = $"Extraction failed: {ex.Message}";
+            StatusText = $"Ekstraksi gagal: {ex.Message}";
             AppendLog($"Extraction Error: {ex.Message}");
-            MessageBox.Show($"Extraction Error:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show($"Terjadi kesalahan saat ekstraksi:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
         finally
         {
@@ -264,7 +318,7 @@ public partial class MkvExtractorViewModel : ObservableObject
         if (OutputMode == 1) // Mode: MKS Container
         {
             string outMks = Path.Combine(OutputFolder, $"{baseName}.mks");
-            log.Report($"Demuxing to MKS: '{Path.GetFileName(outMks)}'...");
+            log.Report($"Demuxing ke container MKS: '{Path.GetFileName(outMks)}'...");
             bool ok = await _mergeService.ExtractToMksAsync(mkvPath, outMks, selectedIds.Any() ? selectedIds : null, ExtractFonts, log);
             progress.Report(100);
             return ok ? outMks : null;
@@ -275,7 +329,13 @@ public partial class MkvExtractorViewModel : ObservableObject
             if (info.Attachments.Count > 0)
             {
                 string fontsDir = Path.Combine(OutputFolder, "fonts");
-                var attMap = info.Attachments.ToDictionary(a => a.Id, a => Path.Combine(fontsDir, a.FileName));
+                var selectedFontIds = ScannedFontItems.Where(f => f.IsSelected).Select(f => f.Id).ToHashSet();
+                
+                var attachmentsToExtract = selectedFontIds.Count > 0
+                    ? info.Attachments.Where(a => selectedFontIds.Contains(a.Id)).ToList()
+                    : info.Attachments;
+
+                var attMap = attachmentsToExtract.ToDictionary(a => a.Id, a => Path.Combine(fontsDir, a.FileName));
                 await _extractService.ExtractAttachmentsAsync(mkvPath, attMap, progress, log);
                 return fontsDir;
             }
@@ -304,7 +364,7 @@ public partial class MkvExtractorViewModel : ObservableObject
         }
         else
         {
-            MessageBox.Show("No extracted file is available to open yet.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show("Belum ada file hasil ekstraksi yang dapat dibuka.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 

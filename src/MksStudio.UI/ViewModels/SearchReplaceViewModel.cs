@@ -23,40 +23,122 @@ public partial class SearchReplaceViewModel : ObservableObject
     private string _statusText = string.Empty;
 
     public Func<IEnumerable<SubtitleCue>>? GetTargetCues { get; set; }
-    public Action<SubtitleCue>? OnMatchFound { get; set; }
+    public Func<SubtitleCue?>? GetCurrentCue { get; set; }
+    public Action<SearchReplaceService.SearchMatch>? OnMatchFound { get; set; }
     public Action? OnDataModified { get; set; }
 
     private int _lastFoundIndex = -1;
 
+    partial void OnSearchTextChanged(string value) => _lastFoundIndex = -1;
+    partial void OnMatchCaseChanged(bool value) => _lastFoundIndex = -1;
+    partial void OnUseRegexChanged(bool value) => _lastFoundIndex = -1;
+
     [RelayCommand]
-    private void FindNext()
+    public void FindNext()
     {
-        if (string.IsNullOrEmpty(SearchText) || GetTargetCues == null) return;
+        if (string.IsNullOrEmpty(SearchText) || GetTargetCues == null)
+        {
+            StatusText = "Masukkan kata kunci pencarian.";
+            return;
+        }
 
         var cues = GetTargetCues().ToList();
+        if (cues.Count == 0)
+        {
+            StatusText = "Tidak ada baris subtitle untuk dicari.";
+            return;
+        }
+
         var matches = SearchReplaceService.Find(cues, SearchText, MatchCase, UseRegex);
 
         if (matches.Count == 0)
         {
-            StatusText = "No matches found.";
+            StatusText = "Teks tidak ditemukan.";
             _lastFoundIndex = -1;
             return;
         }
 
-        _lastFoundIndex = (_lastFoundIndex + 1) % matches.Count;
+        if (_lastFoundIndex == -1 && GetCurrentCue != null)
+        {
+            var current = GetCurrentCue();
+            if (current != null)
+            {
+                int currentCueIndex = cues.IndexOf(current);
+                if (currentCueIndex >= 0)
+                {
+                    // Find first match at or after current cue
+                    int nextIdx = matches.FindIndex(m => cues.IndexOf(m.Cue) >= currentCueIndex);
+                    if (nextIdx >= 0)
+                    {
+                        _lastFoundIndex = nextIdx;
+                    }
+                    else
+                    {
+                        _lastFoundIndex = 0;
+                    }
+                }
+                else
+                {
+                    _lastFoundIndex = 0;
+                }
+            }
+            else
+            {
+                _lastFoundIndex = 0;
+            }
+        }
+        else
+        {
+            _lastFoundIndex = (_lastFoundIndex + 1) % matches.Count;
+        }
+
         var currentMatch = matches[_lastFoundIndex];
-        StatusText = $"Match {_lastFoundIndex + 1} of {matches.Count}";
-        OnMatchFound?.Invoke(currentMatch.Cue);
+        StatusText = $"Kecocokan {_lastFoundIndex + 1} dari {matches.Count}";
+        OnMatchFound?.Invoke(currentMatch);
     }
 
     [RelayCommand]
-    private void ReplaceAll()
+    public void ReplaceNext()
+    {
+        if (string.IsNullOrEmpty(SearchText) || GetTargetCues == null) return;
+        var cues = GetTargetCues().ToList();
+        var matches = SearchReplaceService.Find(cues, SearchText, MatchCase, UseRegex);
+        if (matches.Count == 0)
+        {
+            StatusText = "Teks tidak ditemukan.";
+            _lastFoundIndex = -1;
+            return;
+        }
+
+        if (_lastFoundIndex < 0 || _lastFoundIndex >= matches.Count)
+        {
+            FindNext();
+            return;
+        }
+
+        var match = matches[_lastFoundIndex];
+        var replacement = ReplaceText ?? string.Empty;
+
+        if (match.MatchIndex >= 0 && match.MatchIndex + match.MatchLength <= match.Cue.RawText.Length)
+        {
+            match.Cue.RawText = match.Cue.RawText.Remove(match.MatchIndex, match.MatchLength).Insert(match.MatchIndex, replacement);
+            StatusText = "1 kemunculan teks diganti.";
+            OnDataModified?.Invoke();
+
+            _lastFoundIndex--;
+            FindNext();
+        }
+    }
+
+    [RelayCommand]
+    public void ReplaceAll()
     {
         if (string.IsNullOrEmpty(SearchText) || GetTargetCues == null) return;
 
         var cues = GetTargetCues().ToList();
         int count = SearchReplaceService.ReplaceAll(cues, SearchText, ReplaceText, MatchCase, UseRegex);
-        StatusText = $"Replaced {count} occurrence(s).";
+        StatusText = count > 0 ? $"Berhasil mengganti {count} kemunculan teks." : "Teks tidak ditemukan.";
+        _lastFoundIndex = -1;
         OnDataModified?.Invoke();
     }
 }

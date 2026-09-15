@@ -97,6 +97,36 @@ public static class SubtitleConverter
         return doc;
     }
 
+    /// <summary>
+    /// Converts any subtitle document to plain text cues suitable for TTML, SAMI, SBV, MicroDVD, or LRC.
+    /// </summary>
+    public static SubtitleDocument ConvertToPlainTextFormat(SubtitleDocument source)
+    {
+        var doc = new SubtitleDocument();
+        foreach (var cue in source.Cues)
+        {
+            var newCue = cue.Clone();
+            newCue.RawText = cue.PlainText;
+            doc.Cues.Add(newCue);
+        }
+        doc.Reindex();
+        return doc;
+    }
+
+    /// <summary>
+    /// Converts subtitle document to the specified target format.
+    /// </summary>
+    public static SubtitleDocument ConvertToFormat(SubtitleDocument source, string formatOrExtension)
+    {
+        string ext = formatOrExtension.StartsWith('.') ? formatOrExtension.ToLowerInvariant() : $".{formatOrExtension.ToLowerInvariant()}";
+        return ext switch
+        {
+            ".ass" or ".ssa" => ConvertToAss(source),
+            ".vtt" => ConvertToVtt(source),
+            _ => ConvertToPlainTextFormat(source)
+        };
+    }
+
     private static string ConvertHtmlToAssTags(string text)
     {
         if (string.IsNullOrEmpty(text)) return string.Empty;

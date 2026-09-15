@@ -100,6 +100,7 @@ public partial class TrackItemViewModel : ObservableObject
                 _model.CodecId = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(CodecDisplay));
+                OnPropertyChanged(nameof(DisplayName));
                 OnPropertyChanged(nameof(IsAss));
                 OnPropertyChanged(nameof(IsSrt));
                 OnPropertyChanged(nameof(IsVtt));
@@ -107,16 +108,45 @@ public partial class TrackItemViewModel : ObservableObject
         }
     }
 
-    public string CodecDisplay => CodecId switch
+    public string CodecName
     {
-        EbmlConstants.CodecSrt => "SubRip (SRT)",
-        EbmlConstants.CodecAss => "Advanced SSA (ASS)",
-        EbmlConstants.CodecSsa => "SubStation Alpha (SSA)",
-        EbmlConstants.CodecVtt => "WebVTT",
-        EbmlConstants.CodecPgs => "HDMV PGS (Bitmap)",
-        EbmlConstants.CodecVobSub => "VobSub (Bitmap)",
-        _ => CodecId
-    };
+        get => _model.CodecName;
+        set
+        {
+            if (_model.CodecName != value)
+            {
+                _model.CodecName = value ?? string.Empty;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(CodecDisplay));
+                OnPropertyChanged(nameof(DisplayName));
+            }
+        }
+    }
+
+    public string CodecDisplay
+    {
+        get
+        {
+            if (!string.IsNullOrWhiteSpace(_model.CodecName) &&
+                !string.Equals(_model.CodecName, "SubRip", StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(_model.CodecName, "Advanced SubStation Alpha", StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(_model.CodecName, "WebVTT", StringComparison.OrdinalIgnoreCase))
+            {
+                return _model.CodecName;
+            }
+
+            return CodecId switch
+            {
+                EbmlConstants.CodecSrt => "SubRip (SRT)",
+                EbmlConstants.CodecAss => "Advanced SSA (ASS)",
+                EbmlConstants.CodecSsa => "SubStation Alpha (SSA)",
+                EbmlConstants.CodecVtt => "WebVTT",
+                EbmlConstants.CodecPgs => "HDMV PGS (Bitmap)",
+                EbmlConstants.CodecVobSub => "VobSub (Bitmap)",
+                _ => CodecId
+            };
+        }
+    }
 
     public bool IsDefault
     {

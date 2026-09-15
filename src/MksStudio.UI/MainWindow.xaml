@@ -1,52 +1,99 @@
-<Window x:Class="MksStudio.UI.MainWindow"
+<ui:FluentWindow x:Class="MksStudio.UI.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         xmlns:vm="clr-namespace:MksStudio.UI.ViewModels"
         mc:Ignorable="d"
-        Title="{Binding WindowTitle}" Height="840" Width="1320"
+        Title="{Binding WindowTitle}" Height="920" Width="1540" MinHeight="780" MinWidth="1280"
         WindowStartupLocation="CenterScreen" AllowDrop="True" Drop="OnWindowDrop"
         Icon="app.ico"
-        Background="{StaticResource BgDark}" Foreground="{StaticResource TextPrimary}" FontFamily="Segoe UI">
+        WindowBackdropType="Mica"
+        ExtendsContentIntoTitleBar="True"
+        Foreground="{StaticResource TextPrimary}" FontFamily="Segoe UI Variable, Segoe UI">
+
     <Window.DataContext>
         <vm:MainViewModel/>
     </Window.DataContext>
 
-    <Grid>
+    <Grid Background="{StaticResource BgDark}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/> <!-- Top App Header & Nav Bar -->
-            <RowDefinition Height="*"/>    <!-- Main View Switcher (Home / Editor / Extractor) -->
-            <RowDefinition Height="Auto"/> <!-- Status Bar -->
+            <RowDefinition Height="Auto"/> <!-- Modern TitleBar & Navigation -->
+            <RowDefinition Height="*"/>    <!-- Main Views (Home, Editor, Extractor) -->
+            <RowDefinition Height="Auto"/> <!-- Bottom Status Bar -->
         </Grid.RowDefinitions>
 
-        <!-- Top Header & Navigation Bar -->
-        <Border Grid.Row="0" Background="{StaticResource BgPanel}" BorderBrush="{StaticResource BorderDark}" BorderThickness="0,0,0,1" Padding="14,10">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/> <!-- App Brand -->
-                    <ColumnDefinition Width="*"/>    <!-- Center Nav Pills -->
-                    <ColumnDefinition Width="Auto"/> <!-- Quick Stats -->
-                </Grid.ColumnDefinitions>
-
-                <!-- Branding -->
-                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="🎬" FontSize="20" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                    <StackPanel VerticalAlignment="Center">
-                        <TextBlock Text="MKS STUDIO" FontWeight="Bold" FontSize="14" Foreground="{StaticResource AccentPrimary}"/>
-                        <TextBlock Text="Matroska Subtitle Toolkit" FontSize="10" Foreground="{StaticResource TextMuted}"/>
+        <!-- 1. Modern Windows 11 TitleBar & Navigation Header -->
+        <ui:TitleBar x:Name="AppTitleBar"
+                     Grid.Row="0"
+                     Height="52"
+                     Padding="0"
+                     HorizontalContentAlignment="Stretch"
+                     VerticalAlignment="Stretch">
+            <!-- Left: Branding (Clean 20px left margin, vertically centered, no clipping) -->
+            <ui:TitleBar.Header>
+                <Grid Width="260" Margin="20,0,0,0" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left">
+                        <Border Width="32" Height="32" Background="{StaticResource AccentIndigo}" CornerRadius="9" Margin="0,0,10,0" VerticalAlignment="Center">
+                            <ui:SymbolIcon Symbol="Video24" Foreground="#FFFFFF" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="MKS STUDIO" FontWeight="Bold" FontSize="13" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,2"/>
+                            <TextBlock Text="Matroska Subtitle Toolkit" FontSize="10" Foreground="{StaticResource TextSecondary}" Margin="0"/>
+                        </StackPanel>
                     </StackPanel>
-                </StackPanel>
+                </Grid>
+            </ui:TitleBar.Header>
 
-                <!-- Navigation Tabs (Home / Editor / Extractor) -->
-                <Border Grid.Column="1" HorizontalAlignment="Center" Background="{StaticResource BgDark}" CornerRadius="20" Padding="4" BorderBrush="{StaticResource BorderDark}" BorderThickness="1">
-                    <StackPanel Orientation="Horizontal">
+            <!-- Center: Nav Pills (Strictly Centered horizontally across window) -->
+            <ui:TitleBar.CenterContent>
+                <Border x:Name="NavPillBorder"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Height="40"
+                        Background="{StaticResource BgPanel}"
+                        CornerRadius="20"
+                        Padding="4,3"
+                        BorderBrush="{StaticResource BorderDark}"
+                        BorderThickness="1">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <!-- Home Tab -->
-                        <Button Content="🏠 Home" Command="{Binding NavigateToHomeCommand}" Padding="16,6" Margin="0,0,4,0">
+                        <Button x:Name="BtnNavHome"
+                                Command="{Binding NavigateToHomeCommand}"
+                                Click="OnNavHomeClicked"
+                                PreviewMouseLeftButtonDown="OnNavHomePreviewMouseDown"
+                                Cursor="Hand"
+                                Padding="16,0"
+                                Height="32"
+                                Margin="0,0,3,0">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <ui:SymbolIcon Symbol="Home24" FontSize="15" Margin="0,0,7,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Home" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center"/>
+                            </StackPanel>
                             <Button.Style>
-                                <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                <Style TargetType="Button">
                                     <Setter Property="Background" Value="Transparent"/>
-                                    <Setter Property="BorderThickness" Value="0"/>
+                                    <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+                                    <Setter Property="Cursor" Value="Hand"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="btnBorder"
+                                                        Background="{TemplateBinding Background}"
+                                                        CornerRadius="16"
+                                                        Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="btnBorder" Property="Background" Value="{StaticResource BgHover}"/>
+                                                        <Setter Property="Foreground" Value="#FFFFFF"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding CurrentViewIndex}" Value="0">
                                             <Setter Property="Background" Value="{StaticResource BgCardElevated}"/>
@@ -58,11 +105,41 @@
                         </Button>
 
                         <!-- MKS Editor Tab -->
-                        <Button Content="✏️ MKS Subtitle Editor" Command="{Binding NavigateToEditorCommand}" Padding="16,6" Margin="0,0,4,0">
+                        <Button x:Name="BtnNavEditor"
+                                Command="{Binding NavigateToEditorCommand}"
+                                Click="OnNavEditorClicked"
+                                PreviewMouseLeftButtonDown="OnNavEditorPreviewMouseDown"
+                                Cursor="Hand"
+                                Padding="16,0"
+                                Height="32"
+                                Margin="0,0,3,0">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <ui:SymbolIcon Symbol="DocumentBulletList24" FontSize="15" Margin="0,0,7,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="MKS Subtitle Editor" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center"/>
+                            </StackPanel>
                             <Button.Style>
-                                <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                <Style TargetType="Button">
                                     <Setter Property="Background" Value="Transparent"/>
-                                    <Setter Property="BorderThickness" Value="0"/>
+                                    <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+                                    <Setter Property="Cursor" Value="Hand"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="btnBorder"
+                                                        Background="{TemplateBinding Background}"
+                                                        CornerRadius="16"
+                                                        Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="btnBorder" Property="Background" Value="{StaticResource BgHover}"/>
+                                                        <Setter Property="Foreground" Value="#FFFFFF"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding CurrentViewIndex}" Value="1">
                                             <Setter Property="Background" Value="{StaticResource BgCardElevated}"/>
@@ -74,11 +151,40 @@
                         </Button>
 
                         <!-- MKV Extractor Tab -->
-                        <Button Content="🎬 MKV Subtitle Extractor" Command="{Binding NavigateToExtractorCommand}" Padding="16,6">
+                        <Button x:Name="BtnNavExtractor"
+                                Command="{Binding NavigateToExtractorCommand}"
+                                Click="OnNavExtractorClicked"
+                                PreviewMouseLeftButtonDown="OnNavExtractorPreviewMouseDown"
+                                Cursor="Hand"
+                                Padding="16,0"
+                                Height="32">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <ui:SymbolIcon Symbol="VideoClip24" FontSize="15" Margin="0,0,7,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="MKV Subtitle Extractor" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center"/>
+                            </StackPanel>
                             <Button.Style>
-                                <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                <Style TargetType="Button">
                                     <Setter Property="Background" Value="Transparent"/>
-                                    <Setter Property="BorderThickness" Value="0"/>
+                                    <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+                                    <Setter Property="Cursor" Value="Hand"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="btnBorder"
+                                                        Background="{TemplateBinding Background}"
+                                                        CornerRadius="16"
+                                                        Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="btnBorder" Property="Background" Value="{StaticResource BgHover}"/>
+                                                        <Setter Property="Foreground" Value="#FFFFFF"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding CurrentViewIndex}" Value="2">
                                             <Setter Property="Background" Value="{StaticResource AccentPurple}"/>
@@ -90,163 +196,196 @@
                         </Button>
                     </StackPanel>
                 </Border>
+            </ui:TitleBar.CenterContent>
 
-                <!-- Right Pill Stats -->
-                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                    <Border Background="{StaticResource BgCard}" CornerRadius="12" Padding="8,4" Margin="0,0,6,0" BorderBrush="{StaticResource BorderDark}" BorderThickness="1">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="⏱ " FontSize="10" Foreground="{StaticResource AccentPrimary}"/>
-                            <TextBlock Text="{Binding TotalDurationText}" Foreground="{StaticResource AccentPrimary}" FontWeight="Bold" FontSize="11"/>
-                        </StackPanel>
-                    </Border>
+            <!-- Right: Duration Stats Pill (Centered vertically, 30px height, 22px margin from caption buttons) -->
+            <ui:TitleBar.TrailingContent>
+                <Border x:Name="DurationBorder"
+                        Background="{StaticResource BgPanel}"
+                        CornerRadius="15"
+                        Height="30"
+                        Padding="12,0"
+                        VerticalAlignment="Center"
+                        BorderBrush="{StaticResource BorderDark}"
+                        BorderThickness="1"
+                        Margin="0,0,22,0">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <ui:SymbolIcon Symbol="Clock24" FontSize="13" Foreground="{StaticResource AccentPrimary}" Margin="0,0,7,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding TotalDurationText}" Foreground="{StaticResource AccentPrimary}" FontWeight="Bold" FontSize="11.5" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+            </ui:TitleBar.TrailingContent>
+        </ui:TitleBar>
 
-                    <Border Background="{StaticResource BgCard}" CornerRadius="12" Padding="8,4" Margin="0,0,6,0" BorderBrush="{StaticResource BorderDark}" BorderThickness="1">
-                        <TextBlock Text="{Binding TotalTracksCount, StringFormat='{}📑 {0} Tracks'}" Foreground="{StaticResource TextPrimary}" FontWeight="SemiBold" FontSize="11"/>
-                    </Border>
-
-                    <Border Background="{StaticResource BgCard}" CornerRadius="12" Padding="8,4" BorderBrush="{StaticResource BorderDark}" BorderThickness="1">
-                        <TextBlock Text="{Binding TotalAttachmentsCount, StringFormat='{}🔤 {0} Fonts'}" Foreground="{StaticResource TextPrimary}" FontWeight="SemiBold" FontSize="11"/>
-                    </Border>
-                </StackPanel>
-            </Grid>
-        </Border>
-
-        <!-- Main Body Switcher -->
+        <!-- 2. Main View Switcher (TabControl with Hidden Headers) -->
         <TabControl Grid.Row="1" SelectedIndex="{Binding CurrentViewIndex}" Background="Transparent" BorderThickness="0">
             <TabControl.ItemContainerStyle>
                 <Style TargetType="TabItem">
-                    <Setter Property="Visibility" Value="Collapsed"/> <!-- Hide standard tabs -->
+                    <Setter Property="Visibility" Value="Collapsed"/>
                 </Style>
             </TabControl.ItemContainerStyle>
 
             <!-- ========================================== -->
-            <!-- TAB 0: HOME SCREEN DASHBOARD               -->
+            <!-- TAB 0: HOME DASHBOARD (FLUENT HUB)         -->
             <!-- ========================================== -->
             <TabItem>
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                    <Grid Margin="40,24,40,30" MaxWidth="1100">
+                    <Grid Margin="40,26,40,26" MaxWidth="1360" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/> <!-- Hero Header -->
-                            <RowDefinition Height="Auto"/> <!-- 2 Main Option Cards -->
-                            <RowDefinition Height="Auto"/> <!-- Drop Zone / Quick Info -->
+                            <RowDefinition Height="Auto"/> <!-- 2 Major Action Cards -->
+                            <RowDefinition Height="Auto"/> <!-- Drag & Drop Zone -->
                         </Grid.RowDefinitions>
 
-                        <!-- Hero Header Section -->
-                        <StackPanel Grid.Row="0" HorizontalAlignment="Center" Margin="0,0,0,32">
-                            <Border Background="{StaticResource BgCardElevated}" HorizontalAlignment="Center" CornerRadius="16" Padding="12,4" Margin="0,0,0,12" BorderBrush="{StaticResource BorderDark}" BorderThickness="1">
-                                <TextBlock Text="✨ Versi 1.0 Ready • MKVToolNix Engine Terintegrasi" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource AccentPrimary}"/>
-                            </Border>
-                            <TextBlock Text="MKS Subtitle Studio &amp; Demuxer" FontSize="32" FontWeight="Bold" Foreground="#FFFFFF" HorizontalAlignment="Center" Margin="0,0,0,6"/>
-                            <TextBlock Text="Pilih modul yang ingin Anda gunakan di bawah ini:" FontSize="15" Foreground="{StaticResource TextSecondary}" HorizontalAlignment="Center"/>
-                        </StackPanel>
-
-                        <!-- 2 Main Cards Grid -->
-                        <Grid Grid.Row="1" Margin="0,0,0,24">
+                        <!-- 2 Major Action Cards -->
+                        <Grid Grid.Row="0" Margin="0,0,0,24">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="24"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
 
-                            <!-- ==================================================== -->
-                            <!-- OPTION CARD 1: MKV SUBTITLE EXTRACTOR (PURPLE ACCENT) -->
-                            <!-- ==================================================== -->
-                            <Border Grid.Column="0" Background="{StaticResource BgPanel}" CornerRadius="12" Padding="24" BorderBrush="{StaticResource BorderDark}" BorderThickness="1">
+                            <!-- CARD 1: MKV EXTRACTOR -->
+                            <ui:Card Grid.Column="0" Padding="26,24" Background="{StaticResource BgCard}" BorderBrush="{StaticResource BorderDark}">
                                 <Grid>
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/> <!-- Icon & Title -->
-                                        <RowDefinition Height="Auto"/> <!-- Description -->
-                                        <RowDefinition Height="*"/>    <!-- Feature Checklist -->
-                                        <RowDefinition Height="Auto"/> <!-- Buttons -->
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
 
-                                    <!-- Header -->
-                                    <StackPanel Grid.Row="0" Margin="0,0,0,12">
-                                        <Border Width="52" Height="52" Background="#3B1D66" CornerRadius="12" HorizontalAlignment="Left" Margin="0,0,0,12">
-                                            <TextBlock Text="🎬" FontSize="26" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    <!-- Card Header -->
+                                    <Grid Grid.Row="0" Margin="0,0,0,14">
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <Border Width="46" Height="46" Background="#2E1065" CornerRadius="12" Margin="0,0,14,0">
+                                                <ui:SymbolIcon Symbol="VideoClip24" FontSize="24" Foreground="{StaticResource AccentPurple}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <StackPanel VerticalAlignment="Center">
+                                                <TextBlock Text="MKV Subtitle Extractor" FontSize="17" FontWeight="Bold" Foreground="#FFFFFF"/>
+                                                <TextBlock Text="Demuxer &amp; Font Extractor" FontSize="12" Foreground="{StaticResource TextMuted}"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                        <Border HorizontalAlignment="Right" Background="#1E1B4B" CornerRadius="6" Padding="7,3" VerticalAlignment="Top">
+                                            <TextBlock Text="MKVToolNix Engine" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentPurple}"/>
                                         </Border>
-                                        <TextBlock Text="MKV Subtitle Extractor" FontSize="20" FontWeight="Bold" Foreground="{StaticResource AccentPurple}"/>
-                                        <TextBlock Text="Ekstrak Subtitle &amp; Font dari Video MKV" FontSize="12" Foreground="{StaticResource TextMuted}" Margin="0,2,0,0"/>
+                                    </Grid>
+
+                                    <!-- Card Description -->
+                                    <TextBlock Grid.Row="1" Text="Ekstrak subtitle (SRT, ASS, VTT, PGS) dan seluruh font embedded (TTF/OTF) langsung dari video MKV, baik file tunggal maupun seluruh folder secara batch."
+                                               Foreground="{StaticResource TextSecondary}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,18" LineHeight="18"/>
+
+                                    <!-- Feature Badges -->
+                                    <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,0,0,22">
+                                        <Border Background="{StaticResource BgPanel}" CornerRadius="4" Padding="6,2" Margin="0,0,6,0">
+                                            <TextBlock Text="✓ Batch Folder" FontSize="10" Foreground="{StaticResource TextSecondary}"/>
+                                        </Border>
+                                        <Border Background="{StaticResource BgPanel}" CornerRadius="4" Padding="6,2" Margin="0,0,6,0">
+                                            <TextBlock Text="✓ Subtitle .srt/.ass" FontSize="10" Foreground="{StaticResource TextSecondary}"/>
+                                        </Border>
+                                        <Border Background="{StaticResource BgPanel}" CornerRadius="4" Padding="6,2">
+                                            <TextBlock Text="✓ Font TTF/OTF" FontSize="10" Foreground="{StaticResource TextSecondary}"/>
+                                        </Border>
                                     </StackPanel>
 
-                                    <!-- Description -->
-                                    <TextBlock Grid.Row="1" Text="Ekstrak track subtitle (SRT, ASS, VTT, PGS) dan font secara instan dari file video MKV berkecepatan tinggi tanpa perlu re-encoding video/audio." FontSize="13" Foreground="{StaticResource TextSecondary}" TextWrapping="Wrap" Margin="0,0,0,18"/>
+                                    <!-- Card Action Buttons -->
+                                    <Grid Grid.Row="3">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="10"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
 
-                                    <!-- Features List -->
-                                    <StackPanel Grid.Row="2" Margin="0,0,0,20">
-                                        <TextBlock Text="✓ Ekstraksi berkecepatan tinggi (1–2 detik per video)" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,6" FontSize="12"/>
-                                        <TextBlock Text="✓ Ekstrak ke SRT, ASS, VTT, PGS, atau langsung ke .mks" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,6" FontSize="12"/>
-                                        <TextBlock Text="✓ Otomatis mengekstrak font embedded (TTF/OTF)" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,6" FontSize="12"/>
-                                        <TextBlock Text="✓ Batch Folder Mode (proses 1 season serial anime sekaligus)" Foreground="{StaticResource TextSecondary}" FontSize="12"/>
-                                    </StackPanel>
+                                        <ui:Button Grid.Column="0" Content="Pilih File .mkv..." Command="{Binding ExtractorVm.BrowseInputCommand}"
+                                                   Appearance="Primary" HorizontalAlignment="Stretch" Padding="0,11" FontWeight="SemiBold"
+                                                   Icon="{ui:SymbolIcon Symbol=FolderOpen24}"/>
 
-                                    <!-- Buttons -->
-                                    <StackPanel Grid.Row="3">
-                                        <Button Content="🚀 Buka MKV Extractor ➔" Command="{Binding NavigateToExtractorCommand}" Background="{StaticResource AccentPurple}" Foreground="#FFFFFF" FontWeight="Bold" FontSize="13" Padding="16,10" Margin="0,0,0,8" BorderThickness="0"/>
-                                        <Button Content="📁 Pilih File Video .mkv..." Command="{Binding ExtractorVm.BrowseInputCommand}" Padding="14,8" Background="{StaticResource BgCardElevated}"/>
-                                    </StackPanel>
+                                        <ui:Button Grid.Column="2" Content="Buka Extractor" Command="{Binding NavigateToExtractorCommand}"
+                                                   Appearance="Secondary" HorizontalAlignment="Stretch" Padding="0,11" FontWeight="SemiBold"
+                                                   Icon="{ui:SymbolIcon Symbol=ArrowRight24}"/>
+                                    </Grid>
                                 </Grid>
-                            </Border>
+                            </ui:Card>
 
-                            <!-- =================================================== -->
-                            <!-- OPTION CARD 2: MKS SUBTITLE STUDIO (CYAN ACCENT)   -->
-                            <!-- =================================================== -->
-                            <Border Grid.Column="2" Background="{StaticResource BgPanel}" CornerRadius="12" Padding="24" BorderBrush="{StaticResource BorderDark}" BorderThickness="1">
+                            <!-- CARD 2: MKS SUBTITLE STUDIO -->
+                            <ui:Card Grid.Column="2" Padding="26,24" Background="{StaticResource BgCard}" BorderBrush="{StaticResource BorderDark}">
                                 <Grid>
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/> <!-- Icon & Title -->
-                                        <RowDefinition Height="Auto"/> <!-- Description -->
-                                        <RowDefinition Height="*"/>    <!-- Feature Checklist -->
-                                        <RowDefinition Height="Auto"/> <!-- Buttons -->
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
 
-                                    <!-- Header -->
-                                    <StackPanel Grid.Row="0" Margin="0,0,0,12">
-                                        <Border Width="52" Height="52" Background="#0C3650" CornerRadius="12" HorizontalAlignment="Left" Margin="0,0,0,12">
-                                            <TextBlock Text="✏️" FontSize="26" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    <!-- Card Header -->
+                                    <Grid Grid.Row="0" Margin="0,0,0,14">
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <Border Width="46" Height="46" Background="#082F49" CornerRadius="12" Margin="0,0,14,0">
+                                                <ui:SymbolIcon Symbol="DocumentBulletList24" FontSize="24" Foreground="{StaticResource AccentPrimary}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <StackPanel VerticalAlignment="Center">
+                                                <TextBlock Text="MKS Subtitle Studio" FontSize="17" FontWeight="Bold" Foreground="#FFFFFF"/>
+                                                <TextBlock Text="Editor, Converter &amp; Translator" FontSize="12" Foreground="{StaticResource TextMuted}"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                        <Border HorizontalAlignment="Right" Background="#0C4A6E" CornerRadius="6" Padding="7,3" VerticalAlignment="Top">
+                                            <TextBlock Text="Pure C# EBML" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentPrimary}"/>
                                         </Border>
-                                        <TextBlock Text="MKS Subtitle Studio" FontSize="20" FontWeight="Bold" Foreground="{StaticResource AccentPrimary}"/>
-                                        <TextBlock Text="Viewer, Editor &amp; Muxer File .mks" FontSize="12" Foreground="{StaticResource TextMuted}" Margin="0,2,0,0"/>
+                                    </Grid>
+
+                                    <!-- Card Description -->
+                                    <TextBlock Grid.Row="1" Text="Buka, edit ribuan baris subtitle dengan virtualized DataGrid, konversi lintas format (SRT, ASS, VTT, TTML, SAMI, MicroDVD, SBV, LRC), terjemahkan online dengan Google Translate, dan simpan ke .mks native."
+                                               Foreground="{StaticResource TextSecondary}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,18" LineHeight="18"/>
+
+                                    <!-- Feature Badges -->
+                                    <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,0,0,22">
+                                        <Border Background="{StaticResource BgPanel}" CornerRadius="4" Padding="6,2" Margin="0,0,6,0">
+                                            <TextBlock Text="✓ 10+ Format Subtitle" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentPrimary}"/>
+                                        </Border>
+                                        <Border Background="{StaticResource BgPanel}" CornerRadius="4" Padding="6,2" Margin="0,0,6,0">
+                                            <TextBlock Text="✓ Google Translate" FontSize="10" Foreground="{StaticResource TextSecondary}"/>
+                                        </Border>
+                                        <Border Background="{StaticResource BgPanel}" CornerRadius="4" Padding="6,2">
+                                            <TextBlock Text="✓ Multi-Track .mks" FontSize="10" Foreground="{StaticResource TextSecondary}"/>
+                                        </Border>
                                     </StackPanel>
 
-                                    <!-- Description -->
-                                    <TextBlock Grid.Row="1" Text="Buka, inspeksi, edit baris subtitle, timecode, styling teks ASS, serta kelola multi-track dan font dalam satu container Matroska Subtitles (.mks)." FontSize="13" Foreground="{StaticResource TextSecondary}" TextWrapping="Wrap" Margin="0,0,0,18"/>
+                                    <!-- Card Action Buttons -->
+                                    <Grid Grid.Row="3">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="10"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
 
-                                    <!-- Features List -->
-                                    <StackPanel Grid.Row="2" Margin="0,0,0,20">
-                                        <TextBlock Text="✓ Manajemen multi-track subtitle (SRT, ASS, VTT)" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,6" FontSize="12"/>
-                                        <TextBlock Text="✓ Virtualized DataGrid &amp; Filter Pencarian Real-time" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,6" FontSize="12"/>
-                                        <TextBlock Text="✓ Time Shifting presisi (+/- ms) &amp; FPS Converter" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,6" FontSize="12"/>
-                                        <TextBlock Text="✓ Live Cinema Preview 16:9 &amp; Quick Formatting Bar" Foreground="{StaticResource TextSecondary}" FontSize="12"/>
-                                    </StackPanel>
+                                        <ui:Button Grid.Column="0" Content="Buka File Subtitle..." Command="{Binding OpenFileCommand}"
+                                                   Appearance="Primary" HorizontalAlignment="Stretch" Padding="0,11" FontWeight="SemiBold"
+                                                   Icon="{ui:SymbolIcon Symbol=FolderOpen24}"/>
 
-                                    <!-- Buttons -->
-                                    <StackPanel Grid.Row="3">
-                                        <Button Content="🚀 Buka MKS Editor ➔" Command="{Binding NavigateToEditorCommand}" Background="{StaticResource AccentPrimary}" Foreground="#FFFFFF" FontWeight="Bold" FontSize="13" Padding="16,10" Margin="0,0,0,8" BorderThickness="0"/>
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="8"/>
-                                                <ColumnDefinition Width="*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <Button Grid.Column="0" Content="📂 Buka File..." Command="{Binding OpenFileCommand}" Padding="10,8" Background="{StaticResource BgCardElevated}"/>
-                                            <Button Grid.Column="2" Content="➕ Buat Baru" Command="{Binding CreateNewFileCommand}" Padding="10,8" Background="{StaticResource BgCardElevated}"/>
-                                        </Grid>
-                                    </StackPanel>
+                                        <ui:Button Grid.Column="2" Content="Buat Baru" Command="{Binding CreateNewFileCommand}"
+                                                   Appearance="Secondary" HorizontalAlignment="Stretch" Padding="0,11" FontWeight="SemiBold"
+                                                   Icon="{ui:SymbolIcon Symbol=Add24}"/>
+                                    </Grid>
                                 </Grid>
-                            </Border>
+                            </ui:Card>
                         </Grid>
 
-                        <!-- Drop Zone Card -->
-                        <Border Grid.Row="2" Background="{StaticResource BgCard}" CornerRadius="10" Padding="20,16" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <TextBlock Text="💡 " FontSize="16" VerticalAlignment="Center"/>
-                                <TextBlock Text="Tip Cepat: Anda dapat men-Drag &amp; Drop file " Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
-                                <TextBlock Text=".mks" FontWeight="Bold" Foreground="{StaticResource AccentPrimary}" VerticalAlignment="Center"/>
-                                <TextBlock Text=" atau " Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
-                                <TextBlock Text=".mkv" FontWeight="Bold" Foreground="{StaticResource AccentPurple}" VerticalAlignment="Center"/>
-                                <TextBlock Text=" langsung ke layar ini untuk membukanya secara instan." Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
-                            </StackPanel>
+                        <!-- Drag & Drop Zone -->
+                        <Border Grid.Row="1" CornerRadius="14" Padding="28,20" Background="{StaticResource BgPanel}" BorderBrush="{StaticResource BorderDark}" BorderThickness="1.5">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Border Grid.Column="0" Width="46" Height="46" Background="{StaticResource BgCard}" CornerRadius="12" Margin="0,0,18,0">
+                                    <ui:SymbolIcon Symbol="ArrowUpload24" FontSize="24" Foreground="{StaticResource AccentPrimary}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock Text="Drag &amp; Drop file .mkv, .mks, .srt, .ass, .vtt, .ttml, .smi, .sub, .sbv, atau .lrc ke sini" FontWeight="Bold" FontSize="13" Foreground="{StaticResource TextPrimary}"/>
+                                    <TextBlock Text="Aplikasi akan mendeteksi format subtitle secara otomatis dan mengarahkan ke editor atau extractor." FontSize="11" Foreground="{StaticResource TextMuted}" Margin="0,2,0,0"/>
+                                </StackPanel>
+                            </Grid>
                         </Border>
                     </Grid>
                 </ScrollViewer>
@@ -258,12 +397,12 @@
             <TabItem>
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/> <!-- Toolbar & Header -->
-                        <RowDefinition Height="*"/>    <!-- Main Content -->
+                        <RowDefinition Height="Auto"/> <!-- Fluent Action Toolbar -->
+                        <RowDefinition Height="*"/>    <!-- Workspace Area -->
                     </Grid.RowDefinitions>
 
-                    <!-- Action Toolbar & Container Header -->
-                    <Border Grid.Row="0" Background="{StaticResource BgPanel}" BorderBrush="{StaticResource BorderDark}" BorderThickness="0,0,0,1" Padding="12,8">
+                    <!-- Fluent Action Toolbar -->
+                    <Border Grid.Row="0" Background="{StaticResource BgPanel}" BorderBrush="{StaticResource BorderDark}" BorderThickness="0,0,0,1" Padding="14,8">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
@@ -271,28 +410,28 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
 
-                            <!-- Action Toolbar Buttons Grouped -->
+                            <!-- Toolbar Action Buttons -->
                             <StackPanel Grid.Column="0" Orientation="Horizontal">
-                                <Button Content="📂 Open" Command="{Binding OpenFileCommand}" ToolTip="Open .mks or .mkv file" Margin="0,0,6,0"/>
-                                <Button Content="💾 Save (.mks)" Command="{Binding SaveFileCommand}" Background="{StaticResource AccentGreen}" Foreground="#FFFFFF" ToolTip="Save directly to .mks (Ctrl+S)" Margin="0,0,6,0"/>
-                                <Button Content="➕ Add Track" Command="{Binding AddTrackFromFileCommand}" ToolTip="Import subtitle file as track" Margin="0,0,10,0"/>
+                                <ui:Button Content="Buka" Command="{Binding OpenFileCommand}" Icon="{ui:SymbolIcon Symbol=FolderOpen24}" Margin="0,0,5,0" ToolTip="Buka file subtitle atau container .mks"/>
+                                <ui:Button Content="Simpan .mks" Command="{Binding SaveFileCommand}" Appearance="Primary" Icon="{ui:SymbolIcon Symbol=Save24}" Margin="0,0,5,0" ToolTip="Simpan langsung ke container .mks (Ctrl+S)"/>
+                                <ui:Button Content="Tambah Track" Command="{Binding AddTrackFromFileCommand}" Icon="{ui:SymbolIcon Symbol=Add24}" Margin="0,0,10,0" ToolTip="Impor file subtitle sebagai track baru"/>
 
-                                <Border Width="1" Background="{StaticResource BorderDark}" Margin="0,2,10,2"/>
+                                <Border Width="1" Background="{StaticResource BorderDark}" Margin="4,4,10,4"/>
 
-                                <Button Content="⏱️ Time Shift" Click="OnOpenTimeShiftClicked" ToolTip="Shift timestamps or convert FPS" Margin="0,0,6,0"/>
-                                <Button Content="🔍 Find/Replace" Click="OnOpenSearchReplaceClicked" ToolTip="Search and replace text" Margin="0,0,6,0"/>
-                                <Button Content="🔤 Fonts" Click="OnOpenAttachmentsClicked" ToolTip="Manage embedded fonts" Margin="0,0,10,0"/>
+                                <ui:Button Content="Cari &amp; Ganti" Click="OnOpenSearchReplaceClicked" Icon="{ui:SymbolIcon Symbol=Search24}" Margin="0,0,5,0" ToolTip="Cari dan ganti teks (Regex)"/>
+                                <ui:Button Content="Font" Click="OnOpenAttachmentsClicked" Icon="{ui:SymbolIcon Symbol=FontIncrease24}" Margin="0,0,5,0" ToolTip="Kelola embedded font TTF/OTF"/>
+                                <ui:Button Content="Terjemahkan" Click="OnOpenTranslationClicked" Icon="{ui:SymbolIcon Symbol=LocalLanguage24}" Margin="0,0,10,0" ToolTip="Terjemahkan subtitle dengan Google Translate online"/>
 
-                                <Border Width="1" Background="{StaticResource BorderDark}" Margin="0,2,10,2"/>
+                                <Border Width="1" Background="{StaticResource BorderDark}" Margin="4,4,10,4"/>
 
-                                <Button Content="📤 Export Track" Command="{Binding ExportTrackCommand}" ToolTip="Export current track" Margin="0,0,6,0"/>
-                                <Button Content="📦 Export All Tracks" Command="{Binding ExportAllTracksCommand}" ToolTip="Export all tracks to folder" Margin="0,0,6,0"/>
+                                <ui:Button Content="Ekspor" Command="{Binding ExportTrackCommand}" Icon="{ui:SymbolIcon Symbol=Share24}" Margin="0,0,5,0" ToolTip="Ekspor track aktif ke format .srt/.ass"/>
+                                <ui:Button Content="Ekspor Semua" Command="{Binding ExportAllTracksCommand}" Icon="{ui:SymbolIcon Symbol=FolderZip24}" Margin="0,0,5,0" ToolTip="Ekspor semua track ke folder"/>
                             </StackPanel>
 
-                            <!-- Right Pill Badges for Container Info -->
+                            <!-- Container Title Box -->
                             <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="Title:" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" Margin="0,0,6,0" FontSize="11"/>
-                                <TextBox Text="{Binding ContainerTitle, UpdateSourceTrigger=PropertyChanged}" Width="160" Padding="6,3" FontSize="11"/>
+                                <TextBlock Text="Judul Kontainer:" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11"/>
+                                <ui:TextBox Text="{Binding ContainerTitle, UpdateSourceTrigger=PropertyChanged}" Width="190" Height="32" FontSize="11" Padding="8,4"/>
                             </StackPanel>
                         </Grid>
                     </Border>
@@ -300,8 +439,8 @@
                     <!-- Workspace Area -->
                     <Grid Grid.Row="1">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="320" MinWidth="260" MaxWidth="480"/>
-                            <ColumnDefinition Width="4"/> <!-- Splitter -->
+                            <ColumnDefinition Width="330" MinWidth="280" MaxWidth="500"/>
+                            <ColumnDefinition Width="5"/> <!-- Splitter -->
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
@@ -309,19 +448,25 @@
                         <Grid Grid.Column="0" Background="{StaticResource BgPanel}">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="200" MinHeight="120"/>
+                                <RowDefinition Height="180" MinHeight="110"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
 
                             <!-- Track List Header -->
-                            <Border Grid.Row="0" Padding="12,8" Background="{StaticResource BgCardElevated}" BorderBrush="{StaticResource BorderDark}" BorderThickness="0,0,0,1">
+                            <Border Grid.Row="0" Padding="14,10" Background="{StaticResource BgCardElevated}" BorderBrush="{StaticResource BorderDark}" BorderThickness="0,0,0,1">
                                 <Grid>
-                                    <TextBlock Text="SUBTITLE TRACKS" FontWeight="Bold" FontSize="11" Foreground="{StaticResource AccentPrimary}" VerticalAlignment="Center"/>
+                                    <TextBlock Text="TRACK SUBTITLE" FontWeight="Bold" FontSize="11" Foreground="{StaticResource AccentPrimary}" VerticalAlignment="Center"/>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                        <Button Content="➕ Add" Command="{Binding AddTrackFromFileCommand}" Padding="6,2" Margin="0,0,4,0" FontSize="11"/>
-                                        <Button Content="📋 Copy" Command="{Binding DuplicateTrackCommand}" Padding="6,2" Margin="0,0,4,0" FontSize="11"/>
-                                        <Button Content="🗑️ Del" Command="{Binding RemoveTrackCommand}" Padding="6,2" FontSize="11"/>
+                                        <Button Command="{Binding AddTrackFromFileCommand}" Padding="6,3" Margin="0,0,4,0" ToolTip="Tambah Track">
+                                            <ui:SymbolIcon Symbol="Add20" FontSize="12"/>
+                                        </Button>
+                                        <Button Command="{Binding DuplicateTrackCommand}" Padding="6,3" Margin="0,0,4,0" ToolTip="Duplikasi Track">
+                                            <ui:SymbolIcon Symbol="Copy20" FontSize="12"/>
+                                        </Button>
+                                        <Button Command="{Binding RemoveTrackCommand}" Padding="6,3" ToolTip="Hapus Track">
+                                            <ui:SymbolIcon Symbol="Delete20" FontSize="12"/>
+                                        </Button>
                                     </StackPanel>
                                 </Grid>
                             </Border>
@@ -332,7 +477,7 @@
                                      ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Padding="8,7" CornerRadius="6" Margin="2,2" Background="{StaticResource BgCard}" BorderBrush="{StaticResource BorderDark}" BorderThickness="1">
+                                        <Border Padding="10,8" CornerRadius="8" Margin="4,3" Background="{StaticResource BgCard}" BorderBrush="{StaticResource BorderDark}" BorderThickness="1">
                                             <Grid>
                                                 <Grid.RowDefinitions>
                                                     <RowDefinition Height="Auto"/>
@@ -340,17 +485,15 @@
                                                 </Grid.RowDefinitions>
                                                 <Grid Grid.Row="0">
                                                     <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="#FFFFFF" TextTrimming="CharacterEllipsis" Margin="0,0,50,0"/>
-                                                    <Border HorizontalAlignment="Right" Background="{StaticResource AccentPrimary}" CornerRadius="4" Padding="5,1">
+                                                    <Border HorizontalAlignment="Right" Background="{StaticResource AccentIndigo}" CornerRadius="4" Padding="6,2">
                                                         <TextBlock Text="{Binding Language, StringFormat='{}{0}'}" FontSize="10" FontWeight="Bold" Foreground="#FFFFFF"/>
                                                     </Border>
                                                 </Grid>
-                                                <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,4,0,0">
-                                                    <Border Background="{StaticResource BgCardElevated}" CornerRadius="3" Padding="4,1" Margin="0,0,6,0">
+                                                <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,5,0,0">
+                                                    <Border Background="{StaticResource BgCardElevated}" CornerRadius="3" Padding="5,2" Margin="0,0,8,0">
                                                         <TextBlock Text="{Binding CodecDisplay}" FontSize="10" Foreground="{StaticResource TextSecondary}"/>
                                                     </Border>
-                                                    <TextBlock Text="{Binding CueCount, StringFormat='{}{0} cues'}" FontSize="10" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                                                    <TextBlock Text="[DEFAULT]" FontSize="9" FontWeight="Bold" Foreground="{StaticResource AccentPrimary}" VerticalAlignment="Center" Visibility="{Binding IsDefault, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}" Margin="0,0,4,0"/>
-                                                    <TextBlock Text="[FORCED]" FontSize="9" FontWeight="Bold" Foreground="{StaticResource AccentAmber}" VerticalAlignment="Center" Visibility="{Binding IsForced, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"/>
+                                                    <TextBlock Text="{Binding CueCount, StringFormat='{}{0} cues'}" FontSize="10" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center"/>
                                                 </StackPanel>
                                             </Grid>
                                         </Border>
@@ -359,175 +502,195 @@
                             </ListBox>
 
                             <!-- Track Inspector Header -->
-                            <Border Grid.Row="2" Padding="12,8" Background="{StaticResource BgCardElevated}" BorderBrush="{StaticResource BorderDark}" BorderThickness="0,1,0,1">
-                                <TextBlock Text="TRACK PROPERTIES &amp; CONVERSION" FontWeight="Bold" FontSize="11" Foreground="{StaticResource AccentPrimary}"/>
+                            <Border Grid.Row="2" Padding="14,10" Background="{StaticResource BgCardElevated}" BorderBrush="{StaticResource BorderDark}" BorderThickness="0,1,0,1">
+                                <TextBlock Text="PROPERTI TRACK" FontWeight="Bold" FontSize="11" Foreground="{StaticResource AccentPrimary}"/>
                             </Border>
 
                             <!-- Track Inspector Details -->
                             <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto" Padding="14,12">
                                 <StackPanel DataContext="{Binding SelectedTrack}">
-                                    <TextBlock Text="Track Name:" FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,3"/>
-                                    <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10"/>
+                                    <TextBlock Text="Nama Track:" FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,4"/>
+                                    <ui:TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Height="32" Margin="0,0,0,10" FontSize="11" Padding="8,4"/>
 
                                     <Grid Margin="0,0,0,10">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
-                                        <StackPanel Grid.Column="0" Margin="0,0,6,0">
-                                            <TextBlock Text="Language (ISO-639):" FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,3"/>
-                                            <TextBox Text="{Binding Language, UpdateSourceTrigger=PropertyChanged}"/>
+                                        <StackPanel Grid.Column="0" Margin="0,0,5,0">
+                                            <TextBlock Text="Bahasa (ISO):" FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,4"/>
+                                            <ui:TextBox Text="{Binding Language, UpdateSourceTrigger=PropertyChanged}" Height="32" FontSize="11" Padding="8,4"/>
                                         </StackPanel>
-                                        <StackPanel Grid.Column="1" Margin="6,0,0,0">
-                                            <TextBlock Text="Format / Codec:" FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,3"/>
-                                            <Border Background="{StaticResource BgInput}" CornerRadius="5" Padding="6,4" BorderBrush="{StaticResource BorderDark}" BorderThickness="1">
+                                        <StackPanel Grid.Column="1" Margin="5,0,0,0">
+                                            <TextBlock Text="Format Codec:" FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,4"/>
+                                            <Border Background="{StaticResource BgInput}" CornerRadius="5" Padding="8,4" Height="32" BorderBrush="{StaticResource BorderDark}" BorderThickness="1">
                                                 <TextBlock Text="{Binding CodecDisplay}" Foreground="{StaticResource AccentPrimary}" FontWeight="Bold" FontSize="11" VerticalAlignment="Center"/>
                                             </Border>
                                         </StackPanel>
                                     </Grid>
-
-                                    <!-- Flags -->
-                                    <Border Background="{StaticResource BgCard}" CornerRadius="6" Padding="10,8" Margin="0,0,0,12" BorderBrush="{StaticResource BorderDark}" BorderThickness="1">
-                                        <StackPanel Orientation="Horizontal">
-                                            <CheckBox Content="Default Track" IsChecked="{Binding IsDefault}" Foreground="{StaticResource TextPrimary}" Margin="0,0,18,0"/>
-                                            <CheckBox Content="Forced Track" IsChecked="{Binding IsForced}" Foreground="{StaticResource TextPrimary}"/>
-                                        </StackPanel>
-                                    </Border>
-
-                                    <!-- Conversion Card -->
-                                    <Border Background="{StaticResource BgCard}" CornerRadius="6" Padding="10,10" Margin="0,0,0,12" BorderBrush="{StaticResource BorderDark}" BorderThickness="1">
-                                        <StackPanel>
-                                            <TextBlock Text="Quick Format Conversion" FontWeight="SemiBold" FontSize="11" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,6"/>
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                </Grid.ColumnDefinitions>
-                                                <Button Grid.Column="0" Content="➔ Convert to SRT" Command="{Binding DataContext.ConvertTrackToSrtCommand, RelativeSource={RelativeSource AncestorType=Window}}" Margin="0,0,4,0" Padding="4,5" FontSize="11"/>
-                                                <Button Grid.Column="1" Content="➔ Convert to ASS" Command="{Binding DataContext.ConvertTrackToAssCommand, RelativeSource={RelativeSource AncestorType=Window}}" Margin="4,0,0,0" Padding="4,5" FontSize="11"/>
-                                            </Grid>
-                                        </StackPanel>
-                                    </Border>
-
-                                    <Button Content="📤 Export This Track..." Command="{Binding DataContext.ExportTrackCommand, RelativeSource={RelativeSource AncestorType=Window}}" Padding="8,8" Background="{StaticResource BgCardElevated}"/>
                                 </StackPanel>
                             </ScrollViewer>
                         </Grid>
 
                         <!-- Vertical Splitter -->
-                        <GridSplitter Grid.Column="1" Width="4" HorizontalAlignment="Stretch" Background="{StaticResource BorderDark}" Cursor="SizeWE"/>
+                        <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="{StaticResource BorderDark}" Cursor="SizeWE"/>
 
                         <!-- Center & Right Panel: Subtitle Editor & Live Preview -->
                         <Grid Grid.Column="2">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/> <!-- Quick Filter & Grid Ribbon -->
-                                <RowDefinition Height="*"/>    <!-- Subtitle DataGrid -->
-                                <RowDefinition Height="4"/>    <!-- Splitter -->
-                                <RowDefinition Height="240" MinHeight="140"/> <!-- Bottom Editor & Preview -->
+                                <RowDefinition Height="3*" MinHeight="160"/>    <!-- Subtitle DataGrid -->
+                                <RowDefinition Height="5"/>    <!-- Splitter -->
+                                <RowDefinition Height="2*" MinHeight="170"/> <!-- Bottom Editor & Preview -->
                             </Grid.RowDefinitions>
 
                             <!-- Subtitle Grid Toolbar with Search Filter Bar -->
-                            <Border Grid.Row="0" Background="{StaticResource BgPanel}" BorderBrush="{StaticResource BorderDark}" BorderThickness="0,0,0,1" Padding="12,6">
+                            <Border Grid.Row="0" Background="{StaticResource BgPanel}" BorderBrush="{StaticResource BorderDark}" BorderThickness="0,0,0,1" Padding="14,8">
                                 <Grid>
-                                    <!-- Left Cue Action Buttons -->
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                                        <Button Content="➕ Add Line" Command="{Binding AddCueCommand}" Background="{StaticResource AccentPrimary}" Foreground="#FFFFFF" Margin="0,0,6,0"/>
-                                        <Button Content="🗑️ Delete" Command="{Binding DeleteCueCommand}" Margin="0,0,6,0"/>
-                                        <Button Content="✂️ Split" Command="{Binding SplitCueCommand}" Margin="0,0,6,0"/>
-                                        <Button Content="▲ Move Up" Command="{Binding MoveCueUpCommand}" Margin="0,0,6,0"/>
-                                        <Button Content="▼ Move Down" Command="{Binding MoveCueDownCommand}" Margin="0,0,12,0"/>
-                                    </StackPanel>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="280"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
 
-                                    <!-- Right Live Search Filter Bar -->
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                        <TextBlock Text="🔍 Filter:" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                                        <TextBox Text="{Binding FilterQuery, UpdateSourceTrigger=PropertyChanged}" Width="200" Padding="6,3" ToolTip="Filter subtitle lines in real-time as you type"/>
+                                    <!-- Search / Filter Box -->
+                                    <ui:TextBox Grid.Column="0" PlaceholderText="Cari teks subtitle..."
+                                                Text="{Binding FilterQuery, UpdateSourceTrigger=PropertyChanged}"
+                                                Icon="{ui:SymbolIcon Symbol=Search24}" Height="32" FontSize="12" Padding="8,2"/>
+
+                                    <!-- Mid Info -->
+                                    <TextBlock Grid.Column="1" Text="{Binding SelectedTrack.Cues.Count, StringFormat='{}Total: {0} baris'}"
+                                               Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" Margin="16,0,0,0" FontSize="11"/>
+
+                                    <!-- Cue Operations -->
+                                    <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                        <ui:Button Content="Tambah" Command="{Binding AddCueCommand}" Icon="{ui:SymbolIcon Symbol=Add24}" Padding="9,5" Margin="0,0,4,0" FontSize="11"/>
+                                        <ui:Button Content="Hapus" Command="{Binding DeleteCueCommand}" Icon="{ui:SymbolIcon Symbol=Delete24}" Padding="9,5" Margin="0,0,4,0" FontSize="11"/>
+                                        <ui:Button Content="Pecah" Command="{Binding SplitCueCommand}" Icon="{ui:SymbolIcon Symbol=Cut24}" Padding="9,5" Margin="0,0,4,0" FontSize="11"/>
+                                        <ui:Button Content="▲" Command="{Binding MoveCueUpCommand}" Padding="7,5" Margin="0,0,3,0" FontSize="11"/>
+                                        <ui:Button Content="▼" Command="{Binding MoveCueDownCommand}" Padding="7,5" FontSize="11"/>
                                     </StackPanel>
                                 </Grid>
                             </Border>
 
-                            <!-- Virtualized Subtitle DataGrid -->
-                            <DataGrid Grid.Row="1" ItemsSource="{Binding VisibleCues}" SelectedItem="{Binding SelectedCue}"
-                                      AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
-                                      VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling"
-                                      EnableRowVirtualization="True" HeadersVisibility="Column" SelectionMode="Single"
-                                      GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{StaticResource BorderDark}" BorderThickness="0">
+                            <!-- Subtitle DataGrid with Virtualization -->
+                            <DataGrid x:Name="CuesDataGrid" Grid.Row="1" ItemsSource="{Binding VisibleCues}" SelectedItem="{Binding SelectedCue}"
+                                      AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" SelectionMode="Extended"
+                                      Background="{StaticResource BgDark}" Foreground="#FFFFFF" RowBackground="{StaticResource BgDark}" AlternatingRowBackground="{StaticResource BgPanel}"
+                                      GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{StaticResource BorderDark}" BorderBrush="{StaticResource BorderDark}"
+                                      EnableRowVirtualization="True" EnableColumnVirtualization="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
+                                      HeadersVisibility="Column" RowHeight="30" FontSize="12">
                                 <DataGrid.Resources>
                                     <Style TargetType="DataGridColumnHeader">
                                         <Setter Property="Background" Value="{StaticResource BgCardElevated}"/>
                                         <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
-                                        <Setter Property="Padding" Value="10,7"/>
+                                        <Setter Property="Padding" Value="12,7"/>
                                         <Setter Property="FontWeight" Value="SemiBold"/>
                                         <Setter Property="BorderBrush" Value="{StaticResource BorderDark}"/>
                                         <Setter Property="BorderThickness" Value="0,0,1,1"/>
                                     </Style>
+                                    <Style TargetType="DataGridRow">
+                                        <Setter Property="Background" Value="Transparent"/>
+                                        <Setter Property="Foreground" Value="#FFFFFF"/>
+                                        <Setter Property="BorderThickness" Value="0"/>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter Property="Background" Value="#1E3A8A"/>
+                                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                                            </Trigger>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="{StaticResource BgHover}"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                    <Style TargetType="DataGridCell">
+                                        <Setter Property="BorderThickness" Value="0"/>
+                                        <Setter Property="Padding" Value="10,4"/>
+                                        <Setter Property="Foreground" Value="#FFFFFF"/>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="DataGridCell">
+                                                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="0" Padding="{TemplateBinding Padding}">
+                                                        <ContentPresenter VerticalAlignment="Center"/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter Property="Background" Value="#1E3A8A"/>
+                                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
                                 </DataGrid.Resources>
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="#" Binding="{Binding Index}" Width="45" IsReadOnly="True"/>
-                                    <DataGridTextColumn Header="Start Time" Binding="{Binding StartTimeText, UpdateSourceTrigger=LostFocus}" Width="120" FontFamily="Consolas, Segoe UI"/>
-                                    <DataGridTextColumn Header="End Time" Binding="{Binding EndTimeText, UpdateSourceTrigger=LostFocus}" Width="120" FontFamily="Consolas, Segoe UI"/>
-                                    <DataGridTextColumn Header="Duration" Binding="{Binding DurationText}" Width="90" IsReadOnly="True" FontFamily="Consolas, Segoe UI"/>
-                                    <DataGridTextColumn Header="Style" Binding="{Binding Style}" Width="90"/>
-                                    <DataGridTextColumn Header="Actor" Binding="{Binding Actor}" Width="90"/>
-                                    <DataGridTextColumn Header="Subtitle Text Content" Binding="{Binding RawText}" Width="*"/>
+                                    <DataGridTextColumn Header="#" Binding="{Binding Index}" Width="55" IsReadOnly="True"/>
+                                    <DataGridTextColumn Header="Mulai" Binding="{Binding StartTimeText}" Width="105" FontFamily="Consolas"/>
+                                    <DataGridTextColumn Header="Selesai" Binding="{Binding EndTimeText}" Width="105" FontFamily="Consolas"/>
+                                    <DataGridTextColumn Header="Durasi" Binding="{Binding DurationText}" Width="85" IsReadOnly="True" FontFamily="Consolas"/>
+                                    <DataGridTextColumn Header="Style" Binding="{Binding Style}" Width="100"/>
+                                    <DataGridTextColumn Header="Karakter" Binding="{Binding Actor}" Width="100"/>
+                                    <DataGridTextColumn Header="Teks Subtitle" Binding="{Binding RawText}" Width="*"/>
                                 </DataGrid.Columns>
                             </DataGrid>
 
                             <!-- Horizontal Splitter -->
-                            <GridSplitter Grid.Row="2" Height="4" HorizontalAlignment="Stretch" Background="{StaticResource BorderDark}" Cursor="SizeNS"/>
+                            <GridSplitter Grid.Row="2" Height="5" HorizontalAlignment="Stretch" Background="{StaticResource BorderDark}" Cursor="SizeNS"/>
 
-                            <!-- Bottom Editor & Live Cinema Preview -->
+                            <!-- Bottom Cue Inspector & Cinema Preview -->
                             <Grid Grid.Row="3" Background="{StaticResource BgPanel}">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="480" MinWidth="360" MaxWidth="640"/>
                                 </Grid.ColumnDefinitions>
 
-                                <!-- Left: Multiline Subtitle Text Editor & Formatting Bar -->
-                                <Border Grid.Column="0" Padding="14,10" BorderBrush="{StaticResource BorderDark}" BorderThickness="0,0,1,0">
+                                <!-- Left: Cue Text Editor & Quick Format Bar -->
+                                <Border Grid.Column="0" Padding="16,12" BorderBrush="{StaticResource BorderDark}" BorderThickness="0,0,1,0">
                                     <Grid>
                                         <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/> <!-- Format Toolbar -->
-                                            <RowDefinition Height="*"/>    <!-- Text Area -->
-                                            <RowDefinition Height="Auto"/> <!-- Char Count Stats -->
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="Auto"/>
                                         </Grid.RowDefinitions>
 
-                                        <!-- Text Formatting Buttons -->
-                                        <Grid Grid.Row="0" Margin="0,0,0,6">
+                                        <!-- Quick Format Bar -->
+                                        <Grid Grid.Row="0" Margin="0,0,0,10">
                                             <StackPanel Orientation="Horizontal">
-                                                <TextBlock Text="EDIT TEXT:" FontWeight="Bold" FontSize="11" Foreground="{StaticResource AccentPrimary}" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                                                <Button Content="𝗕 Bold" Command="{Binding InsertFormattingCommand}" CommandParameter="b" Padding="6,2" Margin="0,0,4,0" FontSize="11"/>
-                                                <Button Content="𝘐 Italic" Command="{Binding InsertFormattingCommand}" CommandParameter="i" Padding="6,2" Margin="0,0,4,0" FontSize="11"/>
-                                                <Button Content="U Underline" Command="{Binding InsertFormattingCommand}" CommandParameter="u" Padding="6,2" Margin="0,0,4,0" FontSize="11"/>
-                                                <Button Content="↵ \N Newline" Command="{Binding InsertFormattingCommand}" CommandParameter="n" Padding="6,2" Margin="0,0,4,0" FontSize="11"/>
-                                                <Button Content="🎨 Yellow" Command="{Binding InsertFormattingCommand}" CommandParameter="color_yellow" Padding="6,2" Margin="0,0,4,0" FontSize="11"/>
-                                                <Button Content="🎨 Cyan" Command="{Binding InsertFormattingCommand}" CommandParameter="color_cyan" Padding="6,2" FontSize="11"/>
+                                                <TextBlock Text="FORMAT TEKS:" FontWeight="Bold" FontSize="11" Foreground="{StaticResource AccentPrimary}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                                <Button Content="𝗕 Bold" Command="{Binding InsertFormattingCommand}" CommandParameter="b" Padding="7,3" Margin="0,0,4,0" FontSize="11"/>
+                                                <Button Content="𝘐 Italic" Command="{Binding InsertFormattingCommand}" CommandParameter="i" Padding="7,3" Margin="0,0,4,0" FontSize="11"/>
+                                                <Button Content="U Underline" Command="{Binding InsertFormattingCommand}" CommandParameter="u" Padding="7,3" Margin="0,0,4,0" FontSize="11"/>
+                                                <Button Content="↵ \N Newline" Command="{Binding InsertFormattingCommand}" CommandParameter="n" Padding="7,3" Margin="0,0,4,0" FontSize="11"/>
+                                                <Button Content="🎨 Yellow" Command="{Binding InsertFormattingCommand}" CommandParameter="color_yellow" Padding="7,3" Margin="0,0,4,0" FontSize="11"/>
+                                                <Button Content="🎨 Cyan" Command="{Binding InsertFormattingCommand}" CommandParameter="color_cyan" Padding="7,3" FontSize="11"/>
                                             </StackPanel>
                                         </Grid>
 
-                                        <!-- Big Text Box -->
-                                        <TextBox Grid.Row="1" Text="{Binding SelectedCue.RawText, UpdateSourceTrigger=PropertyChanged}"
+                                        <!-- Text Box -->
+                                        <TextBox x:Name="CueRawTextBox" Grid.Row="1" Text="{Binding SelectedCue.RawText, UpdateSourceTrigger=PropertyChanged}"
+                                                 IsInactiveSelectionHighlightEnabled="True"
                                                  AcceptsReturn="True" AcceptsTab="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
-                                                 Background="{StaticResource BgDark}" Foreground="#FFFFFF" FontSize="15" Padding="10" BorderBrush="{StaticResource BorderDark}"/>
+                                                 Background="{StaticResource BgDark}" Foreground="#FFFFFF" FontSize="15" Padding="12,10" BorderBrush="{StaticResource BorderDark}"/>
 
                                         <!-- Character Stats -->
-                                        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,5,0,0">
-                                            <TextBlock Text="{Binding SelectedCueCharCount, StringFormat='{}Characters: {0}'}" FontSize="11" Foreground="{StaticResource TextMuted}" Margin="0,0,12,0"/>
-                                            <TextBlock Text="{Binding SelectedCueWordCount, StringFormat='{}Words: {0}'}" FontSize="11" Foreground="{StaticResource TextMuted}" Margin="0,0,12,0"/>
-                                            <TextBlock Text="{Binding SelectedCueLineCount, StringFormat='{}Lines: {0}'}" FontSize="11" Foreground="{StaticResource TextMuted}"/>
+                                        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,8,0,0">
+                                            <TextBlock Text="{Binding SelectedCueCharCount, StringFormat='{}Karakter: {0}'}" FontSize="11" Foreground="{StaticResource TextMuted}" Margin="0,0,16,0"/>
+                                            <TextBlock Text="{Binding SelectedCueWordCount, StringFormat='{}Kata: {0}'}" FontSize="11" Foreground="{StaticResource TextMuted}" Margin="0,0,16,0"/>
+                                            <TextBlock Text="{Binding SelectedCueLineCount, StringFormat='{}Baris: {0}'}" FontSize="11" Foreground="{StaticResource TextMuted}"/>
                                         </StackPanel>
                                     </Grid>
                                 </Border>
 
                                 <!-- Right: Cinema Style Visual Preview Screen -->
-                                <Border Grid.Column="1" Padding="14,10">
+                                <Border Grid.Column="1" Padding="16,12">
                                     <Grid>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="*"/>
                                         </Grid.RowDefinitions>
 
-                                        <Grid Grid.Row="0" Margin="0,0,0,6">
+                                        <Grid Grid.Row="0" Margin="0,0,0,8">
                                             <TextBlock Text="LIVE CINEMA PREVIEW" FontWeight="Bold" FontSize="11" Foreground="{StaticResource AccentPrimary}"/>
                                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                                 <TextBlock Text="{Binding SelectedCue.Style, StringFormat='{}Style: {0}'}" FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,0,10,0"/>
@@ -539,7 +702,7 @@
                                         <Border Grid.Row="1" Background="#000000" CornerRadius="8" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
                                             <Grid>
                                                 <!-- Timecode HUD overlay on top-left -->
-                                                <Border VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10" Background="#33000000" CornerRadius="4" Padding="6,2">
+                                                <Border VerticalAlignment="Top" HorizontalAlignment="Left" Margin="12" Background="#33000000" CornerRadius="4" Padding="7,3">
                                                     <TextBlock Text="{Binding SelectedCue.StartTimeText, StringFormat='{}▶ {0}'}" Foreground="#00E5FF" FontSize="10" FontFamily="Consolas, Segoe UI"/>
                                                 </Border>
 
@@ -547,10 +710,10 @@
                                                 <TextBlock Text="16:9 PREVIEW VIEWPORT" Foreground="#1E1E1E" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" FontWeight="Bold"/>
 
                                                 <!-- Rendered Subtitle Text -->
-                                                <Border VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="24,0,24,20" Padding="12,6">
+                                                <Border VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="24,0,24,22" Padding="14,8">
                                                     <TextBlock Text="{Binding PreviewText}" Foreground="#FFFFFF" FontSize="20" FontWeight="SemiBold" TextWrapping="Wrap" TextAlignment="Center" FontFamily="Arial, Segoe UI">
                                                         <TextBlock.Effect>
-                                                            <DropShadowEffect Color="Black" BlurRadius="8" ShadowDepth="2" Opacity="0.95"/>
+                                                             <DropShadowEffect Color="Black" BlurRadius="8" ShadowDepth="2" Opacity="0.95"/>
                                                         </TextBlock.Effect>
                                                     </TextBlock>
                                                 </Border>
@@ -568,18 +731,18 @@
             <!-- TAB 2: MKV SUBTITLE EXTRACTOR VIEW         -->
             <!-- ========================================== -->
             <TabItem DataContext="{Binding ExtractorVm}">
-                <Grid Margin="30,20,30,20">
+                <Grid Margin="38,22,38,22">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/> <!-- Header -->
                         <RowDefinition Height="Auto"/> <!-- Input Selection -->
-                        <RowDefinition Height="*"/>    <!-- Track List -->
-                        <RowDefinition Height="Auto"/> <!-- Output Options -->
+                        <RowDefinition Height="*"/>    <!-- Track & Font Lists -->
+                        <RowDefinition Height="Auto"/> <!-- 3 Modular Output Mode Cards -->
                         <RowDefinition Height="Auto"/> <!-- Progress & Logs -->
                         <RowDefinition Height="Auto"/> <!-- Action Buttons -->
                     </Grid.RowDefinitions>
 
                     <!-- Header -->
-                    <Grid Grid.Row="0" Margin="0,0,0,12">
+                    <Grid Grid.Row="0" Margin="0,0,0,14">
                         <StackPanel Orientation="Vertical">
                             <TextBlock Text="🎬 MKV Subtitle Extractor &amp; Demuxer" FontSize="22" FontWeight="Bold" Foreground="{StaticResource AccentPurple}"/>
                             <TextBlock Text="Ekstrak subtitle (SRT, ASS, VTT, PGS) dan font langsung dari file video MKV menggunakan MKVToolNix Engine." FontSize="13" Foreground="{StaticResource TextSecondary}" Margin="0,3,0,0"/>
@@ -587,106 +750,353 @@
                     </Grid>
 
                     <!-- Input File / Folder Selection Dropzone -->
-                    <Border Grid.Row="1" Background="{StaticResource BgCard}" CornerRadius="8" Padding="15,12" Margin="0,0,0,12" BorderBrush="{StaticResource BorderDark}" BorderThickness="1">
-                        <StackPanel>
-                            <Grid Margin="0,0,0,8">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Source MKV:" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,12,0"/>
-                                <TextBox Grid.Column="1" Text="{Binding InputPath, UpdateSourceTrigger=PropertyChanged}" Background="{StaticResource BgInput}" Foreground="#FFFFFF" BorderBrush="{StaticResource BorderDark}" Padding="8,5"/>
-                                <Button Grid.Column="2" Content="📁 Browse..." Command="{Binding BrowseInputCommand}" Background="{StaticResource AccentPrimary}" Foreground="#FFFFFF" Margin="8,0,0,0" Padding="14,5"/>
-                            </Grid>
+                    <ui:Card Grid.Row="1" Padding="18,14" Margin="0,0,0,14" Background="{StaticResource BgCard}" BorderBrush="{StaticResource BorderDark}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Source MKV:" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,14,0"/>
+                            <ui:TextBox Grid.Column="1" Text="{Binding InputPath, UpdateSourceTrigger=PropertyChanged}" Height="36" Padding="10,4"/>
+                            <ui:Button Grid.Column="2" Content="Pilih File..." Command="{Binding BrowseInputCommand}" Appearance="Primary" Margin="10,0,0,0" Padding="16,7" Icon="{ui:SymbolIcon Symbol=FolderOpen24}"/>
+                        </Grid>
+                    </ui:Card>
 
-                            <StackPanel Orientation="Horizontal">
-                                <CheckBox Content="Batch Folder Mode (Proses semua MKV dalam folder sekaligus)" IsChecked="{Binding IsBatchMode}" Foreground="{StaticResource TextPrimary}" Margin="0,0,20,0"/>
-                                <TextBlock Text="💡 Tip: Anda dapat Drag &amp; Drop file .mkv atau folder langsung ke layar ini." Foreground="{StaticResource TextMuted}" FontStyle="Italic"/>
-                            </StackPanel>
-                        </StackPanel>
-                    </Border>
-
-                    <!-- Subtitle Tracks & Attachments DataGrid -->
-                    <Grid Grid.Row="2" Margin="0,0,0,12">
+                    <!-- Subtitle Tracks & Attachments Tabbed DataGrid -->
+                    <Grid Grid.Row="2" Margin="0,0,0,14">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
-                        <!-- Table Header Toolbar -->
-                        <Grid Grid.Row="0" Margin="0,0,0,6">
-                            <TextBlock Text="DETECTED SUBTITLE TRACKS &amp; FONTS:" FontWeight="Bold" FontSize="11" Foreground="{StaticResource AccentPrimary}" VerticalAlignment="Center"/>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                <Button Content="✓ Select All" Command="{Binding SelectAllTracksCommand}" Padding="8,3" Margin="0,0,6,0" FontSize="11"/>
-                                <Button Content="✗ Deselect All" Command="{Binding DeselectAllTracksCommand}" Padding="8,3" FontSize="11"/>
-                            </StackPanel>
-                        </Grid>
+                        <!-- Content Switcher Tabs (Subtitles vs Fonts) -->
+                        <Border Grid.Row="0" Margin="0,0,0,10">
+                            <Grid>
+                                <StackPanel Orientation="Horizontal">
+                                    <RadioButton Content="📝 Track Subtitle Terdeteksi"
+                                                 IsChecked="{Binding SelectedContentTab, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=0, FallbackValue=True}"
+                                                 GroupName="ContentTabGroup" Foreground="{StaticResource TextPrimary}" FontWeight="Bold" FontSize="12" Margin="0,0,20,0"/>
+                                    <RadioButton Content="🔤 Lampiran Font Terdeteksi"
+                                                 IsChecked="{Binding SelectedContentTab, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=1}"
+                                                 GroupName="ContentTabGroup" Foreground="{StaticResource TextPrimary}" FontWeight="Bold" FontSize="12"/>
+                                </StackPanel>
 
-                        <!-- DataGrid -->
+                                <!-- Subtitle Selection Actions -->
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
+                                            Visibility="{Binding SelectedContentTab, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=0, FallbackValue=Visible}">
+                                    <ui:Button Content="✓ Pilih Semua Track" Command="{Binding SelectAllTracksCommand}" Padding="10,4" Margin="0,0,6,0" FontSize="11"/>
+                                    <ui:Button Content="✗ Batalkan Semua" Command="{Binding DeselectAllTracksCommand}" Padding="10,4" FontSize="11"/>
+                                </StackPanel>
+
+                                <!-- Font Selection Actions -->
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
+                                            Visibility="{Binding SelectedContentTab, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=1, FallbackValue=Collapsed}">
+                                    <ui:Button Content="✓ Pilih Semua Font" Command="{Binding SelectAllFontsCommand}" Padding="10,4" Margin="0,0,6,0" FontSize="11"/>
+                                    <ui:Button Content="✗ Batalkan Semua" Command="{Binding DeselectAllFontsCommand}" Padding="10,4" FontSize="11"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- Tab 1: Subtitles DataGrid -->
                         <DataGrid Grid.Row="1" ItemsSource="{Binding ScannedTracks}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
-                                  Background="{StaticResource BgPanel}" Foreground="{StaticResource TextPrimary}" RowBackground="{StaticResource BgDark}" AlternatingRowBackground="{StaticResource BgPanel}"
-                                  GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{StaticResource BorderDark}" BorderBrush="{StaticResource BorderDark}" HeadersVisibility="Column">
+                                  Background="{StaticResource BgDark}" Foreground="{StaticResource TextPrimary}"
+                                  RowBackground="{x:Null}" AlternatingRowBackground="{x:Null}"
+                                  GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{StaticResource BorderDark}" BorderBrush="{StaticResource BorderDark}" HeadersVisibility="Column"
+                                  RowHeight="34" FontSize="12" SelectionUnit="FullRow"
+                                  PreviewKeyDown="OnDataGridPreviewKeyDown"
+                                  Visibility="{Binding SelectedContentTab, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=0, FallbackValue=Visible}">
                             <DataGrid.Resources>
                                 <Style TargetType="DataGridColumnHeader">
                                     <Setter Property="Background" Value="{StaticResource BgCardElevated}"/>
                                     <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
-                                    <Setter Property="Padding" Value="10,7"/>
+                                    <Setter Property="Padding" Value="12,8"/>
                                     <Setter Property="FontWeight" Value="SemiBold"/>
                                     <Setter Property="BorderBrush" Value="{StaticResource BorderDark}"/>
                                     <Setter Property="BorderThickness" Value="0,0,1,1"/>
                                 </Style>
                             </DataGrid.Resources>
+                            <DataGrid.RowStyle>
+                                <Style TargetType="DataGridRow">
+                                    <Setter Property="Background" Value="#0D0D11"/>
+                                    <Setter Property="Foreground" Value="#94A3B8"/>
+                                    <Setter Property="BorderThickness" Value="4,0,0,1"/>
+                                    <Setter Property="BorderBrush" Value="{StaticResource BorderDark}"/>
+                                    <Setter Property="Cursor" Value="Hand"/>
+                                    <EventSetter Event="MouseLeftButtonUp" Handler="OnTrackRowMouseLeftButtonUp"/>
+                                    <Style.Triggers>
+                                        <!-- Highlight row when subtitle track is selected (IsSelected == True) -->
+                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                            <Setter Property="Background" Value="#4C1D95"/>
+                                            <Setter Property="BorderBrush" Value="#A855F7"/>
+                                            <Setter Property="Foreground" Value="#FFFFFF"/>
+                                            <Setter Property="FontWeight" Value="Bold"/>
+                                        </DataTrigger>
+                                        <!-- Unselected state -->
+                                        <DataTrigger Binding="{Binding IsSelected}" Value="False">
+                                            <Setter Property="Background" Value="#0D0D11"/>
+                                            <Setter Property="BorderBrush" Value="{StaticResource BorderDark}"/>
+                                            <Setter Property="Foreground" Value="#94A3B8"/>
+                                            <Setter Property="FontWeight" Value="Normal"/>
+                                        </DataTrigger>
+                                        <!-- Mouse hover on unselected row -->
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding Path=IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True"/>
+                                                <Condition Binding="{Binding IsSelected}" Value="False"/>
+                                            </MultiDataTrigger.Conditions>
+                                            <Setter Property="Background" Value="#22222E"/>
+                                            <Setter Property="Foreground" Value="#FFFFFF"/>
+                                        </MultiDataTrigger>
+                                        <!-- Mouse hover on selected row -->
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding Path=IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True"/>
+                                                <Condition Binding="{Binding IsSelected}" Value="True"/>
+                                            </MultiDataTrigger.Conditions>
+                                            <Setter Property="Background" Value="#5B21B6"/>
+                                            <Setter Property="BorderBrush" Value="#C084FC"/>
+                                            <Setter Property="Foreground" Value="#FFFFFF"/>
+                                        </MultiDataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGrid.RowStyle>
+                            <DataGrid.CellStyle>
+                                <Style TargetType="DataGridCell">
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                    <Setter Property="Padding" Value="10,5"/>
+                                    <Setter Property="Foreground" Value="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=Foreground}"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="DataGridCell">
+                                                <Border Background="Transparent" BorderThickness="0" Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter VerticalAlignment="Center"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter Property="Background" Value="Transparent"/>
+                                            <Setter Property="Foreground" Value="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=Foreground}"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGrid.CellStyle>
                             <DataGrid.Columns>
-                                <DataGridCheckBoxColumn Header="Extract" Binding="{Binding IsSelected}" Width="65"/>
+                                <DataGridTemplateColumn Header="Ekstrak" Width="70">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}"
+                                                      HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                      Cursor="Hand"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
                                 <DataGridTextColumn Header="Track ID" Binding="{Binding Id}" Width="75" IsReadOnly="True" FontFamily="Consolas"/>
-                                <DataGridTextColumn Header="Codec Format" Binding="{Binding Codec}" Width="160" IsReadOnly="True" FontWeight="SemiBold"/>
-                                <DataGridTextColumn Header="Language" Binding="{Binding Language}" Width="85" IsReadOnly="True"/>
-                                <DataGridTextColumn Header="Default" Binding="{Binding IsDefault}" Width="70" IsReadOnly="True"/>
-                                <DataGridTextColumn Header="Forced" Binding="{Binding IsForced}" Width="70" IsReadOnly="True"/>
-                                <DataGridTextColumn Header="Track Name" Binding="{Binding TrackName}" Width="*" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Format / Codec" Binding="{Binding Codec}" Width="160" IsReadOnly="True" FontWeight="SemiBold"/>
+                                <DataGridTextColumn Header="Bahasa" Binding="{Binding Language}" Width="90" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Default" Binding="{Binding IsDefault}" Width="75" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Forced" Binding="{Binding IsForced}" Width="75" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Nama Track" Binding="{Binding TrackName}" Width="*" IsReadOnly="True"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <!-- Tab 2: Fonts DataGrid -->
+                        <DataGrid Grid.Row="1" ItemsSource="{Binding ScannedFontItems}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
+                                  Background="{StaticResource BgDark}" Foreground="{StaticResource TextPrimary}"
+                                  RowBackground="{x:Null}" AlternatingRowBackground="{x:Null}"
+                                  GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{StaticResource BorderDark}" BorderBrush="{StaticResource BorderDark}" HeadersVisibility="Column"
+                                  RowHeight="34" FontSize="12" SelectionUnit="FullRow"
+                                  PreviewKeyDown="OnDataGridPreviewKeyDown"
+                                  Visibility="{Binding SelectedContentTab, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=1, FallbackValue=Collapsed}">
+                            <DataGrid.Resources>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="Background" Value="{StaticResource BgCardElevated}"/>
+                                    <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+                                    <Setter Property="Padding" Value="12,8"/>
+                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                    <Setter Property="BorderBrush" Value="{StaticResource BorderDark}"/>
+                                    <Setter Property="BorderThickness" Value="0,0,1,1"/>
+                                </Style>
+                            </DataGrid.Resources>
+                            <DataGrid.RowStyle>
+                                <Style TargetType="DataGridRow">
+                                    <Setter Property="Background" Value="#0D0D11"/>
+                                    <Setter Property="Foreground" Value="#94A3B8"/>
+                                    <Setter Property="BorderThickness" Value="4,0,0,1"/>
+                                    <Setter Property="BorderBrush" Value="{StaticResource BorderDark}"/>
+                                    <Setter Property="Cursor" Value="Hand"/>
+                                    <EventSetter Event="MouseLeftButtonUp" Handler="OnFontRowMouseLeftButtonUp"/>
+                                    <Style.Triggers>
+                                        <!-- Highlight row when font item is selected (IsSelected == True) -->
+                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                            <Setter Property="Background" Value="#4C1D95"/>
+                                            <Setter Property="BorderBrush" Value="#A855F7"/>
+                                            <Setter Property="Foreground" Value="#FFFFFF"/>
+                                            <Setter Property="FontWeight" Value="Bold"/>
+                                        </DataTrigger>
+                                        <!-- Unselected state -->
+                                        <DataTrigger Binding="{Binding IsSelected}" Value="False">
+                                            <Setter Property="Background" Value="#0D0D11"/>
+                                            <Setter Property="BorderBrush" Value="{StaticResource BorderDark}"/>
+                                            <Setter Property="Foreground" Value="#94A3B8"/>
+                                            <Setter Property="FontWeight" Value="Normal"/>
+                                        </DataTrigger>
+                                        <!-- Mouse hover on unselected row -->
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding Path=IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True"/>
+                                                <Condition Binding="{Binding IsSelected}" Value="False"/>
+                                            </MultiDataTrigger.Conditions>
+                                            <Setter Property="Background" Value="#22222E"/>
+                                            <Setter Property="Foreground" Value="#FFFFFF"/>
+                                        </MultiDataTrigger>
+                                        <!-- Mouse hover on selected row -->
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding Path=IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True"/>
+                                                <Condition Binding="{Binding IsSelected}" Value="True"/>
+                                            </MultiDataTrigger.Conditions>
+                                            <Setter Property="Background" Value="#5B21B6"/>
+                                            <Setter Property="BorderBrush" Value="#C084FC"/>
+                                            <Setter Property="Foreground" Value="#FFFFFF"/>
+                                        </MultiDataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGrid.RowStyle>
+                            <DataGrid.CellStyle>
+                                <Style TargetType="DataGridCell">
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                    <Setter Property="Padding" Value="10,5"/>
+                                    <Setter Property="Foreground" Value="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=Foreground}"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="DataGridCell">
+                                                <Border Background="Transparent" BorderThickness="0" Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter VerticalAlignment="Center"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter Property="Background" Value="Transparent"/>
+                                            <Setter Property="Foreground" Value="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=Foreground}"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGrid.CellStyle>
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn Header="Ekstrak" Width="70">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}"
+                                                      HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                      Cursor="Hand"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="65" IsReadOnly="True" FontFamily="Consolas"/>
+                                <DataGridTextColumn Header="Nama File Font" Binding="{Binding FileName}" Width="*" IsReadOnly="True" FontWeight="SemiBold"/>
+                                <DataGridTextColumn Header="Tipe MIME" Binding="{Binding ContentType}" Width="160" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Ukuran" Binding="{Binding FormattedSize}" Width="105" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Deskripsi" Binding="{Binding Description}" Width="180" IsReadOnly="True"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </Grid>
 
-                    <!-- Output Options Card -->
-                    <Border Grid.Row="3" Background="{StaticResource BgCard}" CornerRadius="8" Padding="15,12" Margin="0,0,0,12" BorderBrush="{StaticResource BorderDark}" BorderThickness="1">
+                    <!-- Output Options: 3 Distinct Modular Cards -->
+                    <ui:Card Grid.Row="3" Padding="18,14" Margin="0,0,0,14" Background="{StaticResource BgCard}" BorderBrush="{StaticResource BorderDark}">
                         <StackPanel>
-                            <TextBlock Text="EXTRACTION TARGET &amp; FORMAT:" FontWeight="Bold" FontSize="11" Foreground="{StaticResource AccentPrimary}" Margin="0,0,0,8"/>
+                            <TextBlock Text="PILIHAN FORMAT &amp; TARGET EKSTRAKSI:" FontWeight="Bold" FontSize="11" Foreground="{StaticResource AccentPrimary}" Margin="0,0,0,12"/>
 
-                            <!-- Output Format Radios -->
-                            <Grid Margin="0,0,0,10">
+                            <!-- 3 Mode Cards -->
+                            <Grid Margin="0,0,0,14">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="14"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="14"/>
+                                    <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <RadioButton Grid.Column="0" Content="Standalone Subtitle (.srt / .ass / .sup)" IsChecked="{Binding OutputMode, Converter={StaticResource TimeSpanToStringConverter}, FallbackValue=True}" GroupName="OutputMode" Foreground="{StaticResource TextPrimary}" FontWeight="SemiBold" Margin="0,0,24,0" Checked="OnModeStandaloneChecked"/>
-                                <RadioButton Grid.Column="1" Content="Pure .mks Subtitle Container" GroupName="OutputMode" Foreground="{StaticResource TextPrimary}" FontWeight="SemiBold" Margin="0,0,24,0" Checked="OnModeMksChecked"/>
-                                <RadioButton Grid.Column="2" Content="Embedded Fonts Only" GroupName="OutputMode" Foreground="{StaticResource TextPrimary}" FontWeight="SemiBold" Checked="OnModeFontsChecked"/>
+
+                                <!-- Card 1: Standalone Subtitles -->
+                                <Border Grid.Column="0" Background="{StaticResource BgPanel}" CornerRadius="8" Padding="14,12" BorderBrush="{StaticResource BorderDark}" BorderThickness="1">
+                                    <StackPanel>
+                                        <RadioButton Content="📄 Subtitle Standalone"
+                                                     IsChecked="{Binding OutputMode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=0, FallbackValue=True}"
+                                                     GroupName="ExtractionModeGroup" Foreground="#FFFFFF" FontWeight="Bold" FontSize="12" Margin="0,0,0,5"
+                                                     Checked="OnModeStandaloneChecked"/>
+                                        <TextBlock Text="Ekstrak track terpilih menjadi file subtitle individual terpisah (.srt / .ass / .vtt / .sup)."
+                                                   Foreground="{StaticResource TextSecondary}" FontSize="11" TextWrapping="Wrap" Margin="20,0,0,10"/>
+                                        
+                                        <Border Background="{StaticResource BgDark}" CornerRadius="4" Padding="10,7" Margin="20,0,0,0">
+                                            <CheckBox Content="Ekstrak font lampiran ke ./fonts/"
+                                                      IsChecked="{Binding ExtractFonts}"
+                                                      IsEnabled="{Binding OutputMode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=0}"
+                                                      Foreground="{StaticResource TextPrimary}" FontSize="11"/>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Card 2: Pure MKS Container -->
+                                <Border Grid.Column="2" Background="{StaticResource BgPanel}" CornerRadius="8" Padding="14,12" BorderBrush="{StaticResource BorderDark}" BorderThickness="1">
+                                    <StackPanel>
+                                        <RadioButton Content="📦 Kontainer .mks Native"
+                                                     IsChecked="{Binding OutputMode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=1}"
+                                                     GroupName="ExtractionModeGroup" Foreground="#FFFFFF" FontWeight="Bold" FontSize="12" Margin="0,0,0,5"
+                                                     Checked="OnModeMksChecked"/>
+                                        <TextBlock Text="Kemas seluruh track terpilih ke dalam satu file container Matroska Subtitle (.mks)."
+                                                   Foreground="{StaticResource TextSecondary}" FontSize="11" TextWrapping="Wrap" Margin="20,0,0,10"/>
+                                        
+                                        <Border Background="{StaticResource BgDark}" CornerRadius="4" Padding="10,7" Margin="20,0,0,0">
+                                            <CheckBox Content="Sematkan font ke dalam file .mks"
+                                                      IsChecked="{Binding ExtractFonts}"
+                                                      IsEnabled="{Binding OutputMode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=1}"
+                                                      Foreground="{StaticResource TextPrimary}" FontSize="11"/>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Card 3: Embedded Fonts Only -->
+                                <Border Grid.Column="4" Background="{StaticResource BgPanel}" CornerRadius="8" Padding="14,12" BorderBrush="{StaticResource BorderDark}" BorderThickness="1">
+                                    <StackPanel>
+                                        <RadioButton Content="🔤 Ekstrak Font Saja"
+                                                     IsChecked="{Binding OutputMode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=2}"
+                                                     GroupName="ExtractionModeGroup" Foreground="#FFFFFF" FontWeight="Bold" FontSize="12" Margin="0,0,0,5"
+                                                     Checked="OnModeFontsChecked"/>
+                                        <TextBlock Text="Hanya ekstrak font lampiran terpilih (TTF/OTF) ke folder ./fonts/ tanpa subtitle."
+                                                   Foreground="{StaticResource TextSecondary}" FontSize="11" TextWrapping="Wrap" Margin="20,0,0,10"/>
+                                        
+                                        <Border Background="{StaticResource BgDark}" CornerRadius="4" Padding="10,7" Margin="20,0,0,0">
+                                            <TextBlock Text="Font lampiran akan diekstrak ke ./fonts/" Foreground="{StaticResource AccentPrimary}" FontSize="11"/>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
                             </Grid>
 
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                                <CheckBox Content="Ekstrak file font embedded (TTF/OTF) ke folder ./fonts/" IsChecked="{Binding ExtractFonts}" Foreground="{StaticResource TextSecondary}"/>
-                            </StackPanel>
-
                             <!-- Output Folder -->
-                            <Grid>
+                            <Grid Margin="0,4,0,0">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="Output Folder:" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,12,0"/>
-                                <TextBox Grid.Column="1" Text="{Binding OutputFolder, UpdateSourceTrigger=PropertyChanged}" Background="{StaticResource BgInput}" Foreground="#FFFFFF" BorderBrush="{StaticResource BorderDark}" Padding="8,5"/>
-                                <Button Grid.Column="2" Content="📁 Select Folder..." Command="{Binding BrowseOutputFolderCommand}" Margin="8,0,0,0" Padding="12,5"/>
+                                <TextBlock Text="Folder Output:" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,14,0"/>
+                                <ui:TextBox Grid.Column="1" Text="{Binding OutputFolder, UpdateSourceTrigger=PropertyChanged}" Height="36" Padding="10,4"/>
+                                <ui:Button Grid.Column="2" Content="Pilih Folder..." Command="{Binding BrowseOutputFolderCommand}" Margin="10,0,0,0" Padding="14,7" Icon="{ui:SymbolIcon Symbol=Folder24}"/>
+                                <ui:Button Grid.Column="3" Content="Buka Folder" Command="{Binding OpenOutputFolderCommand}" Margin="6,0,0,0" Padding="12,7" Icon="{ui:SymbolIcon Symbol=Open24}"/>
                             </Grid>
                         </StackPanel>
-                    </Border>
+                    </ui:Card>
 
                     <!-- Progress & Status -->
-                    <StackPanel Grid.Row="4" Margin="0,0,0,12">
-                        <Grid Margin="0,0,0,4">
+                    <StackPanel Grid.Row="4" Margin="0,0,0,14">
+                        <Grid Margin="0,0,0,6">
                             <TextBlock Text="{Binding StatusText}" Foreground="{StaticResource AccentPrimary}" FontWeight="SemiBold"/>
                             <TextBlock Text="{Binding ProgressValue, StringFormat='{}{0}%'}" HorizontalAlignment="Right" Foreground="{StaticResource TextSecondary}" FontWeight="Bold"/>
                         </Grid>
@@ -694,30 +1104,31 @@
                     </StackPanel>
 
                     <!-- Bottom Action Buttons -->
-                    <Grid Grid.Row="5">
+                    <Grid Grid.Row="5" Margin="0,4,0,0">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                            <Button Content="✏️ Open in MKS Studio Editor" Command="{Binding OpenLastInEditorCommand}" Background="{StaticResource AccentGreen}" Foreground="#FFFFFF" FontWeight="Bold" Padding="14,8" BorderThickness="0" Margin="0,0,8,0"/>
+                            <ui:Button Content="Buka Hasil di Editor" Command="{Binding OpenLastInEditorCommand}" Appearance="Secondary" FontWeight="Bold" Padding="16,9" Icon="{ui:SymbolIcon Symbol=Edit24}" Margin="0,0,8,0"/>
+                            <ui:Button Content="Buka Folder Output" Command="{Binding OpenOutputFolderCommand}" Padding="14,9" Icon="{ui:SymbolIcon Symbol=Folder24}"/>
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                            <Button Content="⚡ Start Extraction" Command="{Binding ExtractCommand}" Background="{StaticResource AccentPurple}" Foreground="#FFFFFF" FontWeight="Bold" Padding="20,8" BorderThickness="0" IsDefault="True"/>
+                            <ui:Button Content="Mulai Ekstraksi" Command="{Binding ExtractCommand}" Appearance="Primary" FontWeight="Bold" Padding="26,9" FontSize="13" Icon="{ui:SymbolIcon Symbol=Flash24}"/>
                         </StackPanel>
                     </Grid>
                 </Grid>
             </TabItem>
         </TabControl>
 
-        <!-- Bottom Status Bar -->
-        <StatusBar Grid.Row="2" Background="{StaticResource BgPanel}" BorderBrush="{StaticResource BorderDark}" BorderThickness="0,1,0,0" Foreground="{StaticResource TextSecondary}" Padding="12,4">
+        <!-- 3. Bottom Status Bar -->
+        <StatusBar Grid.Row="2" Background="{StaticResource BgPanel}" BorderBrush="{StaticResource BorderDark}" BorderThickness="0,1,0,0" Foreground="{StaticResource TextSecondary}" Padding="16,6">
             <StatusBarItem>
                 <StackPanel Orientation="Horizontal">
-                    <Ellipse Width="8" Height="8" Fill="{StaticResource AccentGreen}" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                    <Ellipse Width="9" Height="9" Fill="{StaticResource AccentGreen}" Margin="0,0,8,0" VerticalAlignment="Center"/>
                     <TextBlock Text="{Binding StatusMessage}" Foreground="{StaticResource TextPrimary}" FontWeight="SemiBold"/>
                 </StackPanel>
             </StatusBarItem>
             <StatusBarItem HorizontalAlignment="Right">
-                <TextBlock Text="MKS Subtitle Studio v1.0 | .NET 10 WPF" Foreground="{StaticResource TextMuted}" FontSize="11"/>
+                <TextBlock Text="MKS Subtitle Studio | Windows 11 Fluent UI" Foreground="{StaticResource TextMuted}" FontSize="11"/>
             </StatusBarItem>
         </StatusBar>
     </Grid>
-</Window>
+</ui:FluentWindow>

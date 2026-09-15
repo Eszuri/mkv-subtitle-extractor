@@ -1,4 +1,7 @@
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
 using MksStudio.UI.ViewModels;
 
 namespace MksStudio.UI.Views;
@@ -85,5 +88,42 @@ public partial class MkvExtractorWindow : Window
     private void OnCloseClicked(object sender, RoutedEventArgs e)
     {
         Close();
+    }
+
+    private void OnTrackRowMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        if (e.OriginalSource is DependencyObject dep && FindVisualParent<CheckBox>(dep) != null)
+            return;
+
+        if (sender is DataGridRow row && row.DataContext is MkvTrackItemViewModel track)
+        {
+            track.IsSelected = !track.IsSelected;
+        }
+    }
+
+    private void OnDataGridPreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Space)
+        {
+            if (sender is DataGrid dg && dg.SelectedItems.Count > 0)
+            {
+                foreach (var item in dg.SelectedItems)
+                {
+                    if (item is MkvTrackItemViewModel track)
+                        track.IsSelected = !track.IsSelected;
+                }
+                e.Handled = true;
+            }
+        }
+    }
+
+    private static T? FindVisualParent<T>(DependencyObject? child) where T : DependencyObject
+    {
+        while (child != null)
+        {
+            if (child is T parent) return parent;
+            child = VisualTreeHelper.GetParent(child);
+        }
+        return null;
     }
 }

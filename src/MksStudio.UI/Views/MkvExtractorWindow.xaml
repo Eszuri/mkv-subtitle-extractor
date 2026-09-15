@@ -5,14 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:MksStudio.UI.ViewModels"
         mc:Ignorable="d"
-        Title="MKV Subtitle Extractor Studio" Height="700" Width="920"
+        Title="MKV Subtitle Extractor Studio" Height="740" Width="980"
         WindowStartupLocation="CenterOwner" AllowDrop="True" Drop="OnWindowDrop"
         Background="{StaticResource BgDark}" Foreground="{StaticResource TextPrimary}" FontFamily="Segoe UI">
     <Window.DataContext>
         <vm:MkvExtractorViewModel/>
     </Window.DataContext>
 
-    <Grid Margin="20">
+    <Grid Margin="26,18,26,22">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/> <!-- Title -->
             <RowDefinition Height="Auto"/> <!-- Input Selection -->
@@ -31,70 +31,142 @@
         </Grid>
 
         <!-- Input File / Folder Selection Dropzone -->
-        <Border Grid.Row="1" Background="{StaticResource BgCard}" CornerRadius="8" Padding="15,12" Margin="0,0,0,14" BorderBrush="{StaticResource BorderDark}" BorderThickness="1">
-            <StackPanel>
-                <Grid Margin="0,0,0,8">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="Source MKV:" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,12,0"/>
-                    <TextBox Grid.Column="1" Text="{Binding InputPath, UpdateSourceTrigger=PropertyChanged}" Background="{StaticResource BgInput}" Foreground="#FFFFFF" BorderBrush="{StaticResource BorderDark}" Padding="8,5"/>
-                    <Button Grid.Column="2" Content="📁 Browse..." Command="{Binding BrowseInputCommand}" Background="{StaticResource AccentPrimary}" Foreground="#FFFFFF" Margin="8,0,0,0" Padding="14,5"/>
-                </Grid>
-
-                <StackPanel Orientation="Horizontal">
-                    <CheckBox Content="Batch Folder Mode (Proses semua MKV dalam folder sekaligus)" IsChecked="{Binding IsBatchMode}" Foreground="{StaticResource TextPrimary}" Margin="0,0,20,0"/>
-                    <TextBlock Text="💡 Tip: Anda dapat Drag &amp; Drop file .mkv atau folder langsung ke jendela ini." Foreground="{StaticResource TextMuted}" FontStyle="Italic"/>
-                </StackPanel>
-            </StackPanel>
+        <Border Grid.Row="1" Background="{StaticResource BgCard}" CornerRadius="8" Padding="18,14" Margin="0,0,0,16" BorderBrush="{StaticResource BorderDark}" BorderThickness="1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Source MKV:" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,12,0"/>
+                <TextBox Grid.Column="1" Text="{Binding InputPath, UpdateSourceTrigger=PropertyChanged}" Background="{StaticResource BgInput}" Foreground="#FFFFFF" BorderBrush="{StaticResource BorderDark}" Padding="8,5"/>
+                <Button Grid.Column="2" Content="📁 Browse..." Command="{Binding BrowseInputCommand}" Background="{StaticResource AccentPrimary}" Foreground="#FFFFFF" Margin="8,0,0,0" Padding="14,5"/>
+            </Grid>
         </Border>
 
         <!-- Subtitle Tracks & Attachments DataGrid -->
-        <Grid Grid.Row="2" Margin="0,0,0,14">
+        <Grid Grid.Row="2" Margin="0,0,0,16">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
             <!-- Table Header Toolbar -->
-            <Grid Grid.Row="0" Margin="0,0,0,6">
+            <Grid Grid.Row="0" Margin="0,0,0,8">
                 <TextBlock Text="DETECTED SUBTITLE TRACKS &amp; FONTS:" FontWeight="Bold" FontSize="11" Foreground="{StaticResource AccentPrimary}" VerticalAlignment="Center"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Content="✓ Select All" Command="{Binding SelectAllTracksCommand}" Padding="8,3" Margin="0,0,6,0" FontSize="11"/>
-                    <Button Content="✗ Deselect All" Command="{Binding DeselectAllTracksCommand}" Padding="8,3" FontSize="11"/>
+                    <Button Content="✓ Select All" Command="{Binding SelectAllTracksCommand}" Padding="10,4" Margin="0,0,6,0" FontSize="11"/>
+                    <Button Content="✗ Deselect All" Command="{Binding DeselectAllTracksCommand}" Padding="10,4" FontSize="11"/>
                 </StackPanel>
             </Grid>
 
             <!-- DataGrid -->
             <DataGrid Grid.Row="1" ItemsSource="{Binding ScannedTracks}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
-                      Background="{StaticResource BgPanel}" Foreground="{StaticResource TextPrimary}" RowBackground="{StaticResource BgDark}" AlternatingRowBackground="{StaticResource BgPanel}"
-                      GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{StaticResource BorderDark}" BorderBrush="{StaticResource BorderDark}" HeadersVisibility="Column">
+                      Background="{StaticResource BgDark}" Foreground="{StaticResource TextPrimary}"
+                      RowBackground="{x:Null}" AlternatingRowBackground="{x:Null}"
+                      GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{StaticResource BorderDark}" BorderBrush="{StaticResource BorderDark}" HeadersVisibility="Column"
+                      RowHeight="34" FontSize="12" SelectionUnit="FullRow"
+                      PreviewKeyDown="OnDataGridPreviewKeyDown">
                 <DataGrid.Resources>
                     <Style TargetType="DataGridColumnHeader">
                         <Setter Property="Background" Value="{StaticResource BgCardElevated}"/>
                         <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
-                        <Setter Property="Padding" Value="10,7"/>
+                        <Setter Property="Padding" Value="12,8"/>
                         <Setter Property="FontWeight" Value="SemiBold"/>
                         <Setter Property="BorderBrush" Value="{StaticResource BorderDark}"/>
                         <Setter Property="BorderThickness" Value="0,0,1,1"/>
                     </Style>
                 </DataGrid.Resources>
+                <DataGrid.RowStyle>
+                    <Style TargetType="DataGridRow">
+                        <Setter Property="Background" Value="#0D0D11"/>
+                        <Setter Property="Foreground" Value="#94A3B8"/>
+                        <Setter Property="BorderThickness" Value="4,0,0,1"/>
+                        <Setter Property="BorderBrush" Value="{StaticResource BorderDark}"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                        <EventSetter Event="MouseLeftButtonUp" Handler="OnTrackRowMouseLeftButtonUp"/>
+                        <Style.Triggers>
+                            <!-- Highlight row when subtitle track is selected (IsSelected == True) -->
+                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                <Setter Property="Background" Value="#4C1D95"/>
+                                <Setter Property="BorderBrush" Value="#A855F7"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </DataTrigger>
+                            <!-- Unselected state -->
+                            <DataTrigger Binding="{Binding IsSelected}" Value="False">
+                                <Setter Property="Background" Value="#0D0D11"/>
+                                <Setter Property="BorderBrush" Value="{StaticResource BorderDark}"/>
+                                <Setter Property="Foreground" Value="#94A3B8"/>
+                                <Setter Property="FontWeight" Value="Normal"/>
+                            </DataTrigger>
+                            <!-- Mouse hover on unselected row -->
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding Path=IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True"/>
+                                    <Condition Binding="{Binding IsSelected}" Value="False"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Background" Value="#22222E"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                            </MultiDataTrigger>
+                            <!-- Mouse hover on selected row -->
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding Path=IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True"/>
+                                    <Condition Binding="{Binding IsSelected}" Value="True"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Background" Value="#5B21B6"/>
+                                <Setter Property="BorderBrush" Value="#C084FC"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                            </MultiDataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.RowStyle>
+                <DataGrid.CellStyle>
+                    <Style TargetType="DataGridCell">
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Padding" Value="10,5"/>
+                        <Setter Property="Foreground" Value="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=Foreground}"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="DataGridCell">
+                                    <Border Background="Transparent" BorderThickness="0" Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="Foreground" Value="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=Foreground}"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.CellStyle>
                 <DataGrid.Columns>
-                    <DataGridCheckBoxColumn Header="Extract" Binding="{Binding IsSelected}" Width="65"/>
-                    <DataGridTextColumn Header="Track ID" Binding="{Binding Id}" Width="75" IsReadOnly="True" FontFamily="Consolas"/>
-                    <DataGridTextColumn Header="Codec Format" Binding="{Binding Codec}" Width="160" IsReadOnly="True" FontWeight="SemiBold"/>
-                    <DataGridTextColumn Header="Language" Binding="{Binding Language}" Width="85" IsReadOnly="True"/>
-                    <DataGridTextColumn Header="Default" Binding="{Binding IsDefault}" Width="70" IsReadOnly="True"/>
-                    <DataGridTextColumn Header="Forced" Binding="{Binding IsForced}" Width="70" IsReadOnly="True"/>
+                    <DataGridTemplateColumn Header="Extract" Width="70">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}"
+                                          HorizontalAlignment="Center" VerticalAlignment="Center"
+                                          Cursor="Hand"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Track ID" Binding="{Binding Id}" Width="80" IsReadOnly="True" FontFamily="Consolas"/>
+                    <DataGridTextColumn Header="Codec Format" Binding="{Binding Codec}" Width="165" IsReadOnly="True" FontWeight="SemiBold"/>
+                    <DataGridTextColumn Header="Language" Binding="{Binding Language}" Width="90" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Default" Binding="{Binding IsDefault}" Width="75" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Forced" Binding="{Binding IsForced}" Width="75" IsReadOnly="True"/>
                     <DataGridTextColumn Header="Track Name" Binding="{Binding TrackName}" Width="*" IsReadOnly="True"/>
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>
 
         <!-- Output Options Card -->
-        <Border Grid.Row="3" Background="{StaticResource BgCard}" CornerRadius="8" Padding="15,12" Margin="0,0,0,14" BorderBrush="{StaticResource BorderDark}" BorderThickness="1">
+        <Border Grid.Row="3" Background="{StaticResource BgCard}" CornerRadius="8" Padding="18,14" Margin="0,0,0,16" BorderBrush="{StaticResource BorderDark}" BorderThickness="1">
             <StackPanel>
                 <TextBlock Text="EXTRACTION TARGET &amp; FORMAT:" FontWeight="Bold" FontSize="11" Foreground="{StaticResource AccentPrimary}" Margin="0,0,0,8"/>
 
@@ -123,14 +195,14 @@
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="Output Folder:" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,12,0"/>
                     <TextBox Grid.Column="1" Text="{Binding OutputFolder, UpdateSourceTrigger=PropertyChanged}" Background="{StaticResource BgInput}" Foreground="#FFFFFF" BorderBrush="{StaticResource BorderDark}" Padding="8,5"/>
-                    <Button Grid.Column="2" Content="📁 Select Folder..." Command="{Binding BrowseOutputFolderCommand}" Margin="8,0,0,0" Padding="12,5"/>
+                    <Button Grid.Column="2" Content="📁 Select Folder..." Command="{Binding BrowseOutputFolderCommand}" Margin="8,0,0,0" Padding="14,5"/>
                 </Grid>
             </StackPanel>
         </Border>
 
         <!-- Progress & Status -->
-        <StackPanel Grid.Row="4" Margin="0,0,0,14">
-            <Grid Margin="0,0,0,4">
+        <StackPanel Grid.Row="4" Margin="0,0,0,16">
+            <Grid Margin="0,0,0,6">
                 <TextBlock Text="{Binding StatusText}" Foreground="{StaticResource AccentPrimary}" FontWeight="SemiBold"/>
                 <TextBlock Text="{Binding ProgressValue, StringFormat='{}{0}%'}" HorizontalAlignment="Right" Foreground="{StaticResource TextSecondary}" FontWeight="Bold"/>
             </Grid>
@@ -140,12 +212,12 @@
         <!-- Bottom Action Buttons -->
         <Grid Grid.Row="5">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                <Button Content="✏️ Open in MKS Editor" Command="{Binding OpenLastInEditorCommand}" Background="{StaticResource AccentGreen}" Foreground="#FFFFFF" FontWeight="Bold" Padding="14,8" BorderThickness="0" Margin="0,0,8,0"/>
+                <Button Content="✏️ Open in MKS Editor" Command="{Binding OpenLastInEditorCommand}" Background="{StaticResource AccentGreen}" Foreground="#FFFFFF" FontWeight="Bold" Padding="16,8" BorderThickness="0" Margin="0,0,8,0"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Content="⚡ Start Extraction" Command="{Binding ExtractCommand}" Background="{StaticResource AccentPurple}" Foreground="#FFFFFF" FontWeight="Bold" Padding="20,8" BorderThickness="0" Margin="0,0,8,0" IsDefault="True"/>
-                <Button Content="Close" Padding="14,8" Background="{StaticResource BgCardElevated}" Foreground="#FFFFFF" BorderThickness="0" Click="OnCloseClicked"/>
+                <Button Content="⚡ Start Extraction" Command="{Binding ExtractCommand}" Background="{StaticResource AccentPurple}" Foreground="#FFFFFF" FontWeight="Bold" Padding="22,9" BorderThickness="0" Margin="0,0,8,0" IsDefault="True"/>
+                <Button Content="Close" Padding="16,8" Background="{StaticResource BgCardElevated}" Foreground="#FFFFFF" BorderThickness="0" Click="OnCloseClicked"/>
             </StackPanel>
         </Grid>
     </Grid>

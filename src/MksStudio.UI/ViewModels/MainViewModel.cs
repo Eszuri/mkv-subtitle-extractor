@@ -83,27 +83,17 @@ public partial class MainViewModel : ObservableObject
                         // Single subtitle file: import as track into editor
                         string text = File.ReadAllText(path);
                         string ext = Path.GetExtension(path).ToLowerInvariant();
+                        var (codecId, codecName) = SubtitleFormatRouter.GetMatroskaCodecInfo(ext);
+
                         var track = new MksTrack
                         {
                             Name = Path.GetFileNameWithoutExtension(path),
                             Language = "und",
-                            IsDefault = true
+                            IsDefault = true,
+                            CodecId = codecId,
+                            CodecName = codecName,
+                            Subtitles = SubtitleFormatRouter.Parse(text, path)
                         };
-                        if (ext is ".ass" or ".ssa")
-                        {
-                            track.CodecId = EbmlConstants.CodecAss;
-                            track.Subtitles = AssCodec.Parse(text);
-                        }
-                        else if (ext is ".vtt")
-                        {
-                            track.CodecId = EbmlConstants.CodecVtt;
-                            track.Subtitles = VttCodec.Parse(text);
-                        }
-                        else
-                        {
-                            track.CodecId = EbmlConstants.CodecSrt;
-                            track.Subtitles = SrtCodec.Parse(text);
-                        }
 
                         _currentMks = new MksFile { Title = Path.GetFileNameWithoutExtension(path) };
                         _currentMks.Tracks.Add(track);
@@ -123,6 +113,12 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private string _filterQuery = string.Empty;
 
+    public string SearchFilter
+    {
+        get => FilterQuery;
+        set => FilterQuery = value;
+    }
+
     public ObservableCollection<CueItemViewModel> VisibleCues
     {
         get
@@ -139,9 +135,13 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    public ObservableCollection<CueItemViewModel> FilteredCues => VisibleCues;
+
     partial void OnFilterQueryChanged(string value)
     {
         OnPropertyChanged(nameof(VisibleCues));
+        OnPropertyChanged(nameof(FilteredCues));
+        OnPropertyChanged(nameof(SearchFilter));
     }
 
     partial void OnSelectedTrackChanged(TrackItemViewModel? value)
@@ -149,6 +149,20 @@ public partial class MainViewModel : ObservableObject
         SelectedCue = value?.Cues.FirstOrDefault();
         OnPropertyChanged(nameof(TotalDurationText));
         OnPropertyChanged(nameof(VisibleCues));
+        OnPropertyChanged(nameof(FilteredCues));
+    }
+
+    public void RefreshAllViews()
+    {
+        OnPropertyChanged(nameof(Tracks));
+        OnPropertyChanged(nameof(TotalTracksCount));
+        OnPropertyChanged(nameof(TotalDurationText));
+        OnPropertyChanged(nameof(VisibleCues));
+        OnPropertyChanged(nameof(FilteredCues));
+        OnPropertyChanged(nameof(PreviewText));
+        OnPropertyChanged(nameof(SelectedCueCharCount));
+        OnPropertyChanged(nameof(SelectedCueWordCount));
+        OnPropertyChanged(nameof(SelectedCueLineCount));
     }
 
     partial void OnSelectedCueChanged(CueItemViewModel? value)
@@ -197,6 +211,8 @@ public partial class MainViewModel : ObservableObject
             SelectedTrack.ReindexCues();
             SelectedCue = cue;
             IsModified = true;
+            OnPropertyChanged(nameof(VisibleCues));
+            OnPropertyChanged(nameof(FilteredCues));
         }
     }
 
@@ -212,6 +228,8 @@ public partial class MainViewModel : ObservableObject
             SelectedTrack.ReindexCues();
             SelectedCue = cue;
             IsModified = true;
+            OnPropertyChanged(nameof(VisibleCues));
+            OnPropertyChanged(nameof(FilteredCues));
         }
     }
 
@@ -239,7 +257,18 @@ public partial class MainViewModel : ObservableObject
     {
         var dialog = new OpenFileDialog
         {
-            Filter = "Matroska Subtitles (*.mks)|*.mks|SubRip Subtitles (*.srt)|*.srt|Advanced SubStation (*.ass;*.ssa)|*.ass;*.ssa|WebVTT Subtitles (*.vtt)|*.vtt|Matroska Video (*.mkv)|*.mkv|All Files (*.*)|*.*",
+            Filter = "Semua Format Subtitle Didukung (*.mks;*.srt;*.ass;*.ssa;*.vtt;*.ttml;*.dfxp;*.xml;*.smi;*.sami;*.sub;*.sbv;*.lrc;*.mkv)|*.mks;*.srt;*.ass;*.ssa;*.vtt;*.ttml;*.dfxp;*.xml;*.smi;*.sami;*.sub;*.sbv;*.lrc;*.mkv|" +
+                     "Matroska Subtitles (*.mks)|*.mks|" +
+                     "SubRip Subtitles (*.srt)|*.srt|" +
+                     "Advanced SubStation (*.ass;*.ssa)|*.ass;*.ssa|" +
+                     "WebVTT Subtitles (*.vtt)|*.vtt|" +
+                     "Timed Text XML (*.ttml;*.dfxp;*.xml)|*.ttml;*.dfxp;*.xml|" +
+                     "SAMI Subtitles (*.smi;*.sami)|*.smi;*.sami|" +
+                     "MicroDVD Subtitles (*.sub)|*.sub|" +
+                     "YouTube SubViewer (*.sbv)|*.sbv|" +
+                     "Timed Lyrics (*.lrc)|*.lrc|" +
+                     "Matroska Video (*.mkv)|*.mkv|" +
+                     "Semua File (*.*)|*.*",
             DefaultExt = ".mks",
             FilterIndex = 1,
             Title = "Open Subtitle File"
@@ -257,33 +286,21 @@ public partial class MainViewModel : ObservableObject
                 }
                 else
                 {
-                    // Single subtitle file (.srt, .ass, .ssa, .vtt)
+                    // Single subtitle file: parse with unified SubtitleFormatRouter
                     string text = File.ReadAllText(dialog.FileName);
+                    var (codecId, codecName) = SubtitleFormatRouter.GetMatroskaCodecInfo(ext);
+
                     var track = new MksTrack
                     {
                         TrackNumber = 1,
                         Name = Path.GetFileNameWithoutExtension(dialog.FileName),
                         Language = "und",
-                        IsDefault = true
+                        IsDefault = true,
+                        CodecId = codecId,
+                        CodecName = codecName,
+                        Subtitles = SubtitleFormatRouter.Parse(text, dialog.FileName)
                     };
-                    if (ext is ".ass" or ".ssa")
-                    {
-                        track.CodecId = EbmlConstants.CodecAss;
-                        track.CodecName = "Advanced SubStation Alpha";
-                        track.Subtitles = AssCodec.Parse(text);
-                    }
-                    else if (ext is ".vtt")
-                    {
-                        track.CodecId = EbmlConstants.CodecVtt;
-                        track.CodecName = "WebVTT";
-                        track.Subtitles = VttCodec.Parse(text);
-                    }
-                    else
-                    {
-                        track.CodecId = EbmlConstants.CodecSrt;
-                        track.CodecName = "SubRip";
-                        track.Subtitles = SrtCodec.Parse(text);
-                    }
+
                     _currentMks = new MksFile { Title = Path.GetFileNameWithoutExtension(dialog.FileName) };
                     _currentMks.Tracks.Add(track);
                     LoadMksModel(_currentMks, dialog.FileName);
@@ -405,7 +422,16 @@ public partial class MainViewModel : ObservableObject
     {
         var dialog = new OpenFileDialog
         {
-            Filter = "SubRip Subtitles (*.srt)|*.srt|Advanced SubStation (*.ass)|*.ass|SubStation Alpha (*.ssa)|*.ssa|WebVTT Subtitles (*.vtt)|*.vtt|All Files (*.*)|*.*",
+            Filter = "Semua Format Subtitle Didukung (*.srt;*.ass;*.ssa;*.vtt;*.ttml;*.dfxp;*.xml;*.smi;*.sami;*.sub;*.sbv;*.lrc)|*.srt;*.ass;*.ssa;*.vtt;*.ttml;*.dfxp;*.xml;*.smi;*.sami;*.sub;*.sbv;*.lrc|" +
+                     "SubRip Subtitles (*.srt)|*.srt|" +
+                     "Advanced SubStation (*.ass;*.ssa)|*.ass;*.ssa|" +
+                     "WebVTT Subtitles (*.vtt)|*.vtt|" +
+                     "Timed Text XML (*.ttml;*.dfxp;*.xml)|*.ttml;*.dfxp;*.xml|" +
+                     "SAMI Subtitles (*.smi;*.sami)|*.smi;*.sami|" +
+                     "MicroDVD Subtitles (*.sub)|*.sub|" +
+                     "YouTube SubViewer (*.sbv)|*.sbv|" +
+                     "Timed Lyrics (*.lrc)|*.lrc|" +
+                     "Semua File (*.*)|*.*",
             DefaultExt = ".srt",
             FilterIndex = 1,
             Title = "Import Subtitle Track"
@@ -417,32 +443,18 @@ public partial class MainViewModel : ObservableObject
             {
                 string text = File.ReadAllText(dialog.FileName);
                 string ext = Path.GetExtension(dialog.FileName).ToLowerInvariant();
+                var (codecId, codecName) = SubtitleFormatRouter.GetMatroskaCodecInfo(ext);
+
                 var track = new MksTrack
                 {
                     TrackNumber = (ulong)(Tracks.Count + 1),
                     Name = Path.GetFileNameWithoutExtension(dialog.FileName),
                     Language = "und",
-                    IsDefault = Tracks.Count == 0
+                    IsDefault = Tracks.Count == 0,
+                    CodecId = codecId,
+                    CodecName = codecName,
+                    Subtitles = SubtitleFormatRouter.Parse(text, dialog.FileName)
                 };
-
-                if (ext is ".ass" or ".ssa")
-                {
-                    track.CodecId = EbmlConstants.CodecAss;
-                    track.CodecName = "Advanced SubStation Alpha";
-                    track.Subtitles = AssCodec.Parse(text);
-                }
-                else if (ext is ".vtt")
-                {
-                    track.CodecId = EbmlConstants.CodecVtt;
-                    track.CodecName = "WebVTT";
-                    track.Subtitles = VttCodec.Parse(text);
-                }
-                else
-                {
-                    track.CodecId = EbmlConstants.CodecSrt;
-                    track.CodecName = "SubRip";
-                    track.Subtitles = SrtCodec.Parse(text);
-                }
 
                 var trackVm = new TrackItemViewModel(track);
                 Tracks.Add(trackVm);
@@ -517,21 +529,26 @@ public partial class MainViewModel : ObservableObject
     {
         if (SelectedTrack == null) return;
 
-        string ext = SelectedTrack.IsAss ? ".ass" : (SelectedTrack.IsVtt ? ".vtt" : ".srt");
+        string currentExt = SelectedTrack.IsAss ? ".ass" : (SelectedTrack.IsVtt ? ".vtt" : ".srt");
         string baseName = !string.IsNullOrWhiteSpace(CurrentFilePath)
             ? Path.GetFileNameWithoutExtension(CurrentFilePath)
             : (!string.IsNullOrWhiteSpace(ContainerTitle) ? ContainerTitle : "Subtitles");
 
         var dialog = new SaveFileDialog
         {
-            Filter = SelectedTrack.IsAss
-                ? "Advanced SubStation Alpha (*.ass)|*.ass|SubRip (*.srt)|*.srt|WebVTT (*.vtt)|*.vtt|Matroska Subtitles (*.mks)|*.mks|All Files (*.*)|*.*"
-                : (SelectedTrack.IsVtt
-                    ? "WebVTT (*.vtt)|*.vtt|SubRip (*.srt)|*.srt|Advanced SubStation Alpha (*.ass)|*.ass|Matroska Subtitles (*.mks)|*.mks|All Files (*.*)|*.*"
-                    : "SubRip (*.srt)|*.srt|Advanced SubStation Alpha (*.ass)|*.ass|WebVTT (*.vtt)|*.vtt|Matroska Subtitles (*.mks)|*.mks|All Files (*.*)|*.*"),
-            DefaultExt = ext,
-            FilterIndex = 1,
-            FileName = $"{baseName}{ext}",
+            Filter = "SubRip Subtitles (*.srt)|*.srt|" +
+                     "Advanced SubStation Alpha (*.ass)|*.ass|" +
+                     "WebVTT Subtitles (*.vtt)|*.vtt|" +
+                     "Timed Text XML (*.ttml)|*.ttml|" +
+                     "SAMI Subtitles (*.smi)|*.smi|" +
+                     "MicroDVD Subtitles (*.sub)|*.sub|" +
+                     "YouTube SubViewer (*.sbv)|*.sbv|" +
+                     "Timed Lyrics (*.lrc)|*.lrc|" +
+                     "Matroska Subtitles (*.mks)|*.mks|" +
+                     "All Files (*.*)|*.*",
+            DefaultExt = currentExt,
+            FilterIndex = SelectedTrack.IsAss ? 2 : (SelectedTrack.IsVtt ? 3 : 1),
+            FileName = $"{baseName}{currentExt}",
             Title = "Export Subtitle Track"
         };
 
@@ -562,13 +579,7 @@ public partial class MainViewModel : ObservableObject
                 }
                 else
                 {
-                    string content = saveExt switch
-                    {
-                        ".ass" or ".ssa" => AssCodec.Serialize(SelectedTrack.IsAss ? SelectedTrack.Model.Subtitles : SubtitleConverter.ConvertToAss(SelectedTrack.Model.Subtitles)),
-                        ".vtt" => VttCodec.Serialize(SubtitleConverter.ConvertToVtt(SelectedTrack.Model.Subtitles)),
-                        _ => SrtCodec.Serialize(SubtitleConverter.ConvertToSrt(SelectedTrack.Model.Subtitles))
-                    };
-
+                    string content = SubtitleFormatRouter.Serialize(SelectedTrack.Model.Subtitles, saveExt);
                     File.WriteAllText(dialog.FileName, content, Encoding.UTF8);
                 }
 
@@ -608,13 +619,7 @@ public partial class MainViewModel : ObservableObject
                     string fileName = Tracks.Count == 1 ? $"{baseName}{ext}" : $"{baseName}{lang}{ext}";
                     string fullPath = Path.Combine(dialog.FolderName, fileName);
 
-                    string content = ext switch
-                    {
-                        ".ass" => AssCodec.Serialize(track.IsAss ? track.Model.Subtitles : SubtitleConverter.ConvertToAss(track.Model.Subtitles)),
-                        ".vtt" => VttCodec.Serialize(SubtitleConverter.ConvertToVtt(track.Model.Subtitles)),
-                        _ => SrtCodec.Serialize(SubtitleConverter.ConvertToSrt(track.Model.Subtitles))
-                    };
-
+                    string content = SubtitleFormatRouter.Serialize(track.Model.Subtitles, ext);
                     File.WriteAllText(fullPath, content, Encoding.UTF8);
                     count++;
                 }
@@ -630,31 +635,30 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    public void ConvertTrackToSrt()
-    {
-        if (SelectedTrack == null) return;
-        SelectedTrack.SyncModelCues();
-        var converted = SubtitleConverter.ConvertToSrt(SelectedTrack.Model.Subtitles);
-        SelectedTrack.Model.Subtitles.Cues.Clear();
-        SelectedTrack.Model.Subtitles.Cues.AddRange(converted.Cues);
-        SelectedTrack.CodecId = EbmlConstants.CodecSrt;
-        SelectedTrack.RefreshCues();
-        IsModified = true;
-        StatusMessage = "Converted track to SubRip (SRT).";
-    }
+    public void ConvertTrackToSrt() => ConvertTrackToFormat(".srt");
 
     [RelayCommand]
-    public void ConvertTrackToAss()
+    public void ConvertTrackToAss() => ConvertTrackToFormat(".ass");
+
+    [RelayCommand]
+    public void ConvertTrackToVtt() => ConvertTrackToFormat(".vtt");
+
+    [RelayCommand]
+    public void ConvertTrackToFormat(string targetExt)
     {
         if (SelectedTrack == null) return;
         SelectedTrack.SyncModelCues();
-        var converted = SubtitleConverter.ConvertToAss(SelectedTrack.Model.Subtitles);
+        var converted = SubtitleConverter.ConvertToFormat(SelectedTrack.Model.Subtitles, targetExt);
+        var (codecId, codecName) = SubtitleFormatRouter.GetMatroskaCodecInfo(targetExt);
+
         SelectedTrack.Model.Subtitles.Cues.Clear();
         SelectedTrack.Model.Subtitles.Cues.AddRange(converted.Cues);
-        SelectedTrack.CodecId = EbmlConstants.CodecAss;
+        SelectedTrack.CodecId = codecId;
+        SelectedTrack.CodecName = codecName;
         SelectedTrack.RefreshCues();
         IsModified = true;
-        StatusMessage = "Converted track to Advanced SubStation Alpha (ASS).";
+        RefreshAllViews();
+        StatusMessage = $"Converted track to {codecName}.";
     }
 
     // --- Cue Editing Operations ---
@@ -681,6 +685,8 @@ public partial class MainViewModel : ObservableObject
         var newCue = SelectedTrack.AddCue(start, end, "New subtitle line");
         SelectedCue = newCue;
         IsModified = true;
+        OnPropertyChanged(nameof(VisibleCues));
+        OnPropertyChanged(nameof(FilteredCues));
         StatusMessage = $"Added cue #{newCue.Index}.";
     }
 
@@ -693,6 +699,8 @@ public partial class MainViewModel : ObservableObject
         SelectedTrack.RemoveCue(SelectedCue);
         SelectedCue = SelectedTrack.Cues.ElementAtOrDefault(idx) ?? SelectedTrack.Cues.LastOrDefault();
         IsModified = true;
+        OnPropertyChanged(nameof(VisibleCues));
+        OnPropertyChanged(nameof(FilteredCues));
         StatusMessage = "Cue deleted.";
     }
 
@@ -724,6 +732,8 @@ public partial class MainViewModel : ObservableObject
         SelectedTrack.ReindexCues();
         SelectedCue = newCue;
         IsModified = true;
+        OnPropertyChanged(nameof(VisibleCues));
+        OnPropertyChanged(nameof(FilteredCues));
         StatusMessage = "Cue split into two segments.";
     }
 

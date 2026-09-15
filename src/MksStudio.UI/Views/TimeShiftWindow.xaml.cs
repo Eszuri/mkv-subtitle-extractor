@@ -3,7 +3,7 @@ using MksStudio.UI.ViewModels;
 
 namespace MksStudio.UI.Views;
 
-public partial class TimeShiftWindow : Window
+public partial class TimeShiftWindow : Wpf.Ui.Controls.FluentWindow
 {
     private readonly MainViewModel _mainVm;
     private readonly TimeShiftViewModel _vm;
