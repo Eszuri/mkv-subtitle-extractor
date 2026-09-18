@@ -43,6 +43,24 @@ public partial class App : Application
             return;
         }
 
+        // Check if launched for quick subtitle translate
+        string? translateTarget = null;
+        if (e.Args.Length >= 2 && (e.Args[0].Equals("--quick-translate", StringComparison.OrdinalIgnoreCase) || e.Args[0].Equals("--translate", StringComparison.OrdinalIgnoreCase) || e.Args[0].Equals("-t", StringComparison.OrdinalIgnoreCase)))
+        {
+            translateTarget = e.Args[1];
+        }
+        else if (e.Args.Length >= 1 && (e.Args[0].StartsWith("--quick-translate=", StringComparison.OrdinalIgnoreCase) || e.Args[0].StartsWith("--translate=", StringComparison.OrdinalIgnoreCase)))
+        {
+            int eq = e.Args[0].IndexOf('=');
+            translateTarget = e.Args[0].Substring(eq + 1).Trim('"', '\'');
+        }
+
+        if (!string.IsNullOrWhiteSpace(translateTarget))
+        {
+            await HandleQuickTranslateAsync(translateTarget);
+            return;
+        }
+
         // Standard Launch: Open Main Application Window
         var mainWindow = new MainWindow();
         MainWindow = mainWindow;
@@ -90,6 +108,51 @@ public partial class App : Application
             MessageBox.Show(
                 $"Gagal membaca informasi track MKV:\n{ex.Message}",
                 "Export Subtitle - Error",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+            Shutdown();
+        }
+    }
+
+    private async Task HandleQuickTranslateAsync(string subtitlePath)
+    {
+        if (!File.Exists(subtitlePath))
+        {
+            MessageBox.Show(
+                $"File subtitle tidak ditemukan:\n\"{subtitlePath}\"",
+                "Translate Subtitle",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+            Shutdown();
+            return;
+        }
+
+        try
+        {
+            string content = await File.ReadAllTextAsync(subtitlePath, Encoding.UTF8);
+            var doc = Core.Subtitles.SubtitleFormatRouter.Parse(content, subtitlePath);
+
+            if (doc.Cues.Count == 0)
+            {
+                MessageBox.Show(
+                    $"Tidak ada baris subtitle yang ditemukan pada file ini:\n\"{Path.GetFileName(subtitlePath)}\"",
+                    "Translate Subtitle",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+                Shutdown();
+                return;
+            }
+
+            var translateWindow = new Views.QuickTranslateWindow(subtitlePath, doc);
+            MainWindow = translateWindow;
+            translateWindow.Closed += (_, _) => Shutdown();
+            translateWindow.Show();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(
+                $"Gagal membaca file subtitle:\n{ex.Message}",
+                "Translate Subtitle - Error",
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
             Shutdown();

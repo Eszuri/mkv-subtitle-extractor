@@ -34,8 +34,8 @@ public record LanguageOption(string Code, string DisplayName, string NativeName 
 
     public static IReadOnlyList<LanguageOption> TargetLanguages { get; } = new List<LanguageOption>
     {
-        new("id", "Indonesian", "Bahasa Indonesia"),
         new("en", "English", "English"),
+        new("id", "Indonesian", "Bahasa Indonesia"),
         new("ja", "Japanese", "日本語"),
         new("ko", "Korean", "한국어"),
         new("zh-CN", "Chinese (Simplified)", "简体中文"),
@@ -54,6 +54,31 @@ public record LanguageOption(string Code, string DisplayName, string NativeName 
         new("vi", "Vietnamese", "Tiếng Việt"),
         new("tl", "Filipino / Tagalog", "Wikang Filipino"),
         new("ms", "Malay", "Bahasa Melayu"),
-        new("hi", "Hindi", "हिन्दी")
+        new("hi", "Hindi", "हिन्दी"),
+        new("uk", "Ukrainian", "Українська"),
+        new("sv", "Swedish", "Svenska"),
+        new("no", "Norwegian", "Norsk"),
+        new("da", "Danish", "Dansk"),
+        new("fi", "Finnish", "Suomi"),
+        new("el", "Greek", "Ελληνικά"),
+        new("he", "Hebrew", "עברית"),
+        new("cs", "Czech", "Čeština"),
+        new("hu", "Hungarian", "Magyar"),
+        new("ro", "Romanian", "Română"),
+        new("bg", "Bulgarian", "Български"),
+        new("hr", "Croatian", "Hrvatski"),
+        new("sr", "Serbian", "Српски"),
+        new("sk", "Slovak", "Slovenčina"),
+        new("bn", "Bengali", "বাংলা"),
+        new("fa", "Persian", "فارسی"),
+        new("ur", "Urdu", "اردو"),
+        new("ta", "Tamil", "தமிழ்"),
+        new("te", "Telugu", "తెలుగు"),
+        new("mr", "Marathi", "मराठी"),
+        new("gu", "Gujarati", "ગુજરાતી"),
+        new("my", "Burmese", "မြန်မာ"),
+        new("km", "Khmer", "ខ្មែរ"),
+        new("lo", "Lao", "ລາວ"),
+        new("sw", "Swahili", "Kiswahili")
     };
 }

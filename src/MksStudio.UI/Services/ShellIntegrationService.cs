@@ -5,15 +5,29 @@ using Microsoft.Win32;
 namespace MksStudio.UI.Services;
 
 /// <summary>
-/// Manages Windows Explorer shell integration such as the "Export Subtitle" context menu for .mkv files.
+/// Manages Windows Explorer shell integration such as the "Export Subtitle" context menu for .mkv files
+/// and "Translate Subtitle" context menu for subtitle files.
 /// </summary>
 public static class ShellIntegrationService
 {
-    private const string ContextMenuKey = @"Software\Classes\SystemFileAssociations\.mkv\shell\MksStudioExport";
-    private const string MenuTitle = "Export Subtitle";
+    private const string MkvExportKey = @"Software\Classes\SystemFileAssociations\.mkv\shell\MksStudioExport";
+    private const string MkvExportTitle = "Export Subtitle";
+
+    private const string TranslateSubKeySuffix = @"\shell\MksStudioTranslate";
+    private const string TranslateTitle = "Translate Subtitle";
+
+    private static readonly string[] SubtitleExtensions =
+    [
+        ".srt", ".ass", ".ssa", ".vtt",
+        ".ttml", ".dfxp", ".xml",
+        ".smi", ".sami",
+        ".sub",
+        ".sbv",
+        ".lrc"
+    ];
 
     /// <summary>
-    /// Registers or updates the context menu item in HKCU so it works without administrator privileges.
+    /// Registers or updates context menu items in HKCU so they work without administrator privileges.
     /// </summary>
     public static void RegisterContextMenu()
     {
@@ -26,14 +40,33 @@ public static class ShellIntegrationService
             if (string.IsNullOrEmpty(exePath) || !File.Exists(exePath))
                 return;
 
-            using var key = Registry.CurrentUser.CreateSubKey(ContextMenuKey);
-            if (key == null) return;
+            // 1. Context menu for .mkv (Export Subtitle)
+            using (var key = Registry.CurrentUser.CreateSubKey(MkvExportKey))
+            {
+                if (key != null)
+                {
+                    key.SetValue(string.Empty, MkvExportTitle);
+                    key.SetValue("Icon", $"\"{exePath}\",0");
 
-            key.SetValue(string.Empty, MenuTitle);
-            key.SetValue("Icon", $"\"{exePath}\",0");
+                    using var cmdKey = key.CreateSubKey("command");
+                    cmdKey?.SetValue(string.Empty, $"\"{exePath}\" --quick-export \"%1\"");
+                }
+            }
 
-            using var cmdKey = key.CreateSubKey("command");
-            cmdKey?.SetValue(string.Empty, $"\"{exePath}\" --quick-export \"%1\"");
+            // 2. Context menu for subtitle files (Translate Subtitle)
+            foreach (var ext in SubtitleExtensions)
+            {
+                string regPath = $@"Software\Classes\SystemFileAssociations\{ext}{TranslateSubKeySuffix}";
+                using var key = Registry.CurrentUser.CreateSubKey(regPath);
+                if (key != null)
+                {
+                    key.SetValue(string.Empty, TranslateTitle);
+                    key.SetValue("Icon", $"\"{exePath}\",0");
+
+                    using var cmdKey = key.CreateSubKey("command");
+                    cmdKey?.SetValue(string.Empty, $"\"{exePath}\" --quick-translate \"%1\"");
+                }
+            }
         }
         catch
         {
@@ -42,13 +75,19 @@ public static class ShellIntegrationService
     }
 
     /// <summary>
-    /// Removes the context menu from HKCU.
+    /// Removes context menu items from HKCU.
     /// </summary>
     public static void UnregisterContextMenu()
     {
         try
         {
-            Registry.CurrentUser.DeleteSubKeyTree(ContextMenuKey, throwOnMissingSubKey: false);
+            Registry.CurrentUser.DeleteSubKeyTree(MkvExportKey, throwOnMissingSubKey: false);
+
+            foreach (var ext in SubtitleExtensions)
+            {
+                string regPath = $@"Software\Classes\SystemFileAssociations\{ext}{TranslateSubKeySuffix}";
+                Registry.CurrentUser.DeleteSubKeyTree(regPath, throwOnMissingSubKey: false);
+            }
         }
         catch
         {

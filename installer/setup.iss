@@ -41,6 +41,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 Name: "assoc_mks"; Description: "Associate .mks files with MKS Subtitle Studio"; GroupDescription: "File Associations:"
 Name: "shell_mkv"; Description: "Add 'Export Subtitle' to Windows Explorer context menu for .mkv files"; GroupDescription: "Windows Integration:"
+Name: "shell_subs"; Description: "Add 'Translate Subtitle' to Windows Explorer context menu for subtitle files"; GroupDescription: "Windows Integration:"
 
 [Files]
 Source: "..\dist\MksStudio-v1.0-win-x64\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -56,6 +57,27 @@ Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKey}\shell\open\command"; Value
 Root: HKA; Subkey: "Software\Classes\SystemFileAssociations\.mkv\shell\MksStudioExport"; ValueType: string; ValueName: ""; ValueData: "Export Subtitle"; Flags: uninsdeletekey; Tasks: shell_mkv
 Root: HKA; Subkey: "Software\Classes\SystemFileAssociations\.mkv\shell\MksStudioExport"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\{#MyAppExeName},0"; Tasks: shell_mkv
 Root: HKA; Subkey: "Software\Classes\SystemFileAssociations\.mkv\shell\MksStudioExport\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" --quick-export ""%1"""; Tasks: shell_mkv
+
+; Context menu for subtitle files (Right Click Subtitle -> Translate Subtitle)
+Root: HKA; Subkey: "Software\Classes\SystemFileAssociations\.srt\shell\MksStudioTranslate"; ValueType: string; ValueName: ""; ValueData: "Translate Subtitle"; Flags: uninsdeletekey; Tasks: shell_subs
+Root: HKA; Subkey: "Software\Classes\SystemFileAssociations\.srt\shell\MksStudioTranslate"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\{#MyAppExeName},0"; Tasks: shell_subs
+Root: HKA; Subkey: "Software\Classes\SystemFileAssociations\.srt\shell\MksStudioTranslate\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" --quick-translate ""%1"""; Tasks: shell_subs
+
+Root: HKA; Subkey: "Software\Classes\SystemFileAssociations\.ass\shell\MksStudioTranslate"; ValueType: string; ValueName: ""; ValueData: "Translate Subtitle"; Flags: uninsdeletekey; Tasks: shell_subs
+Root: HKA; Subkey: "Software\Classes\SystemFileAssociations\.ass\shell\MksStudioTranslate"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\{#MyAppExeName},0"; Tasks: shell_subs
+Root: HKA; Subkey: "Software\Classes\SystemFileAssociations\.ass\shell\MksStudioTranslate\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" --quick-translate ""%1"""; Tasks: shell_subs
+
+Root: HKA; Subkey: "Software\Classes\SystemFileAssociations\.vtt\shell\MksStudioTranslate"; ValueType: string; ValueName: ""; ValueData: "Translate Subtitle"; Flags: uninsdeletekey; Tasks: shell_subs
+Root: HKA; Subkey: "Software\Classes\SystemFileAssociations\.vtt\shell\MksStudioTranslate"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\{#MyAppExeName},0"; Tasks: shell_subs
+Root: HKA; Subkey: "Software\Classes\SystemFileAssociations\.vtt\shell\MksStudioTranslate\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" --quick-translate ""%1"""; Tasks: shell_subs
+
+Root: HKA; Subkey: "Software\Classes\SystemFileAssociations\.ssa\shell\MksStudioTranslate"; ValueType: string; ValueName: ""; ValueData: "Translate Subtitle"; Flags: uninsdeletekey; Tasks: shell_subs
+Root: HKA; Subkey: "Software\Classes\SystemFileAssociations\.ssa\shell\MksStudioTranslate"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\{#MyAppExeName},0"; Tasks: shell_subs
+Root: HKA; Subkey: "Software\Classes\SystemFileAssociations\.ssa\shell\MksStudioTranslate\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" --quick-translate ""%1"""; Tasks: shell_subs
+
+Root: HKA; Subkey: "Software\Classes\SystemFileAssociations\.sub\shell\MksStudioTranslate"; ValueType: string; ValueName: ""; ValueData: "Translate Subtitle"; Flags: uninsdeletekey; Tasks: shell_subs
+Root: HKA; Subkey: "Software\Classes\SystemFileAssociations\.sub\shell\MksStudioTranslate"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\{#MyAppExeName},0"; Tasks: shell_subs
+Root: HKA; Subkey: "Software\Classes\SystemFileAssociations\.sub\shell\MksStudioTranslate\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" --quick-translate ""%1"""; Tasks: shell_subs
 
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
