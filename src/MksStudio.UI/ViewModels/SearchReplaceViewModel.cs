@@ -38,14 +38,14 @@ public partial class SearchReplaceViewModel : ObservableObject
     {
         if (string.IsNullOrEmpty(SearchText) || GetTargetCues == null)
         {
-            StatusText = "Masukkan kata kunci pencarian.";
+            StatusText = "Please enter search text.";
             return;
         }
 
         var cues = GetTargetCues().ToList();
         if (cues.Count == 0)
         {
-            StatusText = "Tidak ada baris subtitle untuk dicari.";
+            StatusText = "No subtitle cues to search.";
             return;
         }
 
@@ -53,7 +53,7 @@ public partial class SearchReplaceViewModel : ObservableObject
 
         if (matches.Count == 0)
         {
-            StatusText = "Teks tidak ditemukan.";
+            StatusText = "Text not found.";
             _lastFoundIndex = -1;
             return;
         }
@@ -93,7 +93,7 @@ public partial class SearchReplaceViewModel : ObservableObject
         }
 
         var currentMatch = matches[_lastFoundIndex];
-        StatusText = $"Kecocokan {_lastFoundIndex + 1} dari {matches.Count}";
+        StatusText = $"Match {_lastFoundIndex + 1} of {matches.Count}";
         OnMatchFound?.Invoke(currentMatch);
     }
 
@@ -105,7 +105,7 @@ public partial class SearchReplaceViewModel : ObservableObject
         var matches = SearchReplaceService.Find(cues, SearchText, MatchCase, UseRegex);
         if (matches.Count == 0)
         {
-            StatusText = "Teks tidak ditemukan.";
+            StatusText = "Text not found.";
             _lastFoundIndex = -1;
             return;
         }
@@ -122,7 +122,7 @@ public partial class SearchReplaceViewModel : ObservableObject
         if (match.MatchIndex >= 0 && match.MatchIndex + match.MatchLength <= match.Cue.RawText.Length)
         {
             match.Cue.RawText = match.Cue.RawText.Remove(match.MatchIndex, match.MatchLength).Insert(match.MatchIndex, replacement);
-            StatusText = "1 kemunculan teks diganti.";
+            StatusText = "1 occurrence replaced.";
             OnDataModified?.Invoke();
 
             _lastFoundIndex--;
@@ -137,7 +137,7 @@ public partial class SearchReplaceViewModel : ObservableObject
 
         var cues = GetTargetCues().ToList();
         int count = SearchReplaceService.ReplaceAll(cues, SearchText, ReplaceText, MatchCase, UseRegex);
-        StatusText = count > 0 ? $"Berhasil mengganti {count} kemunculan teks." : "Teks tidak ditemukan.";
+        StatusText = count > 0 ? $"Successfully replaced {count} occurrence(s)." : "Text not found.";
         _lastFoundIndex = -1;
         OnDataModified?.Invoke();
     }

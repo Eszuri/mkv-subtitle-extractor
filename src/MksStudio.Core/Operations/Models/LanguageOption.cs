@@ -8,7 +8,7 @@ public record LanguageOption(string Code, string DisplayName, string NativeName 
 
     public static IReadOnlyList<LanguageOption> SourceLanguages { get; } = new List<LanguageOption>
     {
-        new("auto", "Auto Detect (Deteksi Otomatis)", "Automatic"),
+        new("auto", "Auto Detect", "Automatic"),
         new("en", "English", "English"),
         new("ja", "Japanese", "日本語"),
         new("ko", "Korean", "한국어"),

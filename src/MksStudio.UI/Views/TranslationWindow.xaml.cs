@@ -59,7 +59,7 @@ public partial class TranslationWindow : Wpf.Ui.Controls.FluentWindow
 
         if (cuesToTranslate.Count == 0)
         {
-            MessageBox.Show("Tidak ada baris subtitle yang dapat diterjemahkan.", "Peringatan", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show("No subtitle cues available to translate.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 

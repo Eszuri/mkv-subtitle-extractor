@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-        Title="Pilih Warna Subtitle Kustom"
+        Title="Select Custom Subtitle Color"
         Width="490" Height="580"
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False"
@@ -21,8 +21,8 @@
 
         <!-- 1. Header -->
         <StackPanel Grid.Row="0" Margin="0,0,0,14">
-            <TextBlock Text="PALET WARNA SUBTITLE KUSTOM" FontWeight="Bold" FontSize="13" Foreground="#38BDF8"/>
-            <TextBlock Text="Pilih warna preset atau tentukan nilai RGB / Hex sesuka Anda." FontSize="11" Foreground="#94A3B8" Margin="0,2,0,0"/>
+            <TextBlock Text="CUSTOM SUBTITLE COLOR PALETTE" FontWeight="Bold" FontSize="13" Foreground="#38BDF8"/>
+            <TextBlock Text="Select a preset color or specify custom RGB / Hex values." FontSize="11" Foreground="#94A3B8" Margin="0,2,0,0"/>
         </StackPanel>
 
         <!-- 2. Cinema Preview Banner -->
@@ -34,7 +34,7 @@
                 </Grid.RowDefinitions>
 
                 <!-- Subtitle text in selected color -->
-                <TextBlock x:Name="PreviewTextBlock" Grid.Row="0" Text="Aa Teks Subtitle Cinema 123"
+                <TextBlock x:Name="PreviewTextBlock" Grid.Row="0" Text="Aa Cinema Subtitle Text 123"
                            FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" TextAlignment="Center"
                            TextWrapping="Wrap" MaxHeight="80" TextTrimming="CharacterEllipsis" Margin="0,4,0,8"
                            Foreground="#FFFF00">
@@ -57,7 +57,7 @@
 
         <!-- 3. 32-Color Curated Grid -->
         <StackPanel Grid.Row="2" Margin="0,0,0,14">
-            <TextBlock Text="PILIHAN CEPAT (32 WARNA):" FontSize="10" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,6"/>
+            <TextBlock Text="QUICK PRESETS (32 COLORS):" FontSize="10" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,6"/>
             <WrapPanel x:Name="PaletteWrapPanel" Orientation="Horizontal"/>
         </StackPanel>
 
@@ -105,8 +105,8 @@
 
         <!-- 5. Dialog Action Buttons -->
         <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Batal" Width="80" Height="32" Click="OnCancelClicked" Background="#161C26" BorderBrush="#252C3A" Foreground="#94A3B8" Margin="0,0,10,0"/>
-            <Button Content="✓ Terapkan Warna" Width="150" Height="32" Click="OnApplyClicked" Background="#0284C7" BorderBrush="#38BDF8" Foreground="#FFFFFF" FontWeight="Bold"/>
+            <Button Content="Cancel" Width="80" Height="32" Click="OnCancelClicked" Background="#161C26" BorderBrush="#252C3A" Foreground="#94A3B8" Margin="0,0,10,0"/>
+            <Button Content="✓ Apply Color" Width="150" Height="32" Click="OnApplyClicked" Background="#0284C7" BorderBrush="#38BDF8" Foreground="#FFFFFF" FontWeight="Bold"/>
         </StackPanel>
     </Grid>
 </Window>

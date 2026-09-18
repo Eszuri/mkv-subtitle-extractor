@@ -34,7 +34,7 @@ public partial class TranslationViewModel : ObservableObject
     private double _progressPercent = 0.0;
 
     [ObservableProperty]
-    private string _progressStatusText = "Siap untuk menerjemahkan subtitle.";
+    private string _progressStatusText = "Ready to translate subtitles.";
 
     [ObservableProperty]
     private string _currentOriginalPreview = string.Empty;
@@ -55,7 +55,7 @@ public partial class TranslationViewModel : ObservableObject
     {
         _translateService = new GoogleTranslateService();
         _selectedSourceLanguage = SourceLanguages.FirstOrDefault(l => l.Code == "auto") ?? SourceLanguages[0];
-        _selectedTargetLanguage = TargetLanguages.FirstOrDefault(l => l.Code == "id") ?? TargetLanguages[0];
+        _selectedTargetLanguage = TargetLanguages.FirstOrDefault(l => l.Code == "en") ?? TargetLanguages[0];
     }
 
     [RelayCommand]
@@ -63,13 +63,13 @@ public partial class TranslationViewModel : ObservableObject
     {
         if (cuesToTranslate == null || cuesToTranslate.Count == 0)
         {
-            ProgressStatusText = "Tidak ada baris subtitle yang dipilih untuk diterjemahkan.";
+            ProgressStatusText = "No subtitle cues selected for translation.";
             return;
         }
 
         IsTranslating = true;
         ProgressPercent = 0.0;
-        ProgressStatusText = $"Memulai penerjemahan {cuesToTranslate.Count} baris ({SelectedSourceLanguage.DisplayName} ➔ {SelectedTargetLanguage.DisplayName})...";
+        ProgressStatusText = $"Starting translation of {cuesToTranslate.Count} cues ({SelectedSourceLanguage.DisplayName} ➔ {SelectedTargetLanguage.DisplayName})...";
         _cts = new CancellationTokenSource();
 
         var progress = new Progress<TranslationProgress>(p =>
@@ -92,7 +92,7 @@ public partial class TranslationViewModel : ObservableObject
             );
 
             ProgressPercent = 100.0;
-            ProgressStatusText = $"Selesai! Berhasil menerjemahkan {translatedCues.Count} baris subtitle.";
+            ProgressStatusText = $"Completed! Successfully translated {translatedCues.Count} subtitle cues.";
 
             OnTranslationCompleted?.Invoke(
                 translatedCues,
@@ -106,11 +106,11 @@ public partial class TranslationViewModel : ObservableObject
         }
         catch (OperationCanceledException)
         {
-            ProgressStatusText = "Penerjemahan dibatalkan oleh pengguna.";
+            ProgressStatusText = "Translation canceled by user.";
         }
         catch (Exception ex)
         {
-            ProgressStatusText = $"Terjadi kesalahan saat menerjemahkan: {ex.Message}";
+            ProgressStatusText = $"An error occurred during translation: {ex.Message}";
         }
         finally
         {
@@ -126,7 +126,7 @@ public partial class TranslationViewModel : ObservableObject
         if (_cts != null && !_cts.IsCancellationRequested)
         {
             _cts.Cancel();
-            ProgressStatusText = "Membatalkan proses...";
+            ProgressStatusText = "Canceling translation...";
         }
     }
 

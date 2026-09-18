@@ -34,7 +34,7 @@ public partial class CustomColorDialog : Window
         }
         else
         {
-            PreviewTextBlock.Text = "Aa Teks Subtitle Cinema 123";
+            PreviewTextBlock.Text = "Aa Cinema Subtitle Text 123";
         }
 
         BuildPaletteGrid();

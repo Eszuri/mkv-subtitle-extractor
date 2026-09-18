@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         mc:Ignorable="d"
-        Title="Cari &amp; Ganti Teks Subtitle" Height="385" Width="580"
+        Title="Find &amp; Replace Subtitle Text" Height="385" Width="580"
         WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
         Icon="../app.ico"
         WindowBackdropType="Mica"
@@ -18,7 +18,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <ui:TitleBar Grid.Row="0" Title="Cari &amp; Ganti Subtitle" Icon="../app.ico" Height="44" Padding="12,0,8,0"/>
+        <ui:TitleBar Grid.Row="0" Title="Find &amp; Replace Subtitles" Icon="../app.ico" Height="44" Padding="12,0,8,0"/>
 
         <Grid Grid.Row="1" Margin="26,14,26,22">
             <Grid.RowDefinitions>
@@ -36,8 +36,8 @@
                     <ui:SymbolIcon Symbol="Search24" FontSize="20" Foreground="{StaticResource AccentPrimary}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
                 <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="Cari &amp; Ganti Teks Subtitle" FontSize="15" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
-                    <TextBlock Text="Mendukung pencarian case-sensitive dan Regular Expression (Regex)." FontSize="11" Foreground="{StaticResource TextMuted}" Margin="0,2,0,0"/>
+                    <TextBlock Text="Find &amp; Replace Subtitle Text" FontSize="15" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+                    <TextBlock Text="Supports case-sensitive search and Regular Expressions (Regex)." FontSize="11" Foreground="{StaticResource TextMuted}" Margin="0,2,0,0"/>
                 </StackPanel>
             </StackPanel>
 
@@ -47,8 +47,8 @@
                     <ColumnDefinition Width="95"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="Cari:" VerticalAlignment="Center" Foreground="{StaticResource TextSecondary}" FontWeight="SemiBold" FontSize="12"/>
-                <ui:TextBox Grid.Column="1" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Height="36" PlaceholderText="Masukkan teks pencarian..." Padding="10,4"/>
+                <TextBlock Text="Find:" VerticalAlignment="Center" Foreground="{StaticResource TextSecondary}" FontWeight="SemiBold" FontSize="12"/>
+                <ui:TextBox Grid.Column="1" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Height="36" PlaceholderText="Enter search text..." Padding="10,4"/>
             </Grid>
 
             <!-- Replace Box -->
@@ -57,14 +57,14 @@
                     <ColumnDefinition Width="95"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="Ganti dengan:" VerticalAlignment="Center" Foreground="{StaticResource TextSecondary}" FontWeight="SemiBold" FontSize="12"/>
-                <ui:TextBox Grid.Column="1" Text="{Binding ReplaceText, UpdateSourceTrigger=PropertyChanged}" Height="36" PlaceholderText="Masukkan teks pengganti..." Padding="10,4"/>
+                <TextBlock Text="Replace with:" VerticalAlignment="Center" Foreground="{StaticResource TextSecondary}" FontWeight="SemiBold" FontSize="12"/>
+                <ui:TextBox Grid.Column="1" Text="{Binding ReplaceText, UpdateSourceTrigger=PropertyChanged}" Height="36" PlaceholderText="Enter replacement text..." Padding="10,4"/>
             </Grid>
 
             <!-- Options -->
             <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="95,0,0,12">
-                <CheckBox Content="Cocokkan Huruf Besar/Kecil (Match Case)" IsChecked="{Binding MatchCase}" Foreground="{StaticResource TextPrimary}" Margin="0,0,16,0" FontSize="11"/>
-                <CheckBox Content="Gunakan Regex" IsChecked="{Binding UseRegex}" Foreground="{StaticResource TextPrimary}" FontSize="11"/>
+                <CheckBox Content="Match Case" IsChecked="{Binding MatchCase}" Foreground="{StaticResource TextPrimary}" Margin="0,0,16,0" FontSize="11"/>
+                <CheckBox Content="Use Regex" IsChecked="{Binding UseRegex}" Foreground="{StaticResource TextPrimary}" FontSize="11"/>
             </StackPanel>
 
             <!-- Status -->
@@ -72,10 +72,10 @@
 
             <!-- Buttons -->
             <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right">
-                <ui:Button Content="Cari Selanjutnya" Padding="14,8" Appearance="Primary" Margin="0,0,6,0" Icon="{ui:SymbolIcon Symbol=Search24}" Click="OnFindNextClicked" IsDefault="True"/>
-                <ui:Button Content="Ganti" Padding="14,8" Margin="0,0,6,0" Icon="{ui:SymbolIcon Symbol=ArrowRepeatAll24}" Click="OnReplaceNextClicked"/>
-                <ui:Button Content="Ganti Semua" Padding="14,8" Appearance="Secondary" Margin="0,0,6,0" Icon="{ui:SymbolIcon Symbol=Edit24}" Click="OnReplaceAllClicked"/>
-                <ui:Button Content="Tutup" Padding="14,8" Click="OnCloseClicked" IsCancel="True"/>
+                <ui:Button Content="Find Next" Padding="14,8" Appearance="Primary" Margin="0,0,6,0" Icon="{ui:SymbolIcon Symbol=Search24}" Click="OnFindNextClicked" IsDefault="True"/>
+                <ui:Button Content="Replace" Padding="14,8" Margin="0,0,6,0" Icon="{ui:SymbolIcon Symbol=ArrowRepeatAll24}" Click="OnReplaceNextClicked"/>
+                <ui:Button Content="Replace All" Padding="14,8" Appearance="Secondary" Margin="0,0,6,0" Icon="{ui:SymbolIcon Symbol=Edit24}" Click="OnReplaceAllClicked"/>
+                <ui:Button Content="Close" Padding="14,8" Click="OnCloseClicked" IsCancel="True"/>
             </StackPanel>
         </Grid>
     </Grid>

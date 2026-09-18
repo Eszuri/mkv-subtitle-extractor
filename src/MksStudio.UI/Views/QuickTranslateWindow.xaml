@@ -44,7 +44,7 @@
 
                     <!-- Source: Auto Detect -->
                     <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                        <TextBlock Text="Bahasa Asli" FontSize="10" Foreground="{StaticResource TextMuted}" Margin="0,0,0,4"/>
+                        <TextBlock Text="Source Language" FontSize="10" Foreground="{StaticResource TextMuted}" Margin="0,0,0,4"/>
                         <Border Background="#1E293B" BorderBrush="{StaticResource BorderDark}" BorderThickness="1" CornerRadius="4" Padding="10,0" Height="32">
                             <TextBlock Text="Auto Detect" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
                         </Border>
@@ -55,7 +55,7 @@
 
                     <!-- Target Language Dropdown -->
                     <StackPanel Grid.Column="2" VerticalAlignment="Center">
-                        <TextBlock Text="Bahasa Target" FontSize="10" Foreground="{StaticResource TextMuted}" Margin="0,0,0,4"/>
+                        <TextBlock Text="Target Language" FontSize="10" Foreground="{StaticResource TextMuted}" Margin="0,0,0,4"/>
                         <ComboBox ItemsSource="{Binding TargetLanguages}"
                                   SelectedItem="{Binding SelectedTargetLanguage}"
                                   DisplayMemberPath="FullDisplay"
@@ -90,7 +90,7 @@
                            Foreground="{StaticResource AccentGreen}"
                            Visibility="{Binding IsCompleted, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
-                <!-- Two-Column Preview Table: Text Asli vs Text Terjemahan (No timeline) -->
+                <!-- Two-Column Preview Table: Original Text vs Translated Text (No timeline) -->
                 <Border Grid.Row="1" Background="{StaticResource BgPanel}" BorderBrush="{StaticResource BorderDark}" BorderThickness="1" CornerRadius="8">
                     <Grid>
                         <Grid.RowDefinitions>
@@ -105,8 +105,8 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="Teks Asli" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}"/>
-                                <TextBlock Grid.Column="1" Text="Teks Terjemahan" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource AccentPrimary}" Margin="12,0,0,0"/>
+                                <TextBlock Grid.Column="0" Text="Original Text" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}"/>
+                                <TextBlock Grid.Column="1" Text="Translated Text" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource AccentPrimary}" Margin="12,0,0,0"/>
                             </Grid>
                         </Border>
 
@@ -150,10 +150,10 @@
                                                 <ColumnDefinition Width="*"/>
                                             </Grid.ColumnDefinitions>
 
-                                            <!-- Teks Asli -->
+                                            <!-- Original Text -->
                                             <TextBlock Grid.Column="0" Text="{Binding OriginalText}" TextWrapping="Wrap" FontSize="11.5" Foreground="{StaticResource TextPrimary}" Margin="0,0,8,0"/>
 
-                                            <!-- Teks Terjemahan -->
+                                            <!-- Translated Text -->
                                             <TextBlock Grid.Column="1" Text="{Binding TranslatedText}" TextWrapping="Wrap" FontSize="11.5" Foreground="#38BDF8" Margin="12,0,0,0"/>
                                         </Grid>
                                     </Border>
@@ -175,11 +175,11 @@
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal"
                             IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}">
-                    <Button Content="Terjemahkan" Height="32" Padding="18,0" Margin="0,0,8,0"
+                    <Button Content="Translate" Height="32" Padding="18,0" Margin="0,0,8,0"
                             Background="#162A45" BorderBrush="#0284C7" BorderThickness="1" Foreground="#38BDF8" FontWeight="SemiBold" FontSize="11.5"
                             Command="{Binding StartTranslationCommand}"/>
 
-                    <Button Content="Batal" Height="32" Padding="14,0"
+                    <Button Content="Cancel" Height="32" Padding="14,0"
                             Background="{StaticResource BgCard}" BorderBrush="{StaticResource BorderDark}" BorderThickness="1" Foreground="{StaticResource TextMuted}" FontSize="11.5"
                             Command="{Binding CancelOrCloseCommand}"/>
                 </StackPanel>

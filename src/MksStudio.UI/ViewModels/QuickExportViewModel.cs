@@ -105,13 +105,13 @@ public partial class QuickExportViewModel : ObservableObject
         var selected = Tracks.Where(t => t.IsSelected).ToList();
         if (selected.Count == 0)
         {
-            MessageBox.Show("Pilih setidaknya satu track.", "Export Subtitle", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show("Please select at least one track.", "Export Subtitle", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
         IsBusy = true;
         ProgressValue = 0;
-        StatusText = "Mengekspor .mks...";
+        StatusText = "Exporting .mks...";
 
         try
         {
@@ -135,9 +135,9 @@ public partial class QuickExportViewModel : ObservableObject
 
             if (success && File.Exists(outMks))
             {
-                StatusText = "Export .mks selesai!";
+                StatusText = "Export .mks completed!";
                 var result = MessageBox.Show(
-                    "Export .mks selesai!\n\nBuka folder?",
+                    "Export .mks completed!\n\nOpen output folder?",
                     "Export Subtitle",
                     MessageBoxButton.YesNo,
                     MessageBoxImage.Information);
@@ -151,12 +151,12 @@ public partial class QuickExportViewModel : ObservableObject
             }
             else
             {
-                MessageBox.Show("Gagal mengekspor file .mks.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Failed to export .mks file.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Gagal export .mks:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show($"Failed to export .mks:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
         finally
         {
@@ -171,13 +171,13 @@ public partial class QuickExportViewModel : ObservableObject
         var selected = Tracks.Where(t => t.IsSelected).ToList();
         if (selected.Count == 0)
         {
-            MessageBox.Show("Pilih setidaknya satu track.", "Export Subtitle", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show("Please select at least one track.", "Export Subtitle", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
         IsBusy = true;
         ProgressValue = 0;
-        StatusText = "Mengekspor .ass...";
+        StatusText = "Exporting .ass...";
 
         try
         {
@@ -237,9 +237,9 @@ public partial class QuickExportViewModel : ObservableObject
 
             if (exportedFiles.Count > 0)
             {
-                StatusText = "Export .ass selesai!";
+                StatusText = "Export .ass completed!";
                 var result = MessageBox.Show(
-                    "Export .ass selesai!\n\nBuka folder?",
+                    "Export .ass completed!\n\nOpen output folder?",
                     "Export Subtitle",
                     MessageBoxButton.YesNo,
                     MessageBoxImage.Information);
@@ -253,12 +253,12 @@ public partial class QuickExportViewModel : ObservableObject
             }
             else
             {
-                MessageBox.Show("Gagal mengekspor file .ass.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Failed to export .ass file.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Gagal export .ass:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show($"Failed to export .ass:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
         finally
         {

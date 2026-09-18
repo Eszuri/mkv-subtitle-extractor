@@ -6,7 +6,7 @@
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         xmlns:vm="clr-namespace:MksStudio.UI.ViewModels"
         mc:Ignorable="d"
-        Title="Terjemahkan Subtitle (Google Translate)" Height="680" Width="720"
+        Title="Translate Subtitles (Google Translate)" Height="680" Width="720"
         WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
         Icon="../app.ico"
         WindowBackdropType="Mica"
@@ -19,7 +19,7 @@
             <RowDefinition Height="*"/>    <!-- Content -->
         </Grid.RowDefinitions>
 
-        <ui:TitleBar Grid.Row="0" Title="Terjemahkan Subtitle (Google Translate)" Icon="../app.ico" Height="44" Padding="12,0,8,0"/>
+        <ui:TitleBar Grid.Row="0" Title="Translate Subtitles (Google Translate)" Icon="../app.ico" Height="44" Padding="12,0,8,0"/>
 
         <Grid Grid.Row="1" Margin="26,12,26,22">
             <Grid.RowDefinitions>
@@ -42,8 +42,8 @@
                 </Border>
 
                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                    <TextBlock Text="Penerjemah Subtitle Online (Google Translate)" FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
-                    <TextBlock Text="Terjemahkan subtitle secara instan dengan proteksi format ASS, SRT, dan VTT utuh 100%." FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,2,0,0"/>
+                    <TextBlock Text="Online Subtitle Translator (Google Translate)" FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+                    <TextBlock Text="Instantly translate subtitles with 100% ASS, SRT, and VTT tag protection." FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,2,0,0"/>
                 </StackPanel>
             </Grid>
 
@@ -58,7 +58,7 @@
 
                     <!-- Source Language -->
                     <StackPanel Grid.Column="0">
-                        <TextBlock Text="Bahasa Asal (Source):" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,6"/>
+                        <TextBlock Text="Source Language:" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,6"/>
                         <ComboBox ItemsSource="{Binding SourceLanguages}"
                                   SelectedItem="{Binding SelectedSourceLanguage}"
                                   DisplayMemberPath="FullDisplay"
@@ -72,7 +72,7 @@
 
                     <!-- Target Language -->
                     <StackPanel Grid.Column="2">
-                        <TextBlock Text="Bahasa Tujuan (Target):" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,6"/>
+                        <TextBlock Text="Target Language:" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,6"/>
                         <ComboBox ItemsSource="{Binding TargetLanguages}"
                                   SelectedItem="{Binding SelectedTargetLanguage}"
                                   DisplayMemberPath="FullDisplay"
@@ -93,12 +93,12 @@
 
                     <!-- Scope Selection -->
                     <StackPanel Grid.Column="0">
-                        <TextBlock Text="Cakupan Baris:" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,8"/>
-                        <RadioButton Content="Seluruh Track Aktif"
+                        <TextBlock Text="Cue Scope:" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,8"/>
+                        <RadioButton Content="Entire Active Track"
                                      IsChecked="{Binding SelectedScopeIndex, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=0, FallbackValue=True}"
                                      GroupName="ScopeGroup" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,6"
                                      IsEnabled="{Binding IsTranslating, Converter={StaticResource InverseBooleanConverter}, FallbackValue=True}"/>
-                        <RadioButton Content="Hanya Baris Terpilih"
+                        <RadioButton Content="Selected Cues Only"
                                      IsChecked="{Binding SelectedScopeIndex, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=1}"
                                      GroupName="ScopeGroup" Foreground="{StaticResource TextPrimary}"
                                      IsEnabled="{Binding IsTranslating, Converter={StaticResource InverseBooleanConverter}, FallbackValue=True}"/>
@@ -106,12 +106,12 @@
 
                     <!-- Destination Selection -->
                     <StackPanel Grid.Column="2">
-                        <TextBlock Text="Tujuan Hasil Terjemahan:" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,8"/>
-                        <RadioButton Content="Buat Track Baru (Disarankan)"
+                        <TextBlock Text="Translation Destination:" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,8"/>
+                        <RadioButton Content="Create New Track (Recommended)"
                                      IsChecked="{Binding SelectedDestinationIndex, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=0, FallbackValue=True}"
                                      GroupName="DestGroup" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,6"
                                      IsEnabled="{Binding IsTranslating, Converter={StaticResource InverseBooleanConverter}, FallbackValue=True}"/>
-                        <RadioButton Content="Timpa Teks di Track Saat Ini"
+                        <RadioButton Content="Overwrite Current Track"
                                      IsChecked="{Binding SelectedDestinationIndex, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=1}"
                                      GroupName="DestGroup" Foreground="{StaticResource TextPrimary}"
                                      IsEnabled="{Binding IsTranslating, Converter={StaticResource InverseBooleanConverter}, FallbackValue=True}"/>
@@ -148,14 +148,14 @@
 
                         <Border Grid.Column="0" Background="{StaticResource BgDark}" CornerRadius="6" Padding="8">
                             <StackPanel>
-                                <TextBlock Text="Teks Asli:" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMuted}" Margin="0,0,0,4"/>
+                                <TextBlock Text="Original Text:" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMuted}" Margin="0,0,0,4"/>
                                 <TextBlock Text="{Binding CurrentOriginalPreview}" FontSize="11" Foreground="{StaticResource TextSecondary}" TextWrapping="Wrap" MaxHeight="55" TextTrimming="CharacterEllipsis"/>
                             </StackPanel>
                         </Border>
 
                         <Border Grid.Column="2" Background="{StaticResource BgDark}" CornerRadius="6" Padding="8">
                             <StackPanel>
-                                <TextBlock Text="Hasil Terjemahan:" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentPrimary}" Margin="0,0,0,4"/>
+                                <TextBlock Text="Translated Text:" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentPrimary}" Margin="0,0,0,4"/>
                                 <TextBlock Text="{Binding CurrentTranslatedPreview}" FontSize="11" Foreground="{StaticResource TextPrimary}" TextWrapping="Wrap" MaxHeight="55" TextTrimming="CharacterEllipsis"/>
                             </StackPanel>
                         </Border>
@@ -172,20 +172,20 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- Cancel during translation -->
-                <ui:Button Grid.Column="0" Content="Batal Proses"
+                <ui:Button Grid.Column="0" Content="Cancel Process"
                            Command="{Binding CancelTranslationCommand}"
                            Appearance="Danger"
                            Visibility="{Binding IsTranslating, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"
                            FontWeight="SemiBold" Padding="16,8" Icon="{ui:SymbolIcon Symbol=Dismiss24}"/>
 
                 <!-- Close button (when not translating) -->
-                <ui:Button Grid.Column="0" Content="Tutup"
+                <ui:Button Grid.Column="0" Content="Close"
                            Click="OnCloseClicked"
                            Visibility="{Binding IsTranslating, Converter={StaticResource InverseBooleanToVisibilityConverter}, FallbackValue=Visible}"
                            Padding="18,9"/>
 
                 <!-- Start Button -->
-                <ui:Button Grid.Column="2" Content="Mulai Terjemahkan"
+                <ui:Button Grid.Column="2" Content="Start Translation"
                            Click="OnStartTranslationClicked"
                            IsEnabled="{Binding IsTranslating, Converter={StaticResource InverseBooleanConverter}, FallbackValue=True}"
                            Appearance="Primary" FontWeight="Bold" FontSize="13" Padding="22,10" Icon="{ui:SymbolIcon Symbol=Flash24}"/>

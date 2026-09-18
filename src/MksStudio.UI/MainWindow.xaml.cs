@@ -353,7 +353,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
     {
         if (Vm.SelectedTrack == null)
         {
-            MessageBox.Show("Silakan pilih track subtitle yang ingin diterjemahkan terlebih dahulu.", "Peringatan", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show("Please select a subtitle track to translate first.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
@@ -403,7 +403,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
                     Vm.IsModified = true;
                     Vm.CurrentViewIndex = 1; // Ensure Editor tab is active
                     Vm.RefreshAllViews();
-                    Vm.StatusMessage = $"Berhasil membuat track terjemahan baru '{newTrack.Name}' ({translatedCues.Count} baris).";
+                    Vm.StatusMessage = $"Successfully created new translation track '{newTrack.Name}' ({translatedCues.Count} cues).";
                 }
                 else
                 {
@@ -433,7 +433,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
                     Vm.IsModified = true;
                     Vm.CurrentViewIndex = 1; // Ensure Editor tab is active
                     Vm.RefreshAllViews();
-                    Vm.StatusMessage = $"Berhasil menerjemahkan {translatedCues.Count} baris pada track '{Vm.SelectedTrack.Name}'.";
+                    Vm.StatusMessage = $"Successfully translated {translatedCues.Count} cues in track '{Vm.SelectedTrack.Name}'.";
                 }
             });
         };

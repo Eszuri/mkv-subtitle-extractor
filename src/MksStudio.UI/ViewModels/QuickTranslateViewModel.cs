@@ -69,7 +69,7 @@ public partial class QuickTranslateViewModel : ObservableObject
     {
         if (Document.Cues.Count == 0)
         {
-            MessageBox.Show("Tidak ada baris subtitle untuk diterjemahkan.", "Translate Subtitle", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show("No subtitle cues found to translate.", "Translate Subtitle", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
@@ -77,7 +77,7 @@ public partial class QuickTranslateViewModel : ObservableObject
         IsCompleted = false;
         IsPreviewVisible = true;
         ProgressPercent = 0;
-        StatusText = "Menerjemahkan...";
+        StatusText = "Translating...";
         _cts = new CancellationTokenSource();
 
         PreviewItems.Clear();
@@ -103,7 +103,7 @@ public partial class QuickTranslateViewModel : ObservableObject
                 if (p.TotalCount > 0)
                 {
                     ProgressPercent = (double)p.ProcessedCount / p.TotalCount * 100.0;
-                    StatusText = $"Menerjemahkan: {p.ProcessedCount} / {p.TotalCount} baris ({ProgressPercent:0}%)";
+                    StatusText = $"Translating: {p.ProcessedCount} / {p.TotalCount} lines ({ProgressPercent:0}%)";
                 }
 
                 if (p.CueIndex >= 0 && p.CueIndex < PreviewItems.Count)
@@ -145,9 +145,9 @@ public partial class QuickTranslateViewModel : ObservableObject
                 await File.WriteAllTextAsync(outPath, serialized, Encoding.UTF8);
 
                 IsCompleted = true;
-                StatusText = $"Selesai! {translatedCues.Count} baris berhasil diterjemahkan.";
+                StatusText = $"Completed! Successfully translated {translatedCues.Count} line(s).";
                 var result = MessageBox.Show(
-                    "Terjemahan selesai!\n\nBuka folder?",
+                    "Translation completed!\n\nOpen output folder?",
                     "Translate Subtitle",
                     MessageBoxButton.YesNo,
                     MessageBoxImage.Information);
@@ -161,12 +161,12 @@ public partial class QuickTranslateViewModel : ObservableObject
         }
         catch (OperationCanceledException)
         {
-            StatusText = "Penerjemahan dibatalkan.";
+            StatusText = "Translation canceled.";
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Gagal menerjemahkan subtitle:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            StatusText = "Gagal menerjemahkan.";
+            MessageBox.Show($"Failed to translate subtitles:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            StatusText = "Translation failed.";
         }
         finally
         {

@@ -272,7 +272,7 @@
                                     </Grid>
 
                                     <!-- Card Description -->
-                                    <TextBlock Grid.Row="1" Text="Ekstrak subtitle (SRT, ASS, VTT, PGS) dan seluruh font embedded (TTF/OTF) langsung dari video MKV, baik file tunggal maupun seluruh folder secara batch."
+                                    <TextBlock Grid.Row="1" Text="Extract subtitles (SRT, ASS, VTT, PGS) and all embedded fonts (TTF/OTF) directly from MKV videos, individually or in batch."
                                                Foreground="{StaticResource TextSecondary}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,18" LineHeight="18"/>
 
                                     <!-- Feature Badges -->
@@ -296,11 +296,11 @@
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
 
-                                        <ui:Button Grid.Column="0" Content="Pilih File .mkv..." Command="{Binding ExtractorVm.BrowseInputCommand}"
+                                        <ui:Button Grid.Column="0" Content="Select .mkv File..." Command="{Binding ExtractorVm.BrowseInputCommand}"
                                                    Appearance="Primary" HorizontalAlignment="Stretch" Padding="0,11" FontWeight="SemiBold"
                                                    Icon="{ui:SymbolIcon Symbol=FolderOpen24}"/>
 
-                                        <ui:Button Grid.Column="2" Content="Buka Extractor" Command="{Binding NavigateToExtractorCommand}"
+                                        <ui:Button Grid.Column="2" Content="Open Extractor" Command="{Binding NavigateToExtractorCommand}"
                                                    Appearance="Secondary" HorizontalAlignment="Stretch" Padding="0,11" FontWeight="SemiBold"
                                                    Icon="{ui:SymbolIcon Symbol=ArrowRight24}"/>
                                     </Grid>
@@ -334,13 +334,13 @@
                                     </Grid>
 
                                     <!-- Card Description -->
-                                    <TextBlock Grid.Row="1" Text="Buka, edit ribuan baris subtitle dengan virtualized DataGrid, konversi lintas format (SRT, ASS, VTT, TTML, SAMI, MicroDVD, SBV, LRC), terjemahkan online dengan Google Translate, dan simpan ke .mks native."
+                                    <TextBlock Grid.Row="1" Text="Open and edit thousands of subtitle cues with virtualized DataGrid, convert across formats (SRT, ASS, VTT, TTML, SAMI, MicroDVD, SBV, LRC), translate online with Google Translate, and save to native .mks."
                                                Foreground="{StaticResource TextSecondary}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,18" LineHeight="18"/>
 
                                     <!-- Feature Badges -->
                                     <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,0,0,22">
                                         <Border Background="{StaticResource BgPanel}" CornerRadius="4" Padding="6,2" Margin="0,0,6,0">
-                                            <TextBlock Text="✓ 10+ Format Subtitle" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentPrimary}"/>
+                                            <TextBlock Text="✓ 10+ Subtitle Formats" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentPrimary}"/>
                                         </Border>
                                         <Border Background="{StaticResource BgPanel}" CornerRadius="4" Padding="6,2" Margin="0,0,6,0">
                                             <TextBlock Text="✓ Google Translate" FontSize="10" Foreground="{StaticResource TextSecondary}"/>
@@ -358,11 +358,11 @@
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
 
-                                        <ui:Button Grid.Column="0" Content="Buka File Subtitle..." Command="{Binding OpenFileCommand}"
+                                        <ui:Button Grid.Column="0" Content="Open Subtitle File..." Command="{Binding OpenFileCommand}"
                                                    Appearance="Primary" HorizontalAlignment="Stretch" Padding="0,11" FontWeight="SemiBold"
                                                    Icon="{ui:SymbolIcon Symbol=FolderOpen24}"/>
 
-                                        <ui:Button Grid.Column="2" Content="Buat Baru" Command="{Binding CreateNewFileCommand}"
+                                        <ui:Button Grid.Column="2" Content="Create New" Command="{Binding CreateNewFileCommand}"
                                                    Appearance="Secondary" HorizontalAlignment="Stretch" Padding="0,11" FontWeight="SemiBold"
                                                    Icon="{ui:SymbolIcon Symbol=Add24}"/>
                                     </Grid>
@@ -383,8 +383,8 @@
                                 </Border>
 
                                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                    <TextBlock Text="Drag &amp; Drop file .mkv, .mks, .srt, .ass, .vtt, .ttml, .smi, .sub, .sbv, atau .lrc ke sini" FontWeight="Bold" FontSize="13" Foreground="{StaticResource TextPrimary}"/>
-                                    <TextBlock Text="Aplikasi akan mendeteksi format subtitle secara otomatis dan mengarahkan ke editor atau extractor." FontSize="11" Foreground="{StaticResource TextMuted}" Margin="0,2,0,0"/>
+                                    <TextBlock Text="Drag &amp; drop .mkv, .mks, .srt, .ass, .vtt, .ttml, .smi, .sub, .sbv, or .lrc files here" FontWeight="Bold" FontSize="13" Foreground="{StaticResource TextPrimary}"/>
+                                    <TextBlock Text="The application will automatically detect subtitle formats and direct to editor or extractor." FontSize="11" Foreground="{StaticResource TextMuted}" Margin="0,2,0,0"/>
                                 </StackPanel>
                             </Grid>
                         </Border>
@@ -413,24 +413,24 @@
 
                             <!-- Toolbar Action Buttons -->
                             <StackPanel Grid.Column="0" Orientation="Horizontal">
-                                <ui:Button Content="Tambah Track" Command="{Binding AddTrackFromFileCommand}" Icon="{ui:SymbolIcon Symbol=Add24}" Margin="0,0,10,0" ToolTip="Impor file subtitle sebagai track baru"/>
+                                <ui:Button Content="Add Track" Command="{Binding AddTrackFromFileCommand}" Icon="{ui:SymbolIcon Symbol=Add24}" Margin="0,0,10,0" ToolTip="Import subtitle file as new track"/>
 
                                 <Border Width="1" Background="{StaticResource BorderDark}" Margin="4,4,10,4"/>
 
-                                <ui:Button Content="Cari &amp; Ganti" Click="OnOpenSearchReplaceClicked" Icon="{ui:SymbolIcon Symbol=Search24}" Margin="0,0,5,0" ToolTip="Cari dan ganti teks (Regex)"/>
-                                <ui:Button Content="Font" Click="OnOpenAttachmentsClicked" Icon="{ui:SymbolIcon Symbol=FontIncrease24}" Margin="0,0,5,0" ToolTip="Kelola embedded font TTF/OTF"/>
-                                <ui:Button Content="Terjemahkan" Click="OnOpenTranslationClicked" Icon="{ui:SymbolIcon Symbol=LocalLanguage24}" Margin="0,0,10,0" ToolTip="Terjemahkan subtitle dengan Google Translate online"/>
+                                <ui:Button Content="Find &amp; Replace" Click="OnOpenSearchReplaceClicked" Icon="{ui:SymbolIcon Symbol=Search24}" Margin="0,0,5,0" ToolTip="Find and replace text (Regex)"/>
+                                <ui:Button Content="Fonts" Click="OnOpenAttachmentsClicked" Icon="{ui:SymbolIcon Symbol=FontIncrease24}" Margin="0,0,5,0" ToolTip="Manage embedded TTF/OTF fonts"/>
+                                <ui:Button Content="Translate" Click="OnOpenTranslationClicked" Icon="{ui:SymbolIcon Symbol=LocalLanguage24}" Margin="0,0,10,0" ToolTip="Translate subtitles with Google Translate online"/>
 
                                 <Border Width="1" Background="{StaticResource BorderDark}" Margin="4,4,10,4"/>
 
-                                <ui:Button Content="Simpan .mks" Command="{Binding SaveFileCommand}" Icon="{ui:SymbolIcon Symbol=Save24}" Margin="0,0,5,0" ToolTip="Simpan langsung ke container .mks (Ctrl+S)"/>
-                                <ui:Button Content="Ekspor" Command="{Binding ExportTrackCommand}" Icon="{ui:SymbolIcon Symbol=Share24}" Margin="0,0,5,0" ToolTip="Ekspor track aktif ke format .srt/.ass"/>
-                                <ui:Button Content="Ekspor Semua" Command="{Binding ExportAllTracksCommand}" Icon="{ui:SymbolIcon Symbol=FolderZip24}" Margin="0,0,5,0" ToolTip="Ekspor semua track ke folder"/>
+                                <ui:Button Content="Save .mks" Command="{Binding SaveFileCommand}" Icon="{ui:SymbolIcon Symbol=Save24}" Margin="0,0,5,0" ToolTip="Save directly to .mks container (Ctrl+S)"/>
+                                <ui:Button Content="Export" Command="{Binding ExportTrackCommand}" Icon="{ui:SymbolIcon Symbol=Share24}" Margin="0,0,5,0" ToolTip="Export active track to .srt/.ass"/>
+                                <ui:Button Content="Export All" Command="{Binding ExportAllTracksCommand}" Icon="{ui:SymbolIcon Symbol=FolderZip24}" Margin="0,0,5,0" ToolTip="Export all tracks to folder"/>
                             </StackPanel>
 
                             <!-- Container Title Box -->
                             <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="Judul Kontainer:" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11"/>
+                                <TextBlock Text="Container Title:" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11"/>
                                 <ui:TextBox Text="{Binding ContainerTitle, UpdateSourceTrigger=PropertyChanged}" Width="190" Height="32" FontSize="11" Padding="8,4"/>
                             </StackPanel>
                         </Grid>
@@ -456,15 +456,15 @@
                             <!-- Track List Header -->
                             <Border Grid.Row="0" Padding="14,10" Background="{StaticResource BgCardElevated}" BorderBrush="{StaticResource BorderDark}" BorderThickness="0,0,0,1">
                                 <Grid>
-                                    <TextBlock Text="TRACK SUBTITLE" FontWeight="Bold" FontSize="11" Foreground="{StaticResource AccentPrimary}" VerticalAlignment="Center"/>
+                                    <TextBlock Text="SUBTITLE TRACKS" FontWeight="Bold" FontSize="11" Foreground="{StaticResource AccentPrimary}" VerticalAlignment="Center"/>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                        <Button Command="{Binding AddTrackFromFileCommand}" Padding="6,3" Margin="0,0,4,0" ToolTip="Tambah Track">
+                                        <Button Command="{Binding AddTrackFromFileCommand}" Padding="6,3" Margin="0,0,4,0" ToolTip="Add Track">
                                             <ui:SymbolIcon Symbol="Add20" FontSize="12"/>
                                         </Button>
-                                        <Button Command="{Binding DuplicateTrackCommand}" Padding="6,3" Margin="0,0,4,0" ToolTip="Duplikasi Track">
+                                        <Button Command="{Binding DuplicateTrackCommand}" Padding="6,3" Margin="0,0,4,0" ToolTip="Duplicate Track">
                                             <ui:SymbolIcon Symbol="Copy20" FontSize="12"/>
                                         </Button>
-                                        <Button Command="{Binding RemoveTrackCommand}" Padding="6,3" ToolTip="Hapus Track">
+                                        <Button Command="{Binding RemoveTrackCommand}" Padding="6,3" ToolTip="Delete Track">
                                             <ui:SymbolIcon Symbol="Delete20" FontSize="12"/>
                                         </Button>
                                     </StackPanel>
@@ -503,13 +503,13 @@
 
                             <!-- Track Inspector Header -->
                             <Border Grid.Row="2" Padding="14,10" Background="{StaticResource BgCardElevated}" BorderBrush="{StaticResource BorderDark}" BorderThickness="0,1,0,1">
-                                <TextBlock Text="PROPERTI TRACK" FontWeight="Bold" FontSize="11" Foreground="{StaticResource AccentPrimary}"/>
+                                <TextBlock Text="TRACK PROPERTIES" FontWeight="Bold" FontSize="11" Foreground="{StaticResource AccentPrimary}"/>
                             </Border>
 
                             <!-- Track Inspector Details -->
                             <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto" Padding="14,12">
                                 <StackPanel DataContext="{Binding SelectedTrack}">
-                                    <TextBlock Text="Nama Track:" FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,4"/>
+                                    <TextBlock Text="Track Name:" FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,4"/>
                                     <ui:TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Height="32" Margin="0,0,0,10" FontSize="11" Padding="8,4"/>
 
                                     <Grid Margin="0">
@@ -518,11 +518,11 @@
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
                                         <StackPanel Grid.Column="0" Margin="0,0,5,0">
-                                            <TextBlock Text="Bahasa (ISO):" FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,4"/>
+                                            <TextBlock Text="Language (ISO):" FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,4"/>
                                             <ui:TextBox Text="{Binding Language, UpdateSourceTrigger=PropertyChanged}" Height="32" FontSize="11" Padding="8,4"/>
                                         </StackPanel>
                                         <StackPanel Grid.Column="1" Margin="5,0,0,0">
-                                            <TextBlock Text="Format Codec:" FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,4"/>
+                                            <TextBlock Text="Codec Format:" FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,4"/>
                                             <Border Background="{StaticResource BgInput}" CornerRadius="5" Padding="8,4" Height="32" BorderBrush="{StaticResource BorderDark}" BorderThickness="1">
                                                 <TextBlock Text="{Binding CodecDisplay}" Foreground="{StaticResource AccentPrimary}" FontWeight="Bold" FontSize="11" VerticalAlignment="Center"/>
                                             </Border>
@@ -554,19 +554,19 @@
                                     </Grid.ColumnDefinitions>
 
                                     <!-- Search / Filter Box -->
-                                    <ui:TextBox Grid.Column="0" PlaceholderText="Cari teks subtitle..."
+                                    <ui:TextBox Grid.Column="0" PlaceholderText="Search subtitle text..."
                                                 Text="{Binding FilterQuery, UpdateSourceTrigger=PropertyChanged}"
                                                 Icon="{ui:SymbolIcon Symbol=Search24}" Height="32" FontSize="12" Padding="8,2"/>
 
                                     <!-- Mid Info -->
-                                    <TextBlock Grid.Column="1" Text="{Binding SelectedTrack.Cues.Count, StringFormat='{}Total: {0} baris'}"
+                                    <TextBlock Grid.Column="1" Text="{Binding SelectedTrack.Cues.Count, StringFormat='{}Total: {0} cues'}"
                                                Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" Margin="16,0,0,0" FontSize="11"/>
 
                                     <!-- Cue Operations -->
                                     <StackPanel Grid.Column="2" Orientation="Horizontal">
-                                        <ui:Button Content="Tambah" Command="{Binding AddCueCommand}" Icon="{ui:SymbolIcon Symbol=Add24}" Padding="9,5" Margin="0,0,4,0" FontSize="11"/>
-                                        <ui:Button Content="Hapus" Command="{Binding DeleteCueCommand}" Icon="{ui:SymbolIcon Symbol=Delete24}" Padding="9,5" Margin="0,0,4,0" FontSize="11"/>
-                                        <ui:Button Content="Pecah" Command="{Binding SplitCueCommand}" Icon="{ui:SymbolIcon Symbol=Cut24}" Padding="9,5" Margin="0,0,4,0" FontSize="11"/>
+                                        <ui:Button Content="Add" Command="{Binding AddCueCommand}" Icon="{ui:SymbolIcon Symbol=Add24}" Padding="9,5" Margin="0,0,4,0" FontSize="11"/>
+                                        <ui:Button Content="Delete" Command="{Binding DeleteCueCommand}" Icon="{ui:SymbolIcon Symbol=Delete24}" Padding="9,5" Margin="0,0,4,0" FontSize="11"/>
+                                        <ui:Button Content="Split" Command="{Binding SplitCueCommand}" Icon="{ui:SymbolIcon Symbol=Cut24}" Padding="9,5" Margin="0,0,4,0" FontSize="11"/>
                                         <ui:Button Content="▲" Command="{Binding MoveCueUpCommand}" Padding="7,5" Margin="0,0,3,0" FontSize="11"/>
                                         <ui:Button Content="▼" Command="{Binding MoveCueDownCommand}" Padding="7,5" FontSize="11"/>
                                     </StackPanel>
@@ -626,12 +626,12 @@
                                 </DataGrid.Resources>
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="#" Binding="{Binding Index}" Width="50" IsReadOnly="True"/>
-                                    <DataGridTextColumn Header="Mulai" Binding="{Binding StartTimeText}" Width="115" FontFamily="Consolas"/>
-                                    <DataGridTextColumn Header="Selesai" Binding="{Binding EndTimeText}" Width="115" FontFamily="Consolas"/>
-                                    <DataGridTextColumn Header="Durasi" Binding="{Binding DurationText}" Width="115" IsReadOnly="True" FontFamily="Consolas"/>
+                                    <DataGridTextColumn Header="Start" Binding="{Binding StartTimeText}" Width="115" FontFamily="Consolas"/>
+                                    <DataGridTextColumn Header="End" Binding="{Binding EndTimeText}" Width="115" FontFamily="Consolas"/>
+                                    <DataGridTextColumn Header="Duration" Binding="{Binding DurationText}" Width="115" IsReadOnly="True" FontFamily="Consolas"/>
                                     <DataGridTextColumn Header="Style" Binding="{Binding Style}" Width="110"/>
-                                    <DataGridTextColumn Header="Karakter" Binding="{Binding Actor}" Width="110"/>
-                                    <DataGridTextColumn Header="Teks Subtitle" Binding="{Binding RawText}" Width="*"/>
+                                    <DataGridTextColumn Header="Actor" Binding="{Binding Actor}" Width="110"/>
+                                    <DataGridTextColumn Header="Subtitle Text" Binding="{Binding RawText}" Width="*"/>
                                 </DataGrid.Columns>
                             </DataGrid>
 
@@ -657,19 +657,19 @@
                                         <!-- Comprehensive Subtitle Formatting Preset Toolbar -->
                                         <Border Grid.Row="0" Margin="0,0,0,10" Background="#161922" BorderBrush="{StaticResource BorderDark}" BorderThickness="1" CornerRadius="6" Padding="6,4">
                                             <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                                <TextBlock Text="PRESET FORMAT:" FontWeight="Bold" FontSize="10" Foreground="{StaticResource AccentPrimary}" VerticalAlignment="Center" Margin="2,0,8,0"/>
+                                                <TextBlock Text="FORMAT PRESETS:" FontWeight="Bold" FontSize="10" Foreground="{StaticResource AccentPrimary}" VerticalAlignment="Center" Margin="2,0,8,0"/>
 
                                                 <!-- Style Group (Bold, Italic, Underline, Strikeout) -->
                                                 <Border Background="#0F131B" CornerRadius="4" Padding="2" Margin="0,0,6,0" BorderBrush="#252C3A" BorderThickness="1">
                                                     <StackPanel Orientation="Horizontal">
                                                         <Button Content="𝗕" Width="26" Height="24" Padding="0" Focusable="False" Tag="b" Click="OnFormatActionClicked"
-                                                                ToolTip="Bold / Tebal (Ctrl+B) - {\b1}..{\b0}" Background="Transparent" BorderThickness="0" Foreground="#F1F5F9" FontWeight="Bold" FontSize="12"/>
+                                                                ToolTip="Bold (Ctrl+B) - {\b1}..{\b0}" Background="Transparent" BorderThickness="0" Foreground="#F1F5F9" FontWeight="Bold" FontSize="12"/>
                                                         <Button Content="𝘐" Width="26" Height="24" Padding="0" Focusable="False" Tag="i" Click="OnFormatActionClicked"
-                                                                ToolTip="Italic / Miring (Ctrl+I) - {\i1}..{\i0}" Background="Transparent" BorderThickness="0" Foreground="#F1F5F9" FontStyle="Italic" FontSize="12"/>
+                                                                ToolTip="Italic (Ctrl+I) - {\i1}..{\i0}" Background="Transparent" BorderThickness="0" Foreground="#F1F5F9" FontStyle="Italic" FontSize="12"/>
                                                         <Button Content="U̲" Width="26" Height="24" Padding="0" Focusable="False" Tag="u" Click="OnFormatActionClicked"
-                                                                ToolTip="Underline / Garis Bawah (Ctrl+U) - {\u1}..{\u0}" Background="Transparent" BorderThickness="0" Foreground="#F1F5F9" FontSize="12"/>
+                                                                ToolTip="Underline (Ctrl+U) - {\u1}..{\u0}" Background="Transparent" BorderThickness="0" Foreground="#F1F5F9" FontSize="12"/>
                                                         <Button Content="S̶" Width="26" Height="24" Padding="0" Focusable="False" Tag="s" Click="OnFormatActionClicked"
-                                                                ToolTip="Strikeout / Coret Teks - {\s1}..{\s0}" Background="Transparent" BorderThickness="0" Foreground="#F1F5F9" FontSize="12"/>
+                                                                ToolTip="Strikeout - {\s1}..{\s0}" Background="Transparent" BorderThickness="0" Foreground="#F1F5F9" FontSize="12"/>
                                                     </StackPanel>
                                                 </Border>
 
@@ -677,53 +677,53 @@
                                                 <Border Background="#0F131B" CornerRadius="4" Padding="2" Margin="0,0,6,0" BorderBrush="#252C3A" BorderThickness="1">
                                                     <StackPanel Orientation="Horizontal">
                                                         <Button Content="↵ \N" Height="24" Padding="6,0" Focusable="False" Tag="n" Click="OnFormatActionClicked"
-                                                                ToolTip="Ganti Baris Subtitle ASS (Shift+Enter) - \N" Background="Transparent" BorderThickness="0" Foreground="#38BDF8" FontWeight="SemiBold" FontSize="11"/>
+                                                                ToolTip="Line Break ASS Subtitle (Shift+Enter) - \N" Background="Transparent" BorderThickness="0" Foreground="#38BDF8" FontWeight="SemiBold" FontSize="11"/>
                                                         <Button Content="⎵ \h" Height="24" Padding="6,0" Focusable="False" Tag="h" Click="OnFormatActionClicked"
-                                                                ToolTip="Spasi Keras Subtitle ASS (Hard Space) - \h" Background="Transparent" BorderThickness="0" Foreground="#94A3B8" FontSize="11"/>
+                                                                ToolTip="Hard Space ASS Subtitle - \h" Background="Transparent" BorderThickness="0" Foreground="#94A3B8" FontSize="11"/>
                                                     </StackPanel>
                                                 </Border>
 
                                                 <!-- Color Custom Button (Single Unified Picker) -->
-                                                <Button Content="🎨 Kustom" Height="24" Padding="8,0" Margin="0,0,6,0" Focusable="False" Click="OnOpenCustomColorPickerClicked"
-                                                        ToolTip="Pilih Warna Subtitle Kustom (Palet 32 Warna, RGB Slider, &amp; Hex Code)"
+                                                <Button Content="🎨 Custom" Height="24" Padding="8,0" Margin="0,0,6,0" Focusable="False" Click="OnOpenCustomColorPickerClicked"
+                                                        ToolTip="Custom Subtitle Color (32-Color Palette, RGB Sliders, &amp; Hex Code)"
                                                         Background="#0F131B" BorderBrush="#252C3A" BorderThickness="1" Foreground="#38BDF8" FontSize="11" FontWeight="SemiBold"/>
 
                                                 <!-- Screen Alignment Group -->
-                                                <Button Content="⤧ Posisi ▼" Height="24" Padding="6,0" Margin="0,0,6,0" Focusable="False" Click="OnOpenAlignMenuClicked"
-                                                        ToolTip="Atur Posisi Subtitle di Layar ({\an1} - {\an9})" Background="#0F131B" BorderBrush="#252C3A" BorderThickness="1" Foreground="#CBD5E1" FontSize="11">
+                                                <Button Content="⤧ Position ▼" Height="24" Padding="6,0" Margin="0,0,6,0" Focusable="False" Click="OnOpenAlignMenuClicked"
+                                                        ToolTip="Set Subtitle Screen Position ({\an1} - {\an9})" Background="#0F131B" BorderBrush="#252C3A" BorderThickness="1" Foreground="#CBD5E1" FontSize="11">
                                                     <Button.ContextMenu>
                                                         <ContextMenu Background="#1A1F2C" Foreground="#E2E8F0" BorderBrush="#2A3241">
-                                                            <MenuItem Header="Top-Center (Tengah Atas) - \an8" Click="OnAlignMenuItemClicked" Tag="8"/>
-                                                            <MenuItem Header="Top-Left (Kiri Atas) - \an7" Click="OnAlignMenuItemClicked" Tag="7"/>
-                                                            <MenuItem Header="Top-Right (Kanan Atas) - \an9" Click="OnAlignMenuItemClicked" Tag="9"/>
+                                                            <MenuItem Header="Top-Center - \an8" Click="OnAlignMenuItemClicked" Tag="8"/>
+                                                            <MenuItem Header="Top-Left - \an7" Click="OnAlignMenuItemClicked" Tag="7"/>
+                                                            <MenuItem Header="Top-Right - \an9" Click="OnAlignMenuItemClicked" Tag="9"/>
                                                             <Separator Background="#2A3241"/>
-                                                            <MenuItem Header="Mid-Center (Tengah Layar) - \an5" Click="OnAlignMenuItemClicked" Tag="5"/>
-                                                            <MenuItem Header="Mid-Left (Tengah Kiri) - \an4" Click="OnAlignMenuItemClicked" Tag="4"/>
-                                                            <MenuItem Header="Mid-Right (Tengah Kanan) - \an6" Click="OnAlignMenuItemClicked" Tag="6"/>
+                                                            <MenuItem Header="Mid-Center (Screen Center) - \an5" Click="OnAlignMenuItemClicked" Tag="5"/>
+                                                            <MenuItem Header="Mid-Left - \an4" Click="OnAlignMenuItemClicked" Tag="4"/>
+                                                            <MenuItem Header="Mid-Right - \an6" Click="OnAlignMenuItemClicked" Tag="6"/>
                                                             <Separator Background="#2A3241"/>
-                                                            <MenuItem Header="Bottom-Center (Default Bawah) - \an2" Click="OnAlignMenuItemClicked" Tag="2"/>
-                                                            <MenuItem Header="Bottom-Left (Kiri Bawah) - \an1" Click="OnAlignMenuItemClicked" Tag="1"/>
-                                                            <MenuItem Header="Bottom-Right (Kanan Bawah) - \an3" Click="OnAlignMenuItemClicked" Tag="3"/>
+                                                            <MenuItem Header="Bottom-Center (Default Bottom) - \an2" Click="OnAlignMenuItemClicked" Tag="2"/>
+                                                            <MenuItem Header="Bottom-Left - \an1" Click="OnAlignMenuItemClicked" Tag="1"/>
+                                                            <MenuItem Header="Bottom-Right - \an3" Click="OnAlignMenuItemClicked" Tag="3"/>
                                                         </ContextMenu>
                                                     </Button.ContextMenu>
                                                 </Button>
 
                                                 <!-- Case Transformation Group -->
-                                                <Button Content="Aa Huruf ▼" Height="24" Padding="6,0" Margin="0,0,6,0" Focusable="False" Click="OnOpenCaseMenuClicked"
-                                                        ToolTip="Ubah Kapitalisasi Huruf" Background="#0F131B" BorderBrush="#252C3A" BorderThickness="1" Foreground="#CBD5E1" FontSize="11">
+                                                <Button Content="Aa Case ▼" Height="24" Padding="6,0" Margin="0,0,6,0" Focusable="False" Click="OnOpenCaseMenuClicked"
+                                                        ToolTip="Change Text Case" Background="#0F131B" BorderBrush="#252C3A" BorderThickness="1" Foreground="#CBD5E1" FontSize="11">
                                                     <Button.ContextMenu>
                                                         <ContextMenu Background="#1A1F2C" Foreground="#E2E8F0" BorderBrush="#2A3241">
-                                                            <MenuItem Header="HURUF BESAR (UPPERCASE)" Click="OnCaseMenuItemClicked" Tag="upper"/>
-                                                            <MenuItem Header="huruf kecil (lowercase)" Click="OnCaseMenuItemClicked" Tag="lower"/>
-                                                            <MenuItem Header="Huruf Besar Tiap Kata (Title Case)" Click="OnCaseMenuItemClicked" Tag="title"/>
-                                                            <MenuItem Header="Huruf besar awal kalimat (Sentence case)" Click="OnCaseMenuItemClicked" Tag="sentence"/>
+                                                            <MenuItem Header="UPPERCASE" Click="OnCaseMenuItemClicked" Tag="upper"/>
+                                                            <MenuItem Header="lowercase" Click="OnCaseMenuItemClicked" Tag="lower"/>
+                                                            <MenuItem Header="Title Case" Click="OnCaseMenuItemClicked" Tag="title"/>
+                                                            <MenuItem Header="Sentence case" Click="OnCaseMenuItemClicked" Tag="sentence"/>
                                                         </ContextMenu>
                                                     </Button.ContextMenu>
                                                 </Button>
 
                                                 <!-- Clean Strip Group -->
-                                                <Button Content="🧹 Bersihkan" Height="24" Padding="6,0" Focusable="False" Tag="strip" Click="OnFormatActionClicked"
-                                                        ToolTip="Hapus semua tag format ASS {\...} atau HTML dari teks terpilih / baris ini"
+                                                <Button Content="🧹 Clean Tags" Height="24" Padding="6,0" Focusable="False" Tag="strip" Click="OnFormatActionClicked"
+                                                        ToolTip="Remove all ASS {\...} and HTML formatting tags from selected text / cue"
                                                         Background="#1A1418" BorderBrush="#4B2328" BorderThickness="1" Foreground="#F87171" FontSize="11"/>
                                             </WrapPanel>
                                         </Border>
@@ -738,9 +738,9 @@
 
                                         <!-- Character Stats -->
                                         <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,8,0,0">
-                                            <TextBlock Text="{Binding SelectedCueCharCount, StringFormat='{}Karakter: {0}'}" FontSize="11" Foreground="{StaticResource TextMuted}" Margin="0,0,16,0"/>
-                                            <TextBlock Text="{Binding SelectedCueWordCount, StringFormat='{}Kata: {0}'}" FontSize="11" Foreground="{StaticResource TextMuted}" Margin="0,0,16,0"/>
-                                            <TextBlock Text="{Binding SelectedCueLineCount, StringFormat='{}Baris: {0}'}" FontSize="11" Foreground="{StaticResource TextMuted}"/>
+                                            <TextBlock Text="{Binding SelectedCueCharCount, StringFormat='{}Characters: {0}'}" FontSize="11" Foreground="{StaticResource TextMuted}" Margin="0,0,16,0"/>
+                                            <TextBlock Text="{Binding SelectedCueWordCount, StringFormat='{}Words: {0}'}" FontSize="11" Foreground="{StaticResource TextMuted}" Margin="0,0,16,0"/>
+                                            <TextBlock Text="{Binding SelectedCueLineCount, StringFormat='{}Lines: {0}'}" FontSize="11" Foreground="{StaticResource TextMuted}"/>
                                         </StackPanel>
                                     </Grid>
                                 </Border>
@@ -818,7 +818,7 @@
                                                             Visibility="{Binding HasSelectedCue, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
                                                     <ui:SymbolIcon Symbol="MoviesAndTv24" FontSize="34" Foreground="#2A3545" HorizontalAlignment="Center" Margin="0,0,0,6"/>
                                                     <TextBlock Text="LIVE CINEMA VIEWPORT" Foreground="#3A4659" HorizontalAlignment="Center" FontSize="12" FontWeight="Bold"/>
-                                                    <TextBlock Text="Pilih baris subtitle untuk melihat preview styling secara real-time" Foreground="#3A4659" HorizontalAlignment="Center" FontSize="11" Margin="0,4,0,0"/>
+                                                    <TextBlock Text="Select a subtitle cue to preview styling in real time" Foreground="#3A4659" HorizontalAlignment="Center" FontSize="11" Margin="0,4,0,0"/>
                                                 </StackPanel>
 
                                                 <!-- Authentic Cinema Outlined Subtitle Element -->
@@ -869,7 +869,7 @@
                     <Grid Grid.Row="0" Margin="0,0,0,14">
                         <StackPanel Orientation="Vertical">
                             <TextBlock Text="🎬 MKV Subtitle Extractor &amp; Demuxer" FontSize="22" FontWeight="Bold" Foreground="{StaticResource AccentPurple}"/>
-                            <TextBlock Text="Ekstrak subtitle (SRT, ASS, VTT, PGS) dan font langsung dari file video MKV menggunakan MKVToolNix Engine." FontSize="13" Foreground="{StaticResource TextSecondary}" Margin="0,3,0,0"/>
+                            <TextBlock Text="Extract subtitles (SRT, ASS, VTT, PGS) and fonts directly from MKV video files using MKVToolNix Engine." FontSize="13" Foreground="{StaticResource TextSecondary}" Margin="0,3,0,0"/>
                         </StackPanel>
                     </Grid>
 
@@ -883,7 +883,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Source MKV:" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,14,0"/>
                             <ui:TextBox Grid.Column="1" Text="{Binding InputPath, UpdateSourceTrigger=PropertyChanged}" Height="36" Padding="10,4"/>
-                            <ui:Button Grid.Column="2" Content="Pilih File..." Command="{Binding BrowseInputCommand}" Appearance="Primary" Margin="10,0,0,0" Padding="16,7" Icon="{ui:SymbolIcon Symbol=FolderOpen24}"/>
+                            <ui:Button Grid.Column="2" Content="Select File..." Command="{Binding BrowseInputCommand}" Appearance="Primary" Margin="10,0,0,0" Padding="16,7" Icon="{ui:SymbolIcon Symbol=FolderOpen24}"/>
                         </Grid>
                     </ui:Card>
 
@@ -898,10 +898,10 @@
                         <Border Grid.Row="0" Margin="0,0,0,10">
                             <Grid>
                                 <StackPanel Orientation="Horizontal">
-                                    <RadioButton Content="📝 Track Subtitle Terdeteksi"
+                                    <RadioButton Content="📝 Detected Subtitle Tracks"
                                                  IsChecked="{Binding SelectedContentTab, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=0, FallbackValue=True}"
                                                  GroupName="ContentTabGroup" Foreground="{StaticResource TextPrimary}" FontWeight="Bold" FontSize="12" Margin="0,0,20,0"/>
-                                    <RadioButton Content="🔤 Lampiran Font Terdeteksi"
+                                    <RadioButton Content="🔤 Detected Font Attachments"
                                                  IsChecked="{Binding SelectedContentTab, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=1}"
                                                  GroupName="ContentTabGroup" Foreground="{StaticResource TextPrimary}" FontWeight="Bold" FontSize="12"/>
                                 </StackPanel>
@@ -909,15 +909,15 @@
                                 <!-- Subtitle Selection Actions -->
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
                                             Visibility="{Binding SelectedContentTab, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=0, FallbackValue=Visible}">
-                                    <ui:Button Content="✓ Pilih Semua Track" Command="{Binding SelectAllTracksCommand}" Padding="10,4" Margin="0,0,6,0" FontSize="11"/>
-                                    <ui:Button Content="✗ Batalkan Semua" Command="{Binding DeselectAllTracksCommand}" Padding="10,4" FontSize="11"/>
+                                    <ui:Button Content="✓ Select All Tracks" Command="{Binding SelectAllTracksCommand}" Padding="10,4" Margin="0,0,6,0" FontSize="11"/>
+                                    <ui:Button Content="✗ Deselect All" Command="{Binding DeselectAllTracksCommand}" Padding="10,4" FontSize="11"/>
                                 </StackPanel>
 
                                 <!-- Font Selection Actions -->
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
                                             Visibility="{Binding SelectedContentTab, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=1, FallbackValue=Collapsed}">
-                                    <ui:Button Content="✓ Pilih Semua Font" Command="{Binding SelectAllFontsCommand}" Padding="10,4" Margin="0,0,6,0" FontSize="11"/>
-                                    <ui:Button Content="✗ Batalkan Semua" Command="{Binding DeselectAllFontsCommand}" Padding="10,4" FontSize="11"/>
+                                    <ui:Button Content="✓ Select All Fonts" Command="{Binding SelectAllFontsCommand}" Padding="10,4" Margin="0,0,6,0" FontSize="11"/>
+                                    <ui:Button Content="✗ Deselect All" Command="{Binding DeselectAllFontsCommand}" Padding="10,4" FontSize="11"/>
                                 </StackPanel>
                             </Grid>
                         </Border>
@@ -1009,7 +1009,7 @@
                                 </Style>
                             </DataGrid.CellStyle>
                             <DataGrid.Columns>
-                                <DataGridTemplateColumn Header="Ekstrak" Width="70">
+                                <DataGridTemplateColumn Header="Extract" Width="70">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <CheckBox IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}"
@@ -1020,10 +1020,10 @@
                                 </DataGridTemplateColumn>
                                 <DataGridTextColumn Header="Track ID" Binding="{Binding Id}" Width="75" IsReadOnly="True" FontFamily="Consolas"/>
                                 <DataGridTextColumn Header="Format / Codec" Binding="{Binding Codec}" Width="160" IsReadOnly="True" FontWeight="SemiBold"/>
-                                <DataGridTextColumn Header="Bahasa" Binding="{Binding Language}" Width="90" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Language" Binding="{Binding Language}" Width="90" IsReadOnly="True"/>
                                 <DataGridTextColumn Header="Default" Binding="{Binding IsDefault}" Width="75" IsReadOnly="True"/>
                                 <DataGridTextColumn Header="Forced" Binding="{Binding IsForced}" Width="75" IsReadOnly="True"/>
-                                <DataGridTextColumn Header="Nama Track" Binding="{Binding TrackName}" Width="*" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Track Name" Binding="{Binding TrackName}" Width="*" IsReadOnly="True"/>
                             </DataGrid.Columns>
                         </DataGrid>
 
@@ -1114,7 +1114,7 @@
                                 </Style>
                             </DataGrid.CellStyle>
                             <DataGrid.Columns>
-                                <DataGridTemplateColumn Header="Ekstrak" Width="70">
+                                <DataGridTemplateColumn Header="Extract" Width="70">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <CheckBox IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}"
@@ -1124,10 +1124,10 @@
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
                                 <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="65" IsReadOnly="True" FontFamily="Consolas"/>
-                                <DataGridTextColumn Header="Nama File Font" Binding="{Binding FileName}" Width="*" IsReadOnly="True" FontWeight="SemiBold"/>
-                                <DataGridTextColumn Header="Tipe MIME" Binding="{Binding ContentType}" Width="160" IsReadOnly="True"/>
-                                <DataGridTextColumn Header="Ukuran" Binding="{Binding FormattedSize}" Width="105" IsReadOnly="True"/>
-                                <DataGridTextColumn Header="Deskripsi" Binding="{Binding Description}" Width="180" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Font File Name" Binding="{Binding FileName}" Width="*" IsReadOnly="True" FontWeight="SemiBold"/>
+                                <DataGridTextColumn Header="MIME Type" Binding="{Binding ContentType}" Width="160" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Size" Binding="{Binding FormattedSize}" Width="105" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="180" IsReadOnly="True"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </Grid>
@@ -1135,7 +1135,7 @@
                     <!-- Output Options: 3 Distinct Modular Cards -->
                     <ui:Card Grid.Row="3" Padding="18,14" Margin="0,0,0,14" Background="{StaticResource BgCard}" BorderBrush="{StaticResource BorderDark}">
                         <StackPanel>
-                            <TextBlock Text="PILIHAN FORMAT &amp; TARGET EKSTRAKSI:" FontWeight="Bold" FontSize="11" Foreground="{StaticResource AccentPrimary}" Margin="0,0,0,12"/>
+                            <TextBlock Text="FORMAT &amp; EXTRACTION TARGET OPTIONS:" FontWeight="Bold" FontSize="11" Foreground="{StaticResource AccentPrimary}" Margin="0,0,0,12"/>
 
                             <!-- 3 Mode Cards -->
                             <Grid Margin="0,0,0,14">
@@ -1150,15 +1150,15 @@
                                 <!-- Card 1: Standalone Subtitles -->
                                 <Border Grid.Column="0" Background="{StaticResource BgPanel}" CornerRadius="8" Padding="14,12" BorderBrush="{StaticResource BorderDark}" BorderThickness="1">
                                     <StackPanel>
-                                        <RadioButton Content="📄 Subtitle Standalone"
+                                        <RadioButton Content="📄 Standalone Subtitles"
                                                      IsChecked="{Binding OutputMode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=0, FallbackValue=True}"
                                                      GroupName="ExtractionModeGroup" Foreground="#FFFFFF" FontWeight="Bold" FontSize="12" Margin="0,0,0,5"
                                                      Checked="OnModeStandaloneChecked"/>
-                                        <TextBlock Text="Ekstrak track terpilih menjadi file subtitle individual terpisah (.srt / .ass / .vtt / .sup)."
+                                        <TextBlock Text="Extract selected tracks as individual subtitle files (.srt / .ass / .vtt / .sup)."
                                                    Foreground="{StaticResource TextSecondary}" FontSize="11" TextWrapping="Wrap" Margin="20,0,0,10"/>
                                         
                                         <Border Background="{StaticResource BgDark}" CornerRadius="4" Padding="10,7" Margin="20,0,0,0">
-                                            <CheckBox Content="Ekstrak font lampiran ke ./fonts/"
+                                            <CheckBox Content="Extract font attachments to ./fonts/"
                                                       IsChecked="{Binding ExtractFonts}"
                                                       IsEnabled="{Binding OutputMode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=0}"
                                                       Foreground="{StaticResource TextPrimary}" FontSize="11"/>
@@ -1169,15 +1169,15 @@
                                 <!-- Card 2: Pure MKS Container -->
                                 <Border Grid.Column="2" Background="{StaticResource BgPanel}" CornerRadius="8" Padding="14,12" BorderBrush="{StaticResource BorderDark}" BorderThickness="1">
                                     <StackPanel>
-                                        <RadioButton Content="📦 Kontainer .mks Native"
+                                        <RadioButton Content="📦 Native .mks Container"
                                                      IsChecked="{Binding OutputMode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=1}"
                                                      GroupName="ExtractionModeGroup" Foreground="#FFFFFF" FontWeight="Bold" FontSize="12" Margin="0,0,0,5"
                                                      Checked="OnModeMksChecked"/>
-                                        <TextBlock Text="Kemas seluruh track terpilih ke dalam satu file container Matroska Subtitle (.mks)."
+                                        <TextBlock Text="Package all selected tracks into a single Matroska Subtitle container (.mks)."
                                                    Foreground="{StaticResource TextSecondary}" FontSize="11" TextWrapping="Wrap" Margin="20,0,0,10"/>
                                         
                                         <Border Background="{StaticResource BgDark}" CornerRadius="4" Padding="10,7" Margin="20,0,0,0">
-                                            <CheckBox Content="Sematkan font ke dalam file .mks"
+                                            <CheckBox Content="Embed fonts into .mks file"
                                                       IsChecked="{Binding ExtractFonts}"
                                                       IsEnabled="{Binding OutputMode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=1}"
                                                       Foreground="{StaticResource TextPrimary}" FontSize="11"/>
@@ -1188,15 +1188,15 @@
                                 <!-- Card 3: Embedded Fonts Only -->
                                 <Border Grid.Column="4" Background="{StaticResource BgPanel}" CornerRadius="8" Padding="14,12" BorderBrush="{StaticResource BorderDark}" BorderThickness="1">
                                     <StackPanel>
-                                        <RadioButton Content="🔤 Ekstrak Font Saja"
+                                        <RadioButton Content="🔤 Extract Fonts Only"
                                                      IsChecked="{Binding OutputMode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=2}"
                                                      GroupName="ExtractionModeGroup" Foreground="#FFFFFF" FontWeight="Bold" FontSize="12" Margin="0,0,0,5"
                                                      Checked="OnModeFontsChecked"/>
-                                        <TextBlock Text="Hanya ekstrak font lampiran terpilih (TTF/OTF) ke folder ./fonts/ tanpa subtitle."
+                                        <TextBlock Text="Only extract selected font attachments (TTF/OTF) to ./fonts/ without subtitles."
                                                    Foreground="{StaticResource TextSecondary}" FontSize="11" TextWrapping="Wrap" Margin="20,0,0,10"/>
                                         
                                         <Border Background="{StaticResource BgDark}" CornerRadius="4" Padding="10,7" Margin="20,0,0,0">
-                                            <TextBlock Text="Font lampiran akan diekstrak ke ./fonts/" Foreground="{StaticResource AccentPrimary}" FontSize="11"/>
+                                            <TextBlock Text="Font attachments will be extracted to ./fonts/" Foreground="{StaticResource AccentPrimary}" FontSize="11"/>
                                         </Border>
                                     </StackPanel>
                                 </Border>
@@ -1210,10 +1210,10 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="Folder Output:" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,14,0"/>
+                                <TextBlock Text="Output Folder:" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,14,0"/>
                                 <ui:TextBox Grid.Column="1" Text="{Binding OutputFolder, UpdateSourceTrigger=PropertyChanged}" Height="36" Padding="10,4"/>
-                                <ui:Button Grid.Column="2" Content="Pilih Folder..." Command="{Binding BrowseOutputFolderCommand}" Margin="10,0,0,0" Padding="14,7" Icon="{ui:SymbolIcon Symbol=Folder24}"/>
-                                <ui:Button Grid.Column="3" Content="Buka Folder" Command="{Binding OpenOutputFolderCommand}" Margin="6,0,0,0" Padding="12,7" Icon="{ui:SymbolIcon Symbol=Open24}"/>
+                                <ui:Button Grid.Column="2" Content="Select Folder..." Command="{Binding BrowseOutputFolderCommand}" Margin="10,0,0,0" Padding="14,7" Icon="{ui:SymbolIcon Symbol=Folder24}"/>
+                                <ui:Button Grid.Column="3" Content="Open Folder" Command="{Binding OpenOutputFolderCommand}" Margin="6,0,0,0" Padding="12,7" Icon="{ui:SymbolIcon Symbol=Open24}"/>
                             </Grid>
                         </StackPanel>
                     </ui:Card>
@@ -1230,12 +1230,12 @@
                     <!-- Bottom Action Buttons -->
                     <Grid Grid.Row="5" Margin="0,4,0,0">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                            <ui:Button Content="Buka Hasil di Editor" Command="{Binding OpenLastInEditorCommand}" Appearance="Secondary" FontWeight="Bold" Padding="16,9" Icon="{ui:SymbolIcon Symbol=Edit24}" Margin="0,0,8,0"/>
-                            <ui:Button Content="Buka Folder Output" Command="{Binding OpenOutputFolderCommand}" Padding="14,9" Icon="{ui:SymbolIcon Symbol=Folder24}"/>
+                            <ui:Button Content="Open in Editor" Command="{Binding OpenLastInEditorCommand}" Appearance="Secondary" FontWeight="Bold" Padding="16,9" Icon="{ui:SymbolIcon Symbol=Edit24}" Margin="0,0,8,0"/>
+                            <ui:Button Content="Open Output Folder" Command="{Binding OpenOutputFolderCommand}" Padding="14,9" Icon="{ui:SymbolIcon Symbol=Folder24}"/>
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                            <ui:Button Content="Mulai Ekstraksi" Command="{Binding ExtractCommand}" Appearance="Primary" FontWeight="Bold" Padding="26,9" FontSize="13" Icon="{ui:SymbolIcon Symbol=Flash24}"/>
+                            <ui:Button Content="Start Extraction" Command="{Binding ExtractCommand}" Appearance="Primary" FontWeight="Bold" Padding="26,9" FontSize="13" Icon="{ui:SymbolIcon Symbol=Flash24}"/>
                         </StackPanel>
                     </Grid>
                 </Grid>

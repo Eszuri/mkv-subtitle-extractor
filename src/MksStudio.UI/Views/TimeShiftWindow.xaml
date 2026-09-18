@@ -36,14 +36,14 @@
                 </Border>
                 <StackPanel VerticalAlignment="Center">
                     <TextBlock Text="Time Shift &amp; FPS Converter" FontSize="15" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
-                    <TextBlock Text="Sinkronisasi timestamp milidetik atau konversi framerate video." FontSize="11" Foreground="{StaticResource TextMuted}"/>
+                    <TextBlock Text="Synchronize millisecond timestamps or convert video framerate." FontSize="11" Foreground="{StaticResource TextMuted}"/>
                 </StackPanel>
             </StackPanel>
 
             <!-- Millisecond Shift Card -->
             <ui:Card Grid.Row="1" Padding="16,14" Margin="0,0,0,12" Background="{StaticResource BgCard}" BorderBrush="{StaticResource BorderDark}">
                 <StackPanel>
-                    <TextBlock Text="Pergeseran Waktu (Offset Milidetik):" Margin="0,0,0,6" Foreground="{StaticResource TextSecondary}" FontWeight="SemiBold" FontSize="11"/>
+                    <TextBlock Text="Time Shift (Millisecond Offset):" Margin="0,0,0,6" Foreground="{StaticResource TextSecondary}" FontWeight="SemiBold" FontSize="11"/>
                     <Grid Margin="0,0,0,10">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -52,14 +52,14 @@
                         <ui:TextBox x:Name="OffsetBox" Text="{Binding OffsetMilliseconds, UpdateSourceTrigger=PropertyChanged}" Height="36" FontSize="13" FontFamily="Consolas, Segoe UI"/>
                         <TextBlock Grid.Column="1" Text="ms (+/-)" VerticalAlignment="Center" Margin="10,0,0,0" Foreground="{StaticResource TextMuted}" FontWeight="SemiBold" FontSize="11"/>
                     </Grid>
-                    <ui:Button Content="Terapkan Time Shift" Appearance="Primary" HorizontalAlignment="Stretch" Padding="0,8" FontWeight="SemiBold" Icon="{ui:SymbolIcon Symbol=Flash24}" Click="OnApplyShiftClicked"/>
+                    <ui:Button Content="Apply Time Shift" Appearance="Primary" HorizontalAlignment="Stretch" Padding="0,8" FontWeight="SemiBold" Icon="{ui:SymbolIcon Symbol=Flash24}" Click="OnApplyShiftClicked"/>
                 </StackPanel>
             </ui:Card>
 
             <!-- FPS Scaling Card -->
             <ui:Card Grid.Row="2" Padding="16,14" Margin="0,0,0,16" Background="{StaticResource BgCard}" BorderBrush="{StaticResource BorderDark}">
                 <StackPanel>
-                    <TextBlock Text="Skala Frame Rate (Konversi FPS):" Margin="0,0,0,6" Foreground="{StaticResource TextSecondary}" FontWeight="SemiBold" FontSize="11"/>
+                    <TextBlock Text="Frame Rate Scaling (FPS Conversion):" Margin="0,0,0,6" Foreground="{StaticResource TextSecondary}" FontWeight="SemiBold" FontSize="11"/>
                     <Grid Margin="0,0,0,10">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -67,21 +67,21 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0">
-                            <TextBlock Text="FPS Asal:" FontSize="10" Foreground="{StaticResource TextMuted}" Margin="0,0,0,2"/>
+                            <TextBlock Text="Source FPS:" FontSize="10" Foreground="{StaticResource TextMuted}" Margin="0,0,0,2"/>
                             <ui:TextBox Text="{Binding SourceFps, UpdateSourceTrigger=PropertyChanged}" Height="34" FontFamily="Consolas" FontSize="12"/>
                         </StackPanel>
                         <ui:SymbolIcon Grid.Column="1" Symbol="ArrowRight24" FontSize="16" Foreground="{StaticResource AccentPrimary}" VerticalAlignment="Center" Margin="12,14,12,0"/>
                         <StackPanel Grid.Column="2">
-                            <TextBlock Text="FPS Tujuan:" FontSize="10" Foreground="{StaticResource TextMuted}" Margin="0,0,0,2"/>
+                            <TextBlock Text="Target FPS:" FontSize="10" Foreground="{StaticResource TextMuted}" Margin="0,0,0,2"/>
                             <ui:TextBox Text="{Binding TargetFps, UpdateSourceTrigger=PropertyChanged}" Height="34" FontFamily="Consolas" FontSize="12"/>
                         </StackPanel>
                     </Grid>
-                    <ui:Button Content="Konversi Frame Rate" Appearance="Secondary" HorizontalAlignment="Stretch" Padding="0,8" FontWeight="SemiBold" Icon="{ui:SymbolIcon Symbol=ArrowClockwise24}" Click="OnApplyFpsClicked"/>
+                    <ui:Button Content="Convert Frame Rate" Appearance="Secondary" HorizontalAlignment="Stretch" Padding="0,8" FontWeight="SemiBold" Icon="{ui:SymbolIcon Symbol=ArrowClockwise24}" Click="OnApplyFpsClicked"/>
                 </StackPanel>
             </ui:Card>
 
             <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
-                <ui:Button Content="Selesai" Width="100" Padding="0,8" Click="OnCloseClicked"/>
+                <ui:Button Content="Done" Width="100" Padding="0,8" Click="OnCloseClicked"/>
             </StackPanel>
         </Grid>
     </Grid>

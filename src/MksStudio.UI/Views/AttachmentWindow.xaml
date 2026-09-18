@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         mc:Ignorable="d"
-        Title="Lampiran Font Embedded (TTF/OTF)" Height="540" Width="780"
+        Title="Embedded Font Attachments (TTF/OTF)" Height="540" Width="780"
         WindowStartupLocation="CenterOwner"
         Icon="../app.ico"
         WindowBackdropType="Mica"
@@ -18,7 +18,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <ui:TitleBar Grid.Row="0" Title="Lampiran Font Embedded (.mks)" Icon="../app.ico" Height="44" Padding="12,0,8,0"/>
+        <ui:TitleBar Grid.Row="0" Title="Embedded Font Attachments (.mks)" Icon="../app.ico" Height="44" Padding="12,0,8,0"/>
 
         <Grid Grid.Row="1" Margin="26,12,26,20">
             <Grid.RowDefinitions>
@@ -30,14 +30,14 @@
             <!-- Header & Action Buttons -->
             <Grid Grid.Row="0" Margin="0,0,0,16">
                 <StackPanel Orientation="Vertical">
-                    <TextBlock Text="🔤 Lampiran Font Embedded (TTF / OTF)" FontSize="16" FontWeight="Bold" Foreground="{StaticResource AccentPrimary}"/>
-                    <TextBlock Text="Font yang disematkan ke dalam .mks akan dimuat otomatis oleh subtitle renderer untuk tipografi presisi." FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,2,0,0"/>
+                    <TextBlock Text="🔤 Embedded Font Attachments (TTF / OTF)" FontSize="16" FontWeight="Bold" Foreground="{StaticResource AccentPrimary}"/>
+                    <TextBlock Text="Fonts embedded in .mks will be automatically loaded by subtitle renderers for precise typography." FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,2,0,0"/>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                    <ui:Button Content="Tambah Font..." Padding="14,7" Appearance="Primary" Margin="0,0,8,0" Icon="{ui:SymbolIcon Symbol=Add24}" Click="OnAddAttachmentClicked"/>
-                    <ui:Button Content="Ekspor Font..." Padding="14,7" Appearance="Secondary" Margin="0,0,8,0" Icon="{ui:SymbolIcon Symbol=Share24}" Click="OnExportAttachmentClicked"/>
-                    <ui:Button Content="Hapus" Padding="12,7" Appearance="Danger" Icon="{ui:SymbolIcon Symbol=Delete24}" Click="OnRemoveAttachmentClicked"/>
+                    <ui:Button Content="Add Font..." Padding="14,7" Appearance="Primary" Margin="0,0,8,0" Icon="{ui:SymbolIcon Symbol=Add24}" Click="OnAddAttachmentClicked"/>
+                    <ui:Button Content="Export Font..." Padding="14,7" Appearance="Secondary" Margin="0,0,8,0" Icon="{ui:SymbolIcon Symbol=Share24}" Click="OnExportAttachmentClicked"/>
+                    <ui:Button Content="Delete" Padding="12,7" Appearance="Danger" Icon="{ui:SymbolIcon Symbol=Delete24}" Click="OnRemoveAttachmentClicked"/>
                 </StackPanel>
             </Grid>
 
@@ -56,16 +56,16 @@
                     </Style>
                 </DataGrid.Resources>
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Nama File" Binding="{Binding FileName}" Width="240" IsReadOnly="False" FontWeight="SemiBold"/>
-                    <DataGridTextColumn Header="Tipe MIME" Binding="{Binding FileMimeType}" Width="190" IsReadOnly="False"/>
-                    <DataGridTextColumn Header="Ukuran" Binding="{Binding FileSizeFormatted}" Width="95" IsReadOnly="True" FontFamily="Consolas"/>
-                    <DataGridTextColumn Header="Deskripsi" Binding="{Binding Description}" Width="*" IsReadOnly="False"/>
+                    <DataGridTextColumn Header="File Name" Binding="{Binding FileName}" Width="240" IsReadOnly="False" FontWeight="SemiBold"/>
+                    <DataGridTextColumn Header="MIME Type" Binding="{Binding FileMimeType}" Width="190" IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Size" Binding="{Binding FileSizeFormatted}" Width="95" IsReadOnly="True" FontFamily="Consolas"/>
+                    <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*" IsReadOnly="False"/>
                 </DataGrid.Columns>
             </DataGrid>
 
             <!-- Bottom Close Button -->
             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
-                <ui:Button Content="Selesai" Width="110" Padding="0,8" Click="OnCloseClicked"/>
+                <ui:Button Content="Done" Width="110" Padding="0,8" Click="OnCloseClicked"/>
             </StackPanel>
         </Grid>
     </Grid>

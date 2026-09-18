@@ -73,7 +73,7 @@ public partial class App : Application
         if (!File.Exists(mkvPath))
         {
             MessageBox.Show(
-                $"File video tidak ditemukan:\n\"{mkvPath}\"",
+                $"Video file not found:\n\"{mkvPath}\"",
                 "Export Subtitle",
                 MessageBoxButton.OK,
                 MessageBoxImage.Warning);
@@ -90,7 +90,7 @@ public partial class App : Application
             if (subTracks.Count == 0)
             {
                 MessageBox.Show(
-                    $"Tidak ada track subtitle pada file .mkv ini:\n\"{Path.GetFileName(mkvPath)}\"",
+                    $"No subtitle tracks found in this MKV file:\n\"{Path.GetFileName(mkvPath)}\"",
                     "Export Subtitle",
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
@@ -106,7 +106,7 @@ public partial class App : Application
         catch (Exception ex)
         {
             MessageBox.Show(
-                $"Gagal membaca informasi track MKV:\n{ex.Message}",
+                $"Failed to read MKV track information:\n{ex.Message}",
                 "Export Subtitle - Error",
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
@@ -119,7 +119,7 @@ public partial class App : Application
         if (!File.Exists(subtitlePath))
         {
             MessageBox.Show(
-                $"File subtitle tidak ditemukan:\n\"{subtitlePath}\"",
+                $"Subtitle file not found:\n\"{subtitlePath}\"",
                 "Translate Subtitle",
                 MessageBoxButton.OK,
                 MessageBoxImage.Warning);
@@ -135,7 +135,7 @@ public partial class App : Application
             if (doc.Cues.Count == 0)
             {
                 MessageBox.Show(
-                    $"Tidak ada baris subtitle yang ditemukan pada file ini:\n\"{Path.GetFileName(subtitlePath)}\"",
+                    $"No subtitle cues found in this file:\n\"{Path.GetFileName(subtitlePath)}\"",
                     "Translate Subtitle",
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
@@ -151,7 +151,7 @@ public partial class App : Application
         catch (Exception ex)
         {
             MessageBox.Show(
-                $"Gagal membaca file subtitle:\n{ex.Message}",
+                $"Failed to read subtitle file:\n{ex.Message}",
                 "Translate Subtitle - Error",
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
