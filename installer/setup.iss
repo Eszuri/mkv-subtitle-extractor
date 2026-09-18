@@ -40,7 +40,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 Name: "assoc_mks"; Description: "Associate .mks files with MKS Subtitle Studio"; GroupDescription: "File Associations:"
-Name: "shell_mkv"; Description: "Add 'Extract Subtitles with MKS Studio' to Windows Explorer context menu for .mkv files"; GroupDescription: "Windows Integration:"
+Name: "shell_mkv"; Description: "Add 'Export Subtitle' to Windows Explorer context menu for .mkv files"; GroupDescription: "Windows Integration:"
 
 [Files]
 Source: "..\dist\MksStudio-v1.0-win-x64\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -52,9 +52,10 @@ Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKey}"; ValueType: string; Value
 Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKey}\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#MyAppExeName},0"; Tasks: assoc_mks
 Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKey}\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""; Tasks: assoc_mks
 
-; Context menu for .mkv files (Right Click MKV -> Extract Subtitles)
-Root: HKA; Subkey: "Software\Classes\SystemFileAssociations\.mkv\shell\MksStudioExtract"; ValueType: string; ValueName: ""; ValueData: "Extract Subtitles with MKS Studio..."; Flags: uninsdeletekey; Tasks: shell_mkv
-Root: HKA; Subkey: "Software\Classes\SystemFileAssociations\.mkv\shell\MksStudioExtract\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""; Tasks: shell_mkv
+; Context menu for .mkv files (Right Click MKV -> Export Subtitle)
+Root: HKA; Subkey: "Software\Classes\SystemFileAssociations\.mkv\shell\MksStudioExport"; ValueType: string; ValueName: ""; ValueData: "Export Subtitle"; Flags: uninsdeletekey; Tasks: shell_mkv
+Root: HKA; Subkey: "Software\Classes\SystemFileAssociations\.mkv\shell\MksStudioExport"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\{#MyAppExeName},0"; Tasks: shell_mkv
+Root: HKA; Subkey: "Software\Classes\SystemFileAssociations\.mkv\shell\MksStudioExport\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" --quick-export ""%1"""; Tasks: shell_mkv
 
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"

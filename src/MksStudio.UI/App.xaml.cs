@@ -12,13 +12,88 @@ namespace MksStudio.UI;
 /// </summary>
 public partial class App : Application
 {
-    protected override void OnStartup(StartupEventArgs e)
+    protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+
+        // Prevent WPF from shutting down before async window creation
+        ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
         DispatcherUnhandledException += OnDispatcherUnhandledException;
         AppDomain.CurrentDomain.UnhandledException += OnAppDomainUnhandledException;
         TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
+
+        // Ensure Windows Explorer "Export Subtitle" context menu is registered
+        Services.ShellIntegrationService.RegisterContextMenu();
+
+        // Check if launched for quick subtitle export
+        string? mkvTarget = null;
+        if (e.Args.Length >= 2 && (e.Args[0].Equals("--quick-export", StringComparison.OrdinalIgnoreCase) || e.Args[0].Equals("-e", StringComparison.OrdinalIgnoreCase)))
+        {
+            mkvTarget = e.Args[1];
+        }
+        else if (e.Args.Length >= 1 && e.Args[0].StartsWith("--quick-export=", StringComparison.OrdinalIgnoreCase))
+        {
+            mkvTarget = e.Args[0].Substring("--quick-export=".Length).Trim('"', '\'');
+        }
+
+        if (!string.IsNullOrWhiteSpace(mkvTarget))
+        {
+            await HandleQuickExportAsync(mkvTarget);
+            return;
+        }
+
+        // Standard Launch: Open Main Application Window
+        var mainWindow = new MainWindow();
+        MainWindow = mainWindow;
+        mainWindow.Closed += (_, _) => Shutdown();
+        mainWindow.Show();
+    }
+
+    private async Task HandleQuickExportAsync(string mkvPath)
+    {
+        if (!File.Exists(mkvPath))
+        {
+            MessageBox.Show(
+                $"File video tidak ditemukan:\n\"{mkvPath}\"",
+                "Export Subtitle",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+            Shutdown();
+            return;
+        }
+
+        try
+        {
+            var mergeService = new Core.MkvToolNix.MkvMergeService();
+            var info = await mergeService.IdentifyAsync(mkvPath);
+            var subTracks = info.SubtitleTracks.ToList();
+
+            if (subTracks.Count == 0)
+            {
+                MessageBox.Show(
+                    $"Tidak ada track subtitle pada file .mkv ini:\n\"{Path.GetFileName(mkvPath)}\"",
+                    "Export Subtitle",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+                Shutdown();
+                return;
+            }
+
+            var exportWindow = new Views.QuickExportWindow(mkvPath, subTracks);
+            MainWindow = exportWindow;
+            exportWindow.Closed += (_, _) => Shutdown();
+            exportWindow.Show();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(
+                $"Gagal membaca informasi track MKV:\n{ex.Message}",
+                "Export Subtitle - Error",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+            Shutdown();
+        }
     }
 
     private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
