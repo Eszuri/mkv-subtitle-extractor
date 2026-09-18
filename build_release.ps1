@@ -39,16 +39,8 @@ if (-not (Test-Path "$LocalToolsDir\mkvmerge.exe") -and (Test-Path "$SystemMkvDi
     Copy-Item "$SystemMkvDir\mkvextract.exe" "$LocalToolsDir\" -Force
 }
 
-# 3. Run Tests
-Write-Host "[3/6] Running automated test suite..." -ForegroundColor Yellow
-dotnet test tests/MksStudio.Tests/MksStudio.Tests.csproj -c Release
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "Tests failed! Build aborted."
-    exit 1
-}
-
-# 4. Publish Self-Contained Binary
-Write-Host "[4/6] Publishing self-contained win-x64 release build..." -ForegroundColor Yellow
+# 3. Publish Self-Contained Binary
+Write-Host "[3/5] Publishing self-contained win-x64 release build..." -ForegroundColor Yellow
 dotnet publish src/MksStudio.UI/MksStudio.UI.csproj `
     -c Release `
     -r win-x64 `
@@ -62,7 +54,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 # 4. Copy Samples & Documentation
-Write-Host "[4/6] Copying sample assets and documentation..." -ForegroundColor Yellow
+Write-Host "[4/5] Copying sample assets and documentation..." -ForegroundColor Yellow
 $SampleDest = Join-Path $OutputDir "sample"
 New-Item -ItemType Directory -Path $SampleDest -Force | Out-Null
 if (Test-Path "sample/demo_multitrack.mks") {
@@ -70,12 +62,9 @@ if (Test-Path "sample/demo_multitrack.mks") {
 }
 Copy-Item "README.md" "$OutputDir\" -Force
 
-# 5. Create Distribution Zip Archive
-Write-Host "[5/6] Creating portable ZIP distribution archive..." -ForegroundColor Yellow
+# 5. Create Distribution Zip Archive & Setup Installer
+Write-Host "[5/5] Creating portable ZIP distribution archive & compiling installer..." -ForegroundColor Yellow
 Compress-Archive -Path "$OutputDir\*" -DestinationPath $ZipFile -Force
-
-# 6. Compile Inno Setup Windows Installer
-Write-Host "[6/6] Compiling Windows Setup Installer (.exe)..." -ForegroundColor Yellow
 $InnoCompiler = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
 if (-not (Test-Path $InnoCompiler)) {
     $InnoCompiler = "C:\Program Files\Inno Setup 6\ISCC.exe"

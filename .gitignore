@@ -68,5 +68,4 @@ Setup.exe
 # Bundled External Binaries (Auto-copied during release build)
 src/MksStudio.UI/tools/mkvtoolnix/*.exe
 
-tests/*
 sample/*
