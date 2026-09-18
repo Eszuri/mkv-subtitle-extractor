@@ -27,7 +27,7 @@
         <ui:TitleBar Grid.Row="0" Title="{Binding FileName, StringFormat='Export Subtitle - {0}'}" Icon="../app.ico" Height="38" Padding="12,0,8,0"/>
 
         <!-- Selection Toolbar -->
-        <Grid Grid.Row="1" Margin="14,0,14,6">
+        <Grid Grid.Row="1" Margin="14,0,14,6" IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button Content="Select All" Height="26" Padding="10,0" Margin="0,0,6,0"
                         Background="#1E293B" BorderBrush="{StaticResource BorderDark}" BorderThickness="1"
@@ -41,7 +41,8 @@
         </Grid>
 
         <!-- Track List -->
-        <Border Grid.Row="2" Margin="14,0,14,10" Background="{StaticResource BgPanel}" BorderBrush="{StaticResource BorderDark}" BorderThickness="1" CornerRadius="8" Padding="6">
+        <Border Grid.Row="2" Margin="14,0,14,10" Background="{StaticResource BgPanel}" BorderBrush="{StaticResource BorderDark}" BorderThickness="1" CornerRadius="8" Padding="6"
+                IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}">
             <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                 <ItemsControl ItemsSource="{Binding Tracks}">
                     <ItemsControl.ItemTemplate>
@@ -100,16 +101,15 @@
                              Foreground="{StaticResource AccentPrimary}" Background="#1E293B" BorderThickness="0"/>
 
                 <!-- Action Buttons: Export .mks and Export .ass -->
-                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <StackPanel Grid.Column="1" Orientation="Horizontal"
+                            IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}">
                     <Button Content="Export .mks" Height="32" Padding="16,0" Margin="0,0,8,0"
                             Background="#162A45" BorderBrush="#0284C7" BorderThickness="1" Foreground="#38BDF8" FontWeight="SemiBold" FontSize="11.5"
-                            Command="{Binding ExportMksCommand}"
-                            IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}"/>
+                            Command="{Binding ExportMksCommand}"/>
 
                     <Button Content="Export .ass" Height="32" Padding="16,0"
                             Background="#163824" BorderBrush="#16A34A" BorderThickness="1" Foreground="#4ADE80" FontWeight="SemiBold" FontSize="11.5"
-                            Command="{Binding ExportAssCommand}"
-                            IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}"/>
+                            Command="{Binding ExportAssCommand}"/>
                 </StackPanel>
             </Grid>
         </Border>

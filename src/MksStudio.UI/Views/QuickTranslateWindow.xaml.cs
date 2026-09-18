@@ -15,6 +15,13 @@ public partial class QuickTranslateWindow : FluentWindow
         {
             RequestClose = Close
         };
+        Closing += (s, e) =>
+        {
+            if (_viewModel.IsBusy)
+            {
+                e.Cancel = true;
+            }
+        };
         _viewModel.RequestScrollToItem += item =>
         {
             PreviewListBox.ScrollIntoView(item);

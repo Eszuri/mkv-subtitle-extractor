@@ -17,6 +17,13 @@ public partial class QuickExportWindow : FluentWindow
         {
             RequestClose = Close
         };
+        Closing += (s, e) =>
+        {
+            if (_viewModel.IsBusy)
+            {
+                e.Cancel = true;
+            }
+        };
         DataContext = _viewModel;
     }
 }
