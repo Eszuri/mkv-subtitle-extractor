@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -10,6 +11,14 @@ using MksStudio.Core.Subtitles;
 using MksStudio.Core.Subtitles.Models;
 
 namespace MksStudio.UI.ViewModels;
+
+public partial class QuickTranslatePreviewItem : ObservableObject
+{
+    public string OriginalText { get; init; } = string.Empty;
+
+    [ObservableProperty]
+    private string _translatedText = string.Empty;
+}
 
 public partial class QuickTranslateViewModel : ObservableObject
 {
@@ -31,13 +40,20 @@ public partial class QuickTranslateViewModel : ObservableObject
     private bool _isBusy;
 
     [ObservableProperty]
+    private bool _isPreviewVisible;
+
+    [ObservableProperty]
+    private bool _isCompleted;
+
+    [ObservableProperty]
     private double _progressPercent;
 
     [ObservableProperty]
     private string _statusText = string.Empty;
 
-    [ObservableProperty]
-    private string _currentPreview = string.Empty;
+    public ObservableCollection<QuickTranslatePreviewItem> PreviewItems { get; } = new();
+
+    public event Action<QuickTranslatePreviewItem>? RequestScrollToItem;
 
     public Action? RequestClose { get; set; }
 
@@ -58,10 +74,27 @@ public partial class QuickTranslateViewModel : ObservableObject
         }
 
         IsBusy = true;
+        IsCompleted = false;
+        IsPreviewVisible = true;
         ProgressPercent = 0;
         StatusText = "Menerjemahkan...";
-        CurrentPreview = string.Empty;
         _cts = new CancellationTokenSource();
+
+        PreviewItems.Clear();
+        for (int i = 0; i < Document.Cues.Count; i++)
+        {
+            string orig = SubtitleCue.CleanTags(Document.Cues[i].RawText);
+            if (string.IsNullOrWhiteSpace(orig))
+            {
+                orig = Document.Cues[i].RawText;
+            }
+
+            PreviewItems.Add(new QuickTranslatePreviewItem
+            {
+                OriginalText = orig,
+                TranslatedText = string.Empty
+            });
+        }
 
         try
         {
@@ -72,7 +105,22 @@ public partial class QuickTranslateViewModel : ObservableObject
                     ProgressPercent = (double)p.ProcessedCount / p.TotalCount * 100.0;
                     StatusText = $"Menerjemahkan: {p.ProcessedCount} / {p.TotalCount} baris ({ProgressPercent:0}%)";
                 }
-                CurrentPreview = p.TranslatedPreview;
+
+                if (p.CueIndex >= 0 && p.CueIndex < PreviewItems.Count)
+                {
+                    var item = PreviewItems[p.CueIndex];
+                    string trans = SubtitleCue.CleanTags(p.TranslatedPreview);
+                    if (string.IsNullOrWhiteSpace(trans))
+                    {
+                        trans = p.TranslatedPreview;
+                    }
+                    item.TranslatedText = trans;
+
+                    if (p.CueIndex % 3 == 0 || p.ProcessedCount >= p.TotalCount)
+                    {
+                        RequestScrollToItem?.Invoke(item);
+                    }
+                }
             });
 
             var translatedCues = await _translateService.TranslateCuesAsync(
@@ -96,7 +144,8 @@ public partial class QuickTranslateViewModel : ObservableObject
                 string serialized = SubtitleFormatRouter.Serialize(Document, ext);
                 await File.WriteAllTextAsync(outPath, serialized, Encoding.UTF8);
 
-                StatusText = "Terjemahan selesai!";
+                IsCompleted = true;
+                StatusText = $"Selesai! {translatedCues.Count} baris berhasil diterjemahkan.";
                 var result = MessageBox.Show(
                     "Terjemahan selesai!\n\nBuka folder?",
                     "Translate Subtitle",
@@ -106,9 +155,8 @@ public partial class QuickTranslateViewModel : ObservableObject
                 if (result == MessageBoxResult.Yes)
                 {
                     OpenFileInExplorer(outPath);
+                    RequestClose?.Invoke();
                 }
-
-                RequestClose?.Invoke();
             }
         }
         catch (OperationCanceledException)

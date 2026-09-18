@@ -188,6 +188,7 @@ public class GoogleTranslateService
 
                         progress?.Report(new TranslationProgress
                         {
+                            CueIndex = processedCount - 1,
                             ProcessedCount = processedCount,
                             TotalCount = totalCount,
                             StatusMessage = $"Menerjemahkan {processedCount} dari {totalCount} baris ({((double)processedCount / totalCount * 100):0.0}%)...",
@@ -216,6 +217,7 @@ public class GoogleTranslateService
 
                         progress?.Report(new TranslationProgress
                         {
+                            CueIndex = processedCount - 1,
                             ProcessedCount = processedCount,
                             TotalCount = totalCount,
                             StatusMessage = $"Menerjemahkan {processedCount} dari {totalCount} baris ({((double)processedCount / totalCount * 100):0.0}%)...",
@@ -246,6 +248,7 @@ public class GoogleTranslateService
 
                         progress?.Report(new TranslationProgress
                         {
+                            CueIndex = processedCount,
                             ProcessedCount = processedCount + 1,
                             TotalCount = totalCount,
                             StatusMessage = $"Menerjemahkan {processedCount + 1} dari {totalCount} baris ({((double)(processedCount + 1) / totalCount * 100):0.0}%)...",
@@ -257,6 +260,15 @@ public class GoogleTranslateService
                     {
                         // If single translation also fails, preserve original cue
                         result.Add(item.Original.Clone());
+                        progress?.Report(new TranslationProgress
+                        {
+                            CueIndex = processedCount,
+                            ProcessedCount = processedCount + 1,
+                            TotalCount = totalCount,
+                            StatusMessage = $"Menerjemahkan {processedCount + 1} dari {totalCount} baris ({((double)(processedCount + 1) / totalCount * 100):0.0}%)...",
+                            CurrentText = item.Original.RawText,
+                            TranslatedPreview = item.Original.RawText
+                        });
                     }
                     processedCount++;
                 }

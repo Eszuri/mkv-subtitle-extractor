@@ -7,8 +7,8 @@
         xmlns:vm="clr-namespace:MksStudio.UI.ViewModels"
         mc:Ignorable="d"
         Title="{Binding FileName}"
-        Height="360" Width="680"
-        MinHeight="280" MinWidth="520"
+        Height="480" Width="680"
+        MinHeight="360" MinWidth="520"
         WindowStartupLocation="CenterScreen" ResizeMode="CanResizeWithGrip"
         Icon="../app.ico"
         WindowBackdropType="Mica"
@@ -64,15 +64,102 @@
                 </Grid>
             </Border>
 
-            <!-- Progress Area -->
-            <Border Grid.Row="1" Background="{StaticResource BgPanel}" BorderBrush="{StaticResource BorderDark}" BorderThickness="1" CornerRadius="6" Padding="12,10" Margin="0,10,0,0"
-                    Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="{Binding StatusText}" FontSize="11" Foreground="{StaticResource AccentPrimary}" Margin="0,0,0,6"/>
-                    <ProgressBar Value="{Binding ProgressPercent}" Maximum="100" Height="5" Foreground="{StaticResource AccentPrimary}" Background="#1E293B" BorderThickness="0"/>
-                    <TextBlock Text="{Binding CurrentPreview}" FontSize="10" Foreground="{StaticResource TextMuted}" Margin="0,6,0,0" TextTrimming="CharacterEllipsis"/>
+            <!-- Preview Area (visible after pressing translate) -->
+            <Grid Grid.Row="1" Margin="0,10,0,0"
+                  Visibility="{Binding IsPreviewVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Progress Header (while translating) -->
+                <StackPanel Grid.Row="0" Margin="0,0,0,8"
+                            Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <Grid Margin="0,0,0,4">
+                        <TextBlock Text="{Binding StatusText}" FontSize="11" Foreground="{StaticResource AccentPrimary}"/>
+                        <TextBlock Text="{Binding ProgressPercent, StringFormat='{}{0:0}%'}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource AccentPrimary}" HorizontalAlignment="Right"/>
+                    </Grid>
+                    <ProgressBar Value="{Binding ProgressPercent}" Maximum="100" Height="4" Foreground="{StaticResource AccentPrimary}" Background="#1E293B" BorderThickness="0"/>
                 </StackPanel>
-            </Border>
+
+                <!-- Status Header (when translation finished) -->
+                <TextBlock Grid.Row="0" Text="{Binding StatusText}" FontSize="11" FontWeight="SemiBold" Margin="0,0,0,8"
+                           Foreground="{StaticResource AccentGreen}"
+                           Visibility="{Binding IsCompleted, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+                <!-- Two-Column Preview Table: Text Asli vs Text Terjemahan (No timeline) -->
+                <Border Grid.Row="1" Background="{StaticResource BgPanel}" BorderBrush="{StaticResource BorderDark}" BorderThickness="1" CornerRadius="8">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Table Header -->
+                        <Border Grid.Row="0" Background="{StaticResource BgCardElevated}" BorderBrush="{StaticResource BorderDark}" BorderThickness="0,0,0,1" CornerRadius="7,7,0,0" Padding="14,8">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Teks Asli" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}"/>
+                                <TextBlock Grid.Column="1" Text="Teks Terjemahan" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource AccentPrimary}" Margin="12,0,0,0"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- Virtualized List of Cues -->
+                        <ListBox x:Name="PreviewListBox"
+                                 Grid.Row="1"
+                                 ItemsSource="{Binding PreviewItems}"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 Padding="0"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                 ScrollViewer.CanContentScroll="True"
+                                 VirtualizingPanel.IsVirtualizing="True"
+                                 VirtualizingPanel.VirtualizationMode="Recycling"
+                                 Focusable="False">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="Padding" Value="0"/>
+                                    <Setter Property="Margin" Value="0"/>
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Setter Property="Focusable" Value="False"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ListBoxItem">
+                                                <Border Background="{TemplateBinding Background}">
+                                                    <ContentPresenter/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate DataType="{x:Type vm:QuickTranslatePreviewItem}">
+                                    <Border BorderBrush="{StaticResource BorderDark}" BorderThickness="0,0,0,1" Padding="14,8">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <!-- Teks Asli -->
+                                            <TextBlock Grid.Column="0" Text="{Binding OriginalText}" TextWrapping="Wrap" FontSize="11.5" Foreground="{StaticResource TextPrimary}" Margin="0,0,8,0"/>
+
+                                            <!-- Teks Terjemahan -->
+                                            <TextBlock Grid.Column="1" Text="{Binding TranslatedText}" TextWrapping="Wrap" FontSize="11.5" Foreground="#38BDF8" Margin="12,0,0,0"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Grid>
+                </Border>
+            </Grid>
         </Grid>
 
         <!-- Bottom Actions Footer -->
