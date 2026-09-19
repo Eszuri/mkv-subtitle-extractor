@@ -69,6 +69,12 @@ $InnoCompiler = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
 if (-not (Test-Path $InnoCompiler)) {
     $InnoCompiler = "C:\Program Files\Inno Setup 6\ISCC.exe"
 }
+if (-not (Test-Path $InnoCompiler)) {
+    $isccCmd = Get-Command ISCC.exe -ErrorAction SilentlyContinue
+    if ($isccCmd) {
+        $InnoCompiler = $isccCmd.Source
+    }
+}
 
 if (Test-Path $InnoCompiler) {
     & $InnoCompiler "installer\setup.iss"
